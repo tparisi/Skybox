@@ -1,0 +1,14 @@
+h1= game.name
+
+	ul
+		- gameSessions.forEach(function(session) {
+			li
+				a(href="/game?gameId=" + session.game.id + "&sessionId=" + session.id)= game.name
+		- })
+
+
+p
+	a(href="/games") Return to game list.
+
+
+

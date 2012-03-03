@@ -1,0 +1,9 @@
+h1 Games
+p
+	| Select a game from the list below.
+ul
+	- games.forEach(function(game) {
+		li
+			a(href="/game?gameId=" + game.id)= game.name
+	- })
+

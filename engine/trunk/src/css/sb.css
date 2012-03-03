@@ -1,0 +1,105 @@
+.view {
+    position: absolute;
+    height: 300px;
+    width: 300px;
+    top:    200px;
+    left:    200px;
+    
+    z-index:100;
+
+    background-color:rgba(128, 128, 128, 0.8);
+    padding:4px;
+
+}
+
+.popup {
+    -webkit-border-top-right-radius: 20px;
+    -webkit-border-bottom-right-radius: 20px;
+    -moz-border-radius-topright: 20px;
+    -moz-border-radius-bottomright: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    
+
+    -moz-box-shadow: 4px 4px 4px #ccc;
+    -webkit-box-shadow: 4px 4px 4px #ccc;
+    box-shadow: 4px 4px 4px #ccc;
+
+}
+
+.view .caption {
+	border-style: solid;
+	border-width:0px;
+	height: 32px;
+	border-bottom-width: 1px;
+	padding-bottom: 4px;
+	postion:absolute;
+	top: 4px;
+	text-align:center;
+}
+
+.view .closebox {
+	float:right;
+	width: 16px;
+	height: 16px;
+	top: 4px;
+	postion:absolute;
+}
+
+.annotation {
+    position: absolute;
+    height: 40px;
+    width: 200px;
+    top:    200px;
+    left:    200px;
+    
+    z-index:100;
+
+    background-color:rgba(128, 128, 128, 0.5);
+    padding:4px;
+    
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    
+    display:none;
+}
+
+.handwritten {
+    font-family: 'Nothing You Could Do';
+}
+
+.text100 {
+    font-size: 8px;
+}
+
+.text200 {
+    font-size: 10px;
+}
+
+.text300 {
+    font-size: 11px;
+}
+
+.text400 {
+    font-size: 13px;
+}
+
+.text500 {
+    font-size: 14px;
+}
+
+.text600 {
+    font-size: 18px;
+}
+
+.text700 {
+    font-size: 22px;
+}
+
+.text800 {
+    font-size: 28px;
+}

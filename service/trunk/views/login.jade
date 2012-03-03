@@ -1,0 +1,24 @@
+html
+body
+	h1= title
+	p
+		| Enter your username and password below to login or 
+		a(href="/reg") click here to register.
+
+	- if (errors) {
+		ul
+			- errors.forEach(function(err) {
+				li= err
+			- })
+	- }
+
+	form(method="post")
+		fieldset
+			p
+				label(for="user[username]") Username:
+					input(type="text", name="user[username]", value=user.username)
+			p
+				label(for="user[password]") Password:
+					input(type="password", name="user[password]", value=user.password)
+		p.buttons
+			input(type="submit", value="Login")
