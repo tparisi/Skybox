@@ -6,7 +6,9 @@
 
 goog.provide('SB.Modules');
 goog.require('SB.Config');
+goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
+goog.require('SB.KeyFrameAnimator');
 goog.require('SB.Camera');
 goog.require('SB.Component');
 goog.require('SB.Entity');

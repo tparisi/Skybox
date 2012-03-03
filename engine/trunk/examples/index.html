@@ -42,6 +42,9 @@
     <script src="monsters.js"></script>
     <script src="monstersHelp.js"></script>
     <script src="avatar.js"></script>
+    <!-- KEYFRAME GAME -->
+	<script src="keyFrames.js"></script>
+	<script src="keyFrameBall.js"></script>
 
 </head>
 <body>
@@ -68,12 +71,15 @@
 			options[4].text="Duck Riders!";
 			options[5]=document.createElement("option");
 			options[5].text="Monsters!";
+			options[6]=document.createElement("option");
+			options[6].text="Key Frame Demo";
 			select.add(options[0]);
 			select.add(options[1]);
 			select.add(options[2]);
 			select.add(options[3]);
 			select.add(options[4]);
 			select.add(options[5]);
+			select.add(options[6]);
 		}
 	);
 
@@ -82,7 +88,8 @@
 	          		SB.Examples.StatefulRotatorGame,
 	          		SB.Examples.MouseHandlerGame,
 	          		SB.Examples.DuckRiders,
-	          		SB.Examples.Monsters, ] ;
+	          		SB.Examples.Monsters,
+	          		SB.Examples.KeyFrameGame] ;
 	
 	function selectGame()
 	{
