@@ -254,14 +254,23 @@ Gabscape.prototype.onKeyPress = function(keyCode, charCode)
 
 Gabscape.prototype.onRotatorRotate = function(axis, delta)
 {
-	delta *= .666;
+	return;
+	
+	delta *= .1667;
 	
 	if (delta != 0)
 	{
 		// this.viewer.transform.rotation.y -= delta;
-		var dir = new THREE.Vector3(0, -delta, 0);
-		this.viewer.turn(dir);
-		this.lastrotate = delta;
+		//var dir = new THREE.Vector3(0, -delta, 0);
+		//this.viewer.turn(dir);
+		this.viewer.viewpoint.camera.rotation.y -= delta;
+
+		var ry = this.viewer.viewpoint.camera.rotation.y;
+		if (ry > Math.PI / 8)
+			this.viewer.viewpoint.camera.rotation.y = Math.PI / 8;
+		if (ry < - Math.PI / 8)
+			this.viewer.viewpoint.camera.rotation.y = -Math.PI / 8;
+	
 	}
 }
 
@@ -270,7 +279,7 @@ Gabscape.prototype.onDraggerMove = function(dx, dy)
 	if (Math.abs(dy) <= 2)
 		dy = 0;
 	
-	dy *= .02;
+	dy *= .002;
 	
 	if (dy)
 	{
@@ -283,9 +292,12 @@ Gabscape.prototype.onDraggerMove = function(dx, dy)
 
 	if (dy != 0)
 	{
-		// this.viewer.transform.position.z -= dy;
-		var dir = new THREE.Vector3(0, 0, -dy);
-		this.viewer.move(dir);
+		this.viewer.viewpoint.camera.rotation.x += dy;
+		var rx = this.viewer.viewpoint.camera.rotation.x;
+		if (rx > Math.PI / 8)
+			this.viewer.viewpoint.camera.rotation.x = Math.PI / 8;
+		if (rx < - Math.PI / 8)
+			this.viewer.viewpoint.camera.rotation.x = -Math.PI / 8;
 	}
 }
 
