@@ -48,6 +48,7 @@ goog.require('SB.Popup');
 goog.require('SB.View');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
+goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');
 goog.require('SB.Model');

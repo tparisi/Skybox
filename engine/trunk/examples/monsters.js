@@ -34,7 +34,7 @@ SB.Examples.Monsters.prototype.initEntities = function()
 	this.dragger.subscribe("move", this, this.onDraggerMove);
 	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
 	
-	var grid = new SB.Grid();
+	var grid = new SB.Grid({size: 14});
 	this.root.addComponent(grid);
 	
 	var m1 = new SB.Examples.Monster();

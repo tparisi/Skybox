@@ -29,7 +29,6 @@ SB.Viewer = function(param)
 	}
 	
 	this.directionMatrix = new THREE.Matrix4;
-	this.direction = new THREE.Vector3();
 }
 
 goog.inherits(SB.Viewer, SB.Entity);
@@ -42,12 +41,13 @@ SB.Viewer.prototype.realize = function()
 SB.Viewer.prototype.update = function() 
 {
 	SB.Entity.prototype.update.call(this);
-	this.calcDirection();
 }
 
 SB.Viewer.prototype.move = function(dir)
 {
-	dir.multiplySelf(this.direction);
+	this.directionMatrix.identity();
+	this.directionMatrix.setRotationFromEuler(this.transform.rotation);
+	dir = this.directionMatrix.multiplyVector3(dir);
 	this.transform.position.addSelf(dir);
 }
 
@@ -55,12 +55,3 @@ SB.Viewer.prototype.turn = function(dir)
 {
 	this.transform.rotation.addSelf(dir);
 }
-
-SB.Viewer.prototype.calcDirection = function()
-{
-	this.directionMatrix.identity();
-	this.directionMatrix.setRotationFromEuler(this.transform.rotation);
-	this.direction.set(0, 0, 1);
-	this.direction = this.directionMatrix.multiplyVector3(this.direction);
-}
-
