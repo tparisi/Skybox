@@ -89,7 +89,7 @@ Gabscape.prototype.createViewer = function()
 
 Gabscape.prototype.createNetwork = function()
 {
-	this.network = new Gabscape_GabClient("john", this);
+	this.network = new Gabscape_GabClient("tony", this);
 	this.network.connect();
 
 	
@@ -98,17 +98,18 @@ Gabscape.prototype.createNetwork = function()
 
 Gabscape.prototype.initModels = function()
 {
-  this.initModel('../../models/trees01.js', -100, 0, 0);
-  this.initModel('../../models/trees01.js', 100, 0, 0);
-  this.initModel('../../models/trees01.js', 100, 0, 100);
-  this.initModel('../../models/trees_conf01.js', -100, 0, -100);
-  this.initModel('../../models/cloud01.js', -100, 100, -100);
-  this.initModel('../../models/moon01.js', -100, 100, -100);
-  this.initModel('../../models/body_base_nopane.js', -10, 0, -10);
-  this.initModel('../../models/body_flying_nopane.js', 10, 0, 10);
-  this.initModel('../../models/body_flying2_nopane.js', 10, 0, -10);
-  this.initModel('../../models/body_hero_nopane.js', -10, 0, 10);
-  this.initModel('../../models/body_inactive_nopane.js', 0, 0, -15); 
+	  this.initModel('./models/trees01.js', -100, 0, 0);
+	  this.initModel('./models/trees01.js', 100, 0, 0);
+	  this.initModel('./models/trees01.js', 100, 0, 100);
+	  this.initModel('./models/trees_conf01.js', -100, 0, -100);
+	  this.initModel('./models/cloud01_rescaled.js', -40, 60, -100);
+	  this.initModel('./models/moon01_rescaled.js', -100, 100, -100);
+	  this.initModel('./models/body_base_nopane.js', -10, 0, -10);
+	  this.initModel('./models/body_flying_nopane.js', 10, 0, 10);
+	  this.initModel('./models/body_flying2_nopane.js', 10, 0, -10);
+	  this.initModel('./models/body_hero_nopane.js', -10, 0, 10);
+	  this.initModel('./models/body_inactive_nopane.js', 0, 0, -15); 
+	  this.initModel('./models/failwhale.js', 0, 60, -20); 
 }
 
 Gabscape.prototype.initModel = function(url, x, y, z)
@@ -148,7 +149,7 @@ Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var i, len = Gabscape.users.length;
     for (i = 0; i < len; i++)
     {
-        if (i == 1) {
+        if (i == 0) {
             continue;
         }
         this.network.subscribeToUser(Gabscape.users[i]);
@@ -158,7 +159,7 @@ Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
 Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
     console.log('Got positionChangeEvent for ' + twitterId + ' ' + message.position.x + ' ' + message.position.y + ' ' + message.position.z);
 
-    if (twitterId == "tony")
+    if (twitterId == "john")
 	{
     	this.gabbers[0].transform.position.set(message.position.x, 
     			message.position.y, message.position.z);
@@ -168,7 +169,7 @@ Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
 Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
     console.log('Got orientationChangeEvent');
 
-    if (twitterId == "tony")
+    if (twitterId == "john")
 	{
     	this.gabbers[0].transform.rotation.set(message.orientation.pitch, 
     			message.orientation.yaw, message.orientation.roll);
