@@ -13,7 +13,7 @@ SB.Examples.ToonDemo.prototype.initialize = function(param)
 {
 	SB.Game.prototype.initialize.call(this, param);
 	
-    SB.Graphics.instance.camera.position.set( 0, 100, 0 );
+    SB.Graphics.instance.camera.position.set( 0, 20, 0 );
     SB.Graphics.instance.camera.lookAt(new THREE.Vector3(0, 0, 0));
 }
 
@@ -28,8 +28,8 @@ SB.Examples.ToonDemo.prototype.initEntities = function()
 	light.addComponent(dirLight);
 	light.realize();
 
-	this.initModel('trees01.js', 0, 0, 0);
-	this.initModel('trees01.js', 100, 0, 0);
+	this.initModel('models/failwhale.js', 0, 0, 0);
+//	this.initModel('trees01.js', 100, 0, 0);
 }
 
 SB.Examples.ToonDemo.prototype.initModel = function(url, x, y, z)
@@ -45,7 +45,7 @@ SB.Examples.ToonDemo.prototype.initModel = function(url, x, y, z)
 	
 	var diffuseTexture = './images/diffuse-tree.png';
 	var toonTexture = './images/toon-lookup.png';
-	
+
 	// Create the params
 	var params = {
 		materialType: SB.MaterialType.Shader,
