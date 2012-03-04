@@ -6,7 +6,7 @@ function Gabscape_GabClient(twitterId, target) {
 Gabscape_GabClient.prototype = new GabClient;
 
 Gabscape_GabClient.prototype.positionChangeEvent = function(twitterId, message) {
-	this.target.positionChangedEvent.call(this.target, twitterId, message)
+	this.target.positionChangeEvent.call(this.target, twitterId, message)
 }
 
 Gabscape_GabClient.prototype.orientationChangeEvent = function(twitterId, message) {

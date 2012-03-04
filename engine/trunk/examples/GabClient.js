@@ -24,9 +24,9 @@ GabClient.prototype.actionEvent = function(twitterId, message) {
 }
 
 GabClient.prototype._messageListener = function(path, message) {
-    pathChunks = path.split('/');
-    messageTarget = pathChunks[1];
-    messageType = pathChunks[2];
+    pathChunks = path.split("/");
+    messageTarget = pathChunks[2];
+    messageType = pathChunks[3];
     switch (messageType) {
         case 'position_update':
             this.positionChangeEvent(messageTarget, message);
@@ -51,30 +51,32 @@ GabClient.prototype.connect = function() {
 }
 
 GabClient.prototype.connectListener = function() {
+    var me = this;
     // Subscribe to actions that target yourTwitterId
     var msgPath = '/gab/' + this.yourTwitterId + '/action';
     this.client.subscribe(msgPath, function gs_self_action_message(message) {
-        this._messageListener(msgPath, message);
+        me._messageListener(msgPath, message);
     });
 }
 
 GabClient.prototype.subscribeToUser = function(twitterId) {
+    var me = this;
     // Subscribe to users action trigger
     var msgPathAction = '/gab/' + twitterId + '/action';
     this.client.subscribe(msgPathAction, function gs_other_action_message(message) {
-        this._messageListener(msgPathAction, message);
+        me._messageListener(msgPathAction, message);
     });
 
     // Subscribe to users position update
     var msgPathPosition = '/gab/' + twitterId + '/position_update';
     this.client.subscribe(msgPathPosition, function gs_other_action_message(message) {
-        this._messageListener(msgPathPosition, message);
+        me._messageListener(msgPathPosition, message);
     });
 
     // Subscribe to users orientation update
     var msgPathOrientation = '/gab/' + twitterId + '/orientation_update';
     this.client.subscribe(msgPathOrientation, function gs_other_action_message(message) {
-        this._messageListener(msgPathOrientation, message);
+        me._messageListener(msgPathOrientation, message);
     });
 }
 
