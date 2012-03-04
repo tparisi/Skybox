@@ -100,10 +100,22 @@ Gabscape.prototype.createNetwork = function()
 
 Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
     console.log('Got positionChangeEvent');
+
+    if (twitterId == "john")
+	{
+    	this.gabbers[0].transform.position.set(message.position.x, 
+    			message.position.y, message.position.z);
+	}
 }
 
 Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
     console.log('Got orientationChangeEvent');
+
+    if (twitterId == "john")
+	{
+    	this.gabbers[0].transform.rotation.set(message.orientation.pitch, 
+    			message.orientation.yaw, message.orientation.roll);
+	}
 }
 
 Gabscape.prototype.actionEvent = function(twitterId, message) {
