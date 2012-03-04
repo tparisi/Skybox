@@ -32,10 +32,13 @@ SB.Examples.KeyFrameBall = function()
     this.addComponent(this.animator);	
     
 	this.picker.subscribe("mouseUp", this, this.onMouseUp);
+	this.picker.subscribe("mouseOver", this, this.onMouseOver);
+	this.picker.subscribe("mouseOut", this, this.onMouseOut);
     this.animator.subscribe("complete", this, this.onAnimationComplete)
 
     this.animating = false;
-	
+
+    this.overCursor = 'pointer';
 }
 
 goog.inherits(SB.Examples.KeyFrameBall, SB.Entity);
@@ -56,6 +59,16 @@ SB.Examples.KeyFrameBall.prototype.animate = function(on)
 SB.Examples.KeyFrameBall.prototype.onAnimationComplete = function()
 {
 	this.animating = false;
+}
+
+SB.Examples.KeyFrameBall.prototype.onMouseOver = function()
+{
+	SB.Graphics.instance.container.style.cursor = 'pointer';
+}
+
+SB.Examples.KeyFrameBall.prototype.onMouseOut = function()
+{
+	SB.Graphics.instance.container.style.cursor = 'auto';
 }
 
 SB.Examples.KeyFrameBall.prototype.onMouseUp = function(x, y)

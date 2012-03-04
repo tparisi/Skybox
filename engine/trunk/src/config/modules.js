@@ -6,7 +6,9 @@
 
 goog.provide('SB.Modules');
 goog.require('SB.Config');
+goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
+goog.require('SB.KeyFrameAnimator');
 goog.require('SB.Camera');
 goog.require('SB.Component');
 goog.require('SB.Entity');
@@ -28,6 +30,7 @@ goog.require('SB.Mouse');
 goog.require('SB.Picker');
 goog.require('SB.DirectionalLight');
 goog.require('SB.Loader');
+goog.require('SB.NetworkClient');
 goog.require('SB.PhysicsBody');
 goog.require('SB.PhysicsBodyBox2D');
 goog.require('SB.PhysicsMaterial');
@@ -47,6 +50,7 @@ goog.require('SB.View');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
 goog.require('SB.JsonModel');
+goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');
 goog.require('SB.Model');
