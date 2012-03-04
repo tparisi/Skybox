@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+	<link rel="stylesheet" href="../src/css/sb.css" /> 
+    <script src="../libs/JQuery/jquery-1.6.4.js"></script>
+    <script src="../libs/jquery-mousewheel-3.0.4/jquery.mousewheel.js"></script>
+    <script src="../libs/three/Three.js"></script>
+	<script src="../libs/three/Stats.js"></script>
+    <script src="../libs/Box2D/box2d.min.js"></script>
+	<script src="../libs/requestAnimationFrame/RequestAnimationFrame.js"></script>
+    <script src="../build-debug/sb.js"></script>
+    <script src="gabscape-network.js"></script>
+    <script src="gabber.js"></script>
+    <script src="gabatar.js"></script>
+	<script src="GabClient.js"></script>
+	<script src="faye-browser.js"></script>
+    <script src="gabscape-GabClient.js"></script>
+    <script>
+      goog.require('SB.Game');
+    </script>
+</head>
+<body>
+<!--
+<div id="container" style="background-color:#99ccff; overflow:hidden; width:98%; height:98%; position:absolute;"></div>
+-->
+<div id="container" style="background-image:url('skybox01.jpg'); overflow:hidden; width:98%; height:98%; position:absolute;"></div>
+    <script>
+        var game = new Gabscape();
+		var container = document.getElementById("container");
+        game.initialize( { container : container } );
+        SB.Graphics.instance.renderer.domElement.focus();
+        game.run();
+    </script>
+</body>
+</html>
