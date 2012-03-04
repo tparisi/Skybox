@@ -92,6 +92,8 @@ Gabscape.prototype.initEntities = function()
 	this.root.realize();
 	
 	this.viewer.viewpoint.camera.bind();
+	
+	this.initSound();
 }
 
 Gabscape.prototype.createViewer = function()
@@ -154,7 +156,12 @@ Gabscape.prototype.initModel = function(url, x, y, z)
 
        this.addEntity(entity);
 }
-				
+
+Gabscape.prototype.initSound = function()
+{
+	sound_init();
+}
+
 Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var x = message.spawnposition.x;
     var y = message.spawnposition.y;
@@ -568,6 +575,7 @@ Gabscape.prototype.move = function(direction)
 	var delta = direction * .1666;
 	var dir = new THREE.Vector3(0, 0, delta);
 	this.viewer.move(dir);
+	gain2.gain.value = 1;
 }
 
 Gabscape.prototype.turn = function(direction)
