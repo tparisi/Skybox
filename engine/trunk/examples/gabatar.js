@@ -15,13 +15,27 @@ Gabatar = function(param)
     
 //    avParams.ambient = 0x0000ff;
 
-	this.visual = new SB.CylinderVisual(avParams);
-	this.visual.position.y = 0.834;
+    // Create the params
+    var params = {
+            materialType: SB.MaterialType.FromFile,
+            //materialParam: {color: 0x00ff00, shading: THREE.SmoothShading }
+            materialParam: {color: 0x00ff00 },
+    } ;
 
-	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(0, 2, 0) });
+
+    var url = './models/body_hero_nopane.js';
+    this.body = SB.Model.loadModel(url, params);
+    url = './models/avatar_display.js';
+    this.display = SB.Model.loadModel(url, params);
+    url = './models/avatar_frame.js';
+    this.displayFrame = SB.Model.loadModel(url, params);
+
+	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(0, 1.67, 0) });
 	
 	this.addComponent(this.transform);
-	this.addComponent(this.visual);	
+	this.addComponent(this.body);	
+	this.addComponent(this.display);	
+	this.addComponent(this.displayFrame);	
 	this.addComponent(this.screenTracker);	
 
 	this.screenTracker.subscribe("position", this, this.onScreenPositionChanged);

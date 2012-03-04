@@ -68,6 +68,9 @@ Gabscape.prototype.initEntities = function()
         }
         var g1 = new Gabber({name: Gabscape.users[i]});
         g1.name = Gabscape.users[i];
+        g1.network = g1.network || {};
+        g1.network.orientationInterpolationTime = 0.0;
+        g1.network.positionInterpolationTime = 0.0;
         g1.transform.position.set(0, 0, 0);
         this.gabbers.push(g1);
     }
@@ -101,10 +104,10 @@ Gabscape.prototype.createViewer = function()
 
 Gabscape.prototype.createNetwork = function()
 {
-
 	this.network = new Gabscape_GabClient(Gabscape.user, this);
 	this.network.connect();
 	this.lastNetworkUpdateTime = 0;
+    this.lastTweenUpdateTime = 0;
 }
 
 Gabscape.prototype.initModels = function()
@@ -178,7 +181,19 @@ Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
         console.log('Could not find gabber: ' + twitterId);
         return;
     }
-    gabber.transform.position.set(message.position.x, message.position.y, message.position.z);
+    gabber.network = gabber.network || {};
+    if (gabber.network.positionTarget === undefined) {
+        // First time, take position
+        gabber.transform.position.set(message.position.x, message.position.y, message.position.z);
+    } else {
+        // Jump to last network position
+        // If we are interpolate quick enough, we shouldn't notice this.
+        gabber.transform.position.set(gabber.network.positionTarget.x, gabber.network.positionTarget.y, gabber.network.positionTarget.z);
+    }
+    // Start interpolation
+    gabber.network.positionSource = gabber.transform.position;
+    gabber.network.positionTarget = message.position;
+    gabber.network.positionInterpolationTime = 0.0;
 }
 
 Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
@@ -189,17 +204,77 @@ Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
         console.log('Could not find gabber: ' + twitterId);
         return;
     }
-    gabber.transform.rotation.set(message.orientation.pitch, message.orientation.yaw, message.orientation.roll);
+    gabber.network = gabber.network || {};
+    if (gabber.network.orientationTarget === undefined) {
+        // First time, take orientation
+        gabber.transform.rotation.set(message.orientation.pitch, message.orientation.yaw, message.orientation.roll);
+    } else {
+        // Jump to previous network orientation
+        // If we are interpolate quick enough, we shouldn't notice this.
+        gabber.transform.rotation.set(gabber.network.orientationTarget.pitch, gabber.network.orientationTarget.yaw, gabber.network.orientationTarget.roll);
+    }
+    // Start interpolation
+    gabber.network.orientationSource = gabber.transform.rotation;
+    gabber.network.orientationTarget = message.orientation;
+    gabber.network.orientationInterpolationTime = 0.0;
 }
 
 Gabscape.prototype.actionEvent = function(twitterId, message) {
     console.log('Got actionEvent for ' + twitterId);
 }
 
+function orientationTween(t, source, target) {
+    var x,y,z;
+    x = ((1.0 - t) * source.x) + (t * target.pitch);
+    y = ((1.0 - t) * source.y) + (t * target.yaw);
+    z = ((1.0 - t) * source.z) + (t * target.roll);
+    return {"x": x, "y": y, "z": z};
+}
+
+function positionTween(t, source, target) {
+    var x,y,z;
+    x = ((1.0 - t) * source.x) + (t * target.x);
+    y = ((1.0 - t) * source.y) + (t * target.y);
+    z = ((1.0 - t) * source.z) + (t * target.z);
+    return {"x": x, "y": y, "z": z};
+}
+Gabscape.prototype.updateNetworkPositions = function(t) {
+    var deltat = (t - this.lastTweenUpdateTime)/1000.0;
+    this.lastTweenUpdateTime = t;
+    var i;
+    for (i = 0; i < this.gabbers.length; i++) {
+        var gabber = this.gabbers[i];
+        var gabnet = gabber.network;
+        if (gabnet.positionSource === undefined || gabnet.positionTarget == undefined) {
+            continue;
+        }
+        gabnet.positionInterpolationTime += deltat;
+        if (gabnet.positionInterpolationTime > 1.0) {
+            gabnet.positionInterpolationTime = 1.0;
+        }
+        var pt = positionTween(gabnet.positionInterpolationTime, gabnet.positionSource, gabnet.positionTarget);
+        gabber.transform.position.set(pt.x, pt.y, pt.z);
+    }
+
+    for (i = 0; i < this.gabbers.length; i++) {
+        var gabber = this.gabbers[i];
+        var gabnet = gabber.network;
+        if (gabnet.orientationSource === undefined || gabnet.orientationTarget == undefined) {
+            continue;
+        }
+        gabnet.orientationInterpolationTime += deltat;
+        if (gabnet.orientationInterpolationTime > 1.0) {
+            gabnet.orientationInterpolationTime = 1.0;
+        }
+        var ot = orientationTween(gabnet.orientationInterpolationTime, gabnet.orientationSource, gabnet.orientationTarget);
+        gabber.transform.rotation.set(ot.x, ot.y, ot.z);
+    }
+}
+
 Gabscape.prototype.updateNetwork = function(t) 
 {
 	var deltat = t - this.lastNetworkUpdateTime;
-	if (deltat > 200)
+	if (deltat > Gabscape.networkUpdateThreshold)
 	{
 		var pos = this.viewer.transform.position;
 		this.network.updatePosition(pos.x, pos.y, pos.z);
@@ -479,7 +554,7 @@ Gabscape.prototype.onTimeChanged = function(t)
 			}
 		}
 	}
-	
+	this.updateNetworkPositions(t);
 	this.updateNetwork(t);
 }
 
@@ -528,3 +603,4 @@ Gabscape.prototype.help = function()
 Gabscape.default_display_stats = false;
 Gabscape.users = ["tony", "john", "mark", "don", "theo"];
 Gabscape.user = "don";
+Gabscape.networkUpdateThreshold = 100;
