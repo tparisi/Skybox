@@ -62,6 +62,10 @@ Gabscape.prototype.initEntities = function()
     this.gabbers = [];
     var i;
     for (i = 0; i < Gabscape.users.length; i++) {
+        if (Gabscape.users[i] == Gabscape.user) {
+            // Don't add yourself
+            continue;
+        }
         var g1 = new Gabber({name: Gabscape.users[i]});
         g1.name = Gabscape.users[i];
         g1.transform.position.set(0, 0, 0);
