@@ -602,5 +602,5 @@ Gabscape.prototype.help = function()
 
 Gabscape.default_display_stats = false;
 Gabscape.users = ["tony", "john", "mark", "don", "theo"];
-Gabscape.user = "john";
+Gabscape.user = "tony";
 Gabscape.networkUpdateThreshold = 100;
