@@ -11,8 +11,11 @@ goog.require('SB.PubSub');
  * Creates a new Component.
  * @constructor
  */
-SB.Component = function() {
+SB.Component = function(param) {
     SB.PubSub.call(this);
+	
+	param = param || {};
+	this.param = param;
     
     /**
      * @type {SB.Entity}
