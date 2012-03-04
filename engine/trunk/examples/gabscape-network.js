@@ -98,10 +98,10 @@ Gabscape.prototype.createNetwork = function()
 
 Gabscape.prototype.initModels = function()
 {
-	  this.initModel('./models/trees01.js', -100, 0, 0);
-	  this.initModel('./models/trees01.js', 100, 0, 0);
-	  this.initModel('./models/trees01.js', 100, 0, 100);
-	  this.initModel('./models/trees_conf01.js', -100, 0, -100);
+	  this.initModel('./models/trees01_rescaled.js', -100, 0, 0);
+	  this.initModel('./models/trees01_rescaled.js', 100, 0, 0);
+	  this.initModel('./models/trees01_rescaled.js', 100, 0, 100);
+	  this.initModel('./models/trees_conf01_rescaled.js', -100, 0, -100);
 	  this.initModel('./models/cloud01_rescaled.js', -40, 60, -100);
 	  this.initModel('./models/moon01_rescaled.js', -100, 100, -100);
 	  this.initModel('./models/body_base_nopane.js', -10, 0, -10);
