@@ -26,7 +26,7 @@ void main() {
 	vec3 viewPosition = normalize( vViewPosition );
 
 	vec3 lightDir = vec3(0.0, 1.0, 0.0);
-	vec3 lightColor = vec3(1.0, 0.0, 0.0);
+	vec3 lightColor = vec3(0.8, 0.8, 0.8);
 	
 	vec4 lDirection = viewMatrix * vec4( lightDir, 0.0 );
 	vec3 dirVector = normalize( lDirection.xyz );
@@ -42,8 +42,7 @@ void main() {
 	//dirDiffuseWeight = (texture2D(uToonTexture, dirDiffuseWeight)).x;
 	//dirDiffuseSpecularWeight = (texture2D(uToonTexture, dirSpecularWeight)).x;
 	vec3 dirSpecular = specular * lightColor * dirSpecularWeight * dirDiffuseWeight;
-	vec4 diffuseTexel = texture2D(uDiffuseTexture, vec2(0, 0));
-	vec3 dirDiffuse = diffuseTexel.xyz * lightColor * dirDiffuseWeight;
+	vec3 dirDiffuse = diffuse * lightColor * dirDiffuseWeight;
 
 	gl_FragColor = vec4(( dirDiffuse + ambientLightColor * ambient ) + dirSpecular, 1.0);
 }

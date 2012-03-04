@@ -4,6 +4,7 @@
  */
 goog.provide('SB.JsonModel');
 goog.require('SB.Model');
+goog.require('SB.Shaders');
  
 /**
  * @constructor
@@ -27,7 +28,20 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	{
 		material = SB.Visual.realizeMaterial(this.param);
 	}
+
+	// HACK FOR TOON SHADING REMOVE
+	var diffuseTexture = './images/diffuse-tree.png';
+	var toonTexture = './images/toon-lookup.png';
 	
+	for (var i = 0; i < data.materials.length; i++)
+	{
+		var oldMaterial = data.materials[i];
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+	}
+
 	this.object = new THREE.Mesh(data, material);
 	
 	this.addToScene();
