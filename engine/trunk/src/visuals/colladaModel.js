@@ -29,19 +29,16 @@ SB.ColladaModel.prototype.update = function()
 	
 	if ( this.skin )
 	{
-
     	var now = Date.now();
     	var deltat = (now - this.startTime) / 1000;
     	var fract = deltat - Math.floor(deltat);
     	this.frame = fract * this.frameRate;
 		
-
 		for ( var i = 0; i < this.skin.morphTargetInfluences.length; i++ )
 		{
 			this.skin.morphTargetInfluences[ i ] = 0;
 		}
 
 		this.skin.morphTargetInfluences[ Math.floor( this.frame ) ] = 1;
-
 	}
 }

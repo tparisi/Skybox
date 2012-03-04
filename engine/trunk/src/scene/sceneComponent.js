@@ -8,22 +8,20 @@ goog.require('SB.Component');
 /**
  * @constructor
  */
-SB.SceneComponent = function(param) {
-	
-	SB.Component.call(this);
-	
-    param = param || {};
+SB.SceneComponent = function(param)
+{	
+	SB.Component.call(this, param);
     
     this.object = null;
-    this.position = param.position || new THREE.Vector3();
-    this.rotation = param.rotation || new THREE.Vector3();
-    this.scale = param.scale || new THREE.Vector3(1, 1, 1);	            
+    this.position = this.param.position || new THREE.Vector3();
+    this.rotation = this.param.rotation || new THREE.Vector3();
+    this.scale = this.param.scale || new THREE.Vector3(1, 1, 1);
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
 
-SB.SceneComponent.prototype.update = function() {
-	
+SB.SceneComponent.prototype.update = function()
+{	
 	SB.Component.prototype.update.call(this);
 	
 	if (this.object)

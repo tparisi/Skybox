@@ -9,7 +9,8 @@ goog.require('SB.Visual');
  * @constructor
  * @extends {SB.Visual}
  */
-SB.Model = function(param) {
+SB.Model = function(param)
+{
     SB.Visual.call(this, param);
 
 	this.frame = 0;
@@ -63,7 +64,10 @@ SB.Model.loadModel = function(url, param)
 			modelClass = SB.ColladaModel;
 			loaderClass = THREE.ColladaLoader;
 			break;
-		
+		case 'JS' :
+			modelClass = SB.JsonModel;
+			loaderClass = THREE.JSONLoader;
+			break;
 		default :
 			break;
 	}
