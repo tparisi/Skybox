@@ -1,5 +1,7 @@
 goog.provide('SB.Shaders');
 
+SB.Shaders = {} ;
+
 SB.Shaders.ToonShader = 
 {
 

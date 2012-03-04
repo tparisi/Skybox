@@ -53,6 +53,7 @@ goog.require('SB.Model');
 goog.require('SB.Pane');
 goog.require('SB.Visual');
 
+goog.require('SB.Shaders');
 
 /**
  * @constructor
