@@ -18,10 +18,9 @@ SB.MaterialType = {
 /**
  * @constructor
  */
-SB.Visual = function(param) {
-	
-	SB.SceneComponent.call(this);
-	
+SB.Visual = function(param)
+{
+	SB.SceneComponent.call(this, param);	
 } ;
 
 /**
@@ -29,7 +28,7 @@ SB.Visual = function(param) {
  */
 SB.Visual.realizeMaterial = function(param)
 {
-	if (!param.materialType)
+	if (param.materialType === null)
 	{
 		param.materialType = SB.MaterialType.Basic;
 		
@@ -42,7 +41,7 @@ SB.Visual.realizeMaterial = function(param)
 	switch (param.materialType)
 	{
 		case SB.MaterialType.Shader:
-			return new THREE.MeshShaderMaterial(param.materialParam);
+			return new THREE.ShaderMaterial(param.materialParam);
 		case SB.MaterialType.Phong:
 			return new THREE.MeshPhongMaterial(param.materialParam);
 		default:

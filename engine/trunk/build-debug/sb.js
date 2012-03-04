@@ -2884,10 +2884,9 @@ SB.MaterialType = {
 /**
  * @constructor
  */
-SB.Visual = function(param) {
-	
-	SB.SceneComponent.call(this);
-	
+SB.Visual = function(param)
+{
+	SB.SceneComponent.call(this, param);	
 } ;
 
 /**
@@ -2895,7 +2894,7 @@ SB.Visual = function(param) {
  */
 SB.Visual.realizeMaterial = function(param)
 {
-	if (!param.materialType)
+	if (param.materialType === null)
 	{
 		param.materialType = SB.MaterialType.Basic;
 		
@@ -2908,7 +2907,7 @@ SB.Visual.realizeMaterial = function(param)
 	switch (param.materialType)
 	{
 		case SB.MaterialType.Shader:
-			return new THREE.MeshShaderMaterial(param.materialParam);
+			return new THREE.ShaderMaterial(param.materialParam);
 		case SB.MaterialType.Phong:
 			return new THREE.MeshPhongMaterial(param.materialParam);
 		default:
@@ -4552,24 +4551,29 @@ goog.provide('SB.Shaders');
 
 SB.Shaders = {} ;
 
-SB.Shaders.ToonShader = 
+SB.Shaders.ToonShader = function(diffuseUrl, toonUrl)
 {
+	var params = {	
+		uniforms: THREE.UniformsUtils.merge( [
+			THREE.UniformsLib[ "lights" ],
+			
+			{
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
 
-	uniforms: THREE.UniformsUtils.merge( [
-		THREE.UniformsLib[ "lights" ],
-		
-		{
-		"uDiffuseTexture" : { type: "t", value: 0, texture: null },
-		"uToonTexture"    : { type: "t", value: 1, texture: null },
+			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"uDiffuseColor" : { type: "c", value: new THREE.Color( 0xFFFFFF ) },
+			"uAmbientColor" : { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uShininess"    : { type: "f", value: 30 }
+			}
 
-		"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-		"uAmbientColor": { type: "c", value: new THREE.Color( 0x050505 ) },
-		}
+		] ),
 
-	] ),
-
-	//vertexShader: document.getElementById('toonVertexShader').textContent,
-	//fragmentShader: document.getElementById('toonFragmenShader').textContent
+		vertexShader: document.getElementById('toonVertexShader').textContent,
+		fragmentShader: document.getElementById('toonFragmentShader').textContent
+	} ;
+	
+	return params;
 } ;
 /**
  * @fileoverview Rotator - converts x,y mouse motion into rotation about an axis (event-driven)
@@ -4777,6 +4781,25 @@ SB.Zoomer.prototype.update = function()
         this.oldScale.z = this.scale.z;
     }
 }
+goog.provide('SB.LightComponent');
+goog.require('SB.SceneComponent');
+
+SB.LightComponent = function(param)
+{
+	SB.SceneComponent.call(this, param);
+}
+
+goog.inherits(SB.LightComponent, SB.SceneComponent);
+
+SB.LightComponent.prototype.realize = function()
+{
+	SB.SceneComponent.prototype.realize.call(this);
+	
+	this.object = new THREE.DirectionalLight(0xffffff);
+    this.object.position.set(1, 0, 0).normalize();
+	
+	this.addToScene();
+}
 /**
  * @fileoverview File Manager - load game assets using Ajax
  * 
@@ -4833,6 +4856,7 @@ goog.require('SB.Pane');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');
+goog.require('SB.LightComponent');
 
 /**
  * @constructor

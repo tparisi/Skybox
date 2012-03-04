@@ -19,6 +19,15 @@ SB.Examples.ToonDemo.prototype.initialize = function(param)
 
 SB.Examples.ToonDemo.prototype.initEntities = function()
 {
+	var light = new SB.Entity();
+	var transform  = new SB.Transform();
+	light.addComponent(transform);
+	light.transform = transform;
+	
+	var dirLight = new SB.LightComponent();
+	light.addComponent(dirLight);
+	light.realize();
+
 	this.initModel('trees01.js', 0, 0, 0);
 	this.initModel('trees01.js', 100, 0, 0);
 }
@@ -34,7 +43,16 @@ SB.Examples.ToonDemo.prototype.initModel = function(url, x, y, z)
     entity.addComponent(transform);
     entity.transform = transform;
 	
-	var model = SB.Model.loadModel(url);
+	var diffuseTexture = './images/diffuse-tree.png';
+	var toonTexture = './images/toon-lookup.png';
+	
+	// Create the params
+	var params = {
+		materialType: SB.MaterialType.Shader,
+		materialParam: SB.Shaders.ToonShader(diffuseTexture, toonTexture)
+	} ;
+		
+	var model = SB.Model.loadModel(url, params);
 	entity.addComponent(model);
 	
 	entity.realize();

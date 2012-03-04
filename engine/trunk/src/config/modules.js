@@ -54,6 +54,7 @@ goog.require('SB.Pane');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');
+goog.require('SB.LightComponent');
 
 /**
  * @constructor

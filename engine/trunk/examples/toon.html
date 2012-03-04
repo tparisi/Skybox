@@ -3,6 +3,70 @@
 <html>
 <head>
     <title></title>
+	<script id="toonFragmentShader" type="x-shader/x-fragment">
+		varying vec3 vNormal;
+		varying vec2 vUv;
+		varying vec3 vHalfVector;
+		
+		uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];
+		uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
+		
+		uniform vec4 uSpecularColor;
+		uniform vec4 uDiffuseColor;
+		uniform vec4 uAmbientColor;
+		uniform float uShininess;
+		
+		uniform sampler2D uDiffuseTexture;
+		uniform sampler2D uToonTexture;
+	
+		void getDirectionalLight(vec3 normal, out float diffuse, out float specular){
+			vec3 lightDir   = directionalLightDirection[0];
+			vec3 lightColor = directionalLightColor[0];
+
+			float specularContribution = max(dot(normal, vHalfVector), 0.0);
+			specular =  pow(specularContribution, uShininess);
+			diffuse = max(dot(normal, vHalfVector), 0.0);
+		}
+		
+		void main()
+		{
+			float diffuse;
+			float specular;
+			getDirectionalLight(normalize(vNormal), diffuse, specular);
+			
+			specular = step(0.5, specular);
+
+			gl_FragColor = 
+				vec4(1.0, 0.0, 0.0, 1.0);// * diffuse; // +
+				//texture2D(uDiffuseTexture, vUv) * texture2D(uToonTexture, vec2(diffuse, 0.0)) +
+				//specular * 0.25 * uSpecularColor;
+		}
+		
+	</script>
+	<script id="toonVertexShader" type="x-shader/x-vertex">
+		varying vec3 vNormal;
+		varying vec2 vUv;
+		varying vec3 vHalfVector;
+		
+		uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];
+
+		
+		void main()
+		{
+			vNormal = normal * normalMatrix;
+			vUv = uv;
+			
+vec4 ecPosition = modelViewMatrix * vec4(position.xyz, 1.0); // Position in the eye coordinate position
+vec3 ecLightPosition = (modelViewMatrix * vec4(directionalLightDirection[0], 1.0)).xyz;  // Light position in the eye coordinate
+vec3 lightDirection = ecLightPosition - ecPosition.xyz;    // Light direction
+vec3 eyeDirection = (-ecPosition.xyz);                    // Eye direction
+vHalfVector = normalize(eyeDirection + lightDirection); 
+			
+			// Set the position
+			//vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * ecPosition;
+		}
+	</script>
     <script src="../libs/JQuery/jquery-1.6.4.js"></script>
     <script src="../libs/jquery-mousewheel-3.0.4/jquery.mousewheel.js"></script>
     <script src="../libs/three/Three.js"></script>
@@ -11,6 +75,7 @@
 	<script src="../libs/requestAnimationFrame/RequestAnimationFrame.js"></script>
     <script src="../build-debug/sb.js"></script>
     <script src="toon.js"></script>
+
     <script>
       goog.require('SB.Game');
     </script>
