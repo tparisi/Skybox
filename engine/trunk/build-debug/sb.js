@@ -1574,7 +1574,6 @@ SB.Mouse.prototype.getState = function()
 
 SB.Mouse.instance = null;
 SB.Mouse.NO_POSITION = Number.MIN_VALUE;
-<<<<<<< HEAD
 /**
  *
  */
@@ -1606,39 +1605,6 @@ SB.Service.prototype.terminate = function() {};
 /**
  * Updates the Service.
  */
-=======
-/**
- *
- */
-goog.provide('SB.Service');
-
-/**
- * Interface for a Service.
- *
- * Allows multiple different backends for the same type of service.
- * @interface
- */
-SB.Service = function() {};
-
-//---------------------------------------------------------------------
-// Initialization/Termination
-//---------------------------------------------------------------------
-
-/**
- * Initializes the physics world.
- */
-SB.Service.prototype.initialize = function(param) {};
-
-/**
- * Terminates the physics world.
- */
-SB.Service.prototype.terminate = function() {};
-
-
-/**
- * Updates the Service.
- */
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 SB.Service.prototype.update = function() {};/**
  *
  */
@@ -1728,7 +1694,6 @@ SB.Time.prototype.update = function()
 
 SB.Time.instance = null;
 	        
-<<<<<<< HEAD
 /**
  * @fileoverview Contains configuration options for the Forbidden Engine.
  * @author Don Olmstead
@@ -1739,18 +1704,6 @@ goog.provide('SB.Config');
  * @define {boolean} Whether the library should be compiled for WebGL usage.
  */
 SB.Config.USE_WEBGL = true;
-=======
-/**
- * @fileoverview Contains configuration options for the Forbidden Engine.
- * @author Don Olmstead
- */
-goog.provide('SB.Config');
-
-/**
- * @define {boolean} Whether the library should be compiled for WebGL usage.
- */
-SB.Config.USE_WEBGL = true;
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
@@ -2072,7 +2025,6 @@ SB.GraphicsThreeJS.prototype.update = function()
 }
 	        
 SB.GraphicsThreeJS.default_display_stats = false,
-<<<<<<< HEAD
 /**
  *
  */
@@ -2173,108 +2125,6 @@ SB.Services.registerService = function(serviceName, object)
 		var serviceType = { object: object };
 		SB.Services._serviceMap[serviceName] = serviceType;
 	}
-=======
-/**
- *
- */
-goog.require('SB.Service');
-goog.provide('SB.EventService');
-
-/**
- * The EventService.
- *
- * @extends {SB.Service}
- */
-SB.EventService = function() {};
-
-goog.inherits(SB.EventService, SB.Service);
-
-//---------------------------------------------------------------------
-// Initialization/Termination
-//---------------------------------------------------------------------
-
-/**
- * Initializes the events system.
- */
-SB.EventService.prototype.initialize = function(param) {};
-
-/**
- * Terminates the events world.
- */
-SB.EventService.prototype.terminate = function() {};
-
-
-/**
- * Updates the EventService.
- */
-SB.EventService.prototype.update = function()
-{
-	SB.Game.instance.updateEntities();
-}
-/**
- * @fileoverview Service locator for various game services.
- */
-goog.provide('SB.Services');
-goog.require('SB.Config');
-goog.require('SB.Time');
-goog.require('SB.Input');
-goog.require('SB.EventService');
-goog.require('SB.GraphicsThreeJS');
-
-SB.Services = {};
-
-SB.Services._serviceMap = 
-{ 
-		"time" : { object : SB.Time },
-		"input" : { object : SB.Input },
-		"events" : { object : SB.EventService },
-		"graphics" : { object : SB.Config.USE_WEBGL ? SB.GraphicsThreeJS : null },
-};
-
-SB.Services.create = function(serviceName)
-{
-	var serviceType = SB.Services._serviceMap[serviceName];
-	if (serviceType)
-	{
-		var prop = serviceType.property;
-		
-		if (SB.Services[serviceName])
-		{
-	        throw new Error('Cannot create two ' + serviceName + ' service instances');
-		}
-		else
-		{
-			if (serviceType.object)
-			{
-				var service = new serviceType.object;
-				SB.Services[serviceName] = service;
-
-				return service;
-			}
-			else
-			{
-		        throw new Error('No object type supplied for creating service ' + serviceName + '; cannot create');
-			}
-		}
-	}
-	else
-	{
-        throw new Error('Unknown service: ' + serviceName + '; cannot create');
-	}
-}
-
-SB.Services.registerService = function(serviceName, object)
-{
-	if (SB.Services._serviceMap[serviceName])
-	{
-        throw new Error('Service ' + serviceName + 'already registered; cannot register twice');
-	}
-	else
-	{
-		var serviceType = { object: object };
-		SB.Services._serviceMap[serviceName] = serviceType;
-	}
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 }/**
  * @fileoverview The base Game class
  * 
@@ -2461,7 +2311,6 @@ SB.Game.handleKeyPress = function(keyCode, charCode)
     if (SB.Game.instance.onKeyPress)
     	SB.Game.instance.onKeyPress(keyCode, charCode);	            	
 }	        
-<<<<<<< HEAD
 /**
  * @fileoverview PubSub is the base class for any object that sends/receives messages
  * 
@@ -2596,142 +2445,6 @@ SB.PubSub.prototype.peekMessage = function() {
 }
 
 SB.PubSub.postMessages = false;
-=======
-/**
- * @fileoverview PubSub is the base class for any object that sends/receives messages
- * 
- * @author Tony Parisi
- */
-goog.provide('SB.PubSub');
-
-/**
- * @constructor
- */
-SB.PubSub = function() {
-    this.messageTypes = {};
-    this.messageQueue = [];
-    this.post = SB.PubSub.postMessages;
-}
-
-SB.PubSub.prototype.subscribe = function(message, subscriber, callback) {
-    var subscribers = this.messageTypes[message];
-    if (subscribers)
-    {
-        if (this.findSubscriber(subscribers, subscriber) != -1)
-        {
-            return;
-        }
-    }
-    else
-    {
-        subscribers = [];
-        this.messageTypes[message] = subscribers;
-    }
-
-    subscribers.push({ subscriber : subscriber, callback : callback });
-}
-
-SB.PubSub.prototype.unsubscribe =  function(message, subscriber, callback) {
-    if (subscriber)
-    {
-        var subscribers = this.messageTypes[message];
-
-        if (subscribers)
-        {
-            var i = this.findSubscriber(subscribers, subscriber, callback);
-            if (i != -1)
-            {
-                this.messageTypes[message].splice(i, 1);
-            }
-        }
-    }
-    else
-    {
-        delete this.messageTypes[message];
-    }
-}
-
-SB.PubSub.prototype.publish = function(message) {
-    var subscribers = this.messageTypes[message];
-
-    if (subscribers)
-    {
-        for (var i = 0; i < subscribers.length; i++)
-        {
-            if (this.post)
-            {
-                var args = [subscribers[i].callback];
-                for (var j = 0; j < arguments.length - 1; j++)
-                {
-                    args.push(arguments[j + 1]);
-                }
-                subscribers[i].subscriber.postMessage.apply(subscribers[i].subscriber, args);
-            }
-            else
-            {
-                var args = [];
-                for (var j = 0; j < arguments.length - 1; j++)
-                {
-                    args.push(arguments[j + 1]);
-                }
-                subscribers[i].callback.apply(subscribers[i].subscriber, args);
-            }
-        }
-    }
-}
-
-SB.PubSub.prototype.findSubscriber = function (subscribers, subscriber) {
-    for (var i = 0; i < subscribers.length; i++)
-    {
-        if (subscribers[i] == subscriber)
-        {
-            return i;
-        }
-    }
-    
-    return -1;
-}
-
-SB.PubSub.prototype.handleMessages = function() {
-    var message;
-    while (message = this.getMessage())
-    {
-        if (message.callback)
-        {
-            message.callback.apply(this, message.args);
-        }
-    }
-}
-
-SB.PubSub.prototype.postMessage = function (callback) {
-    var args = [];
-    var len = arguments.length - 1;
-    var i;
-    for (i = 0; i < len; i++)
-    {
-        args[i] = arguments[i+1];
-    }
-
-    this.messageQueue.push({callback : callback, args : args});
-}
-
-SB.PubSub.prototype.getMessage = function() {
-    if (this.messageQueue.length)
-    {
-        return this.messageQueue.shift();
-    }
-    else
-    {
-        return null;
-    }
-}
-
-SB.PubSub.prototype.peekMessage = function() {
-    return (this.messageQueue.length > 0) ? this.messageQueue[0] : null;
-}
-
-SB.PubSub.postMessages = false;
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview Component is the base class for defining objects used within an Entity
  * 
@@ -2745,16 +2458,11 @@ goog.require('SB.PubSub');
  * Creates a new Component.
  * @constructor
  */
-<<<<<<< HEAD
 SB.Component = function(param) {
     SB.PubSub.call(this);
 	
 	param = param || {};
 	this.param = param;
-=======
-SB.Component = function() {
-    SB.PubSub.call(this);
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
     
     /**
      * @type {SB.Entity}
@@ -2986,7 +2694,6 @@ goog.require('SB.Component');
 /**
  * @constructor
  */
-<<<<<<< HEAD
 SB.SceneComponent = function(param)
 {	
 	SB.Component.call(this, param);
@@ -2995,29 +2702,12 @@ SB.SceneComponent = function(param)
     this.position = this.param.position || new THREE.Vector3();
     this.rotation = this.param.rotation || new THREE.Vector3();
     this.scale = this.param.scale || new THREE.Vector3(1, 1, 1);
-=======
-SB.SceneComponent = function(param) {
-	
-	SB.Component.call(this);
-	
-    param = param || {};
-    
-    this.object = null;
-    this.position = param.position || new THREE.Vector3();
-    this.rotation = param.rotation || new THREE.Vector3();
-    this.scale = param.scale || new THREE.Vector3(1, 1, 1);	            
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
 
-<<<<<<< HEAD
 SB.SceneComponent.prototype.update = function()
 {	
-=======
-SB.SceneComponent.prototype.update = function() {
-	
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 	SB.Component.prototype.update.call(this);
 	
 	if (this.object)
@@ -3182,7 +2872,6 @@ goog.provide('SB.Visual');
 goog.require('SB.SceneComponent');
 
 /**
-<<<<<<< HEAD
  * Enum for different material types.
  * @enum {number}
  */
@@ -3224,14 +2913,6 @@ SB.Visual.realizeMaterial = function(param)
 		default:
 			return new THREE.MeshBasicMaterial(param.materialParam);
 	} ;
-=======
- * @constructor
- */
-SB.Visual = function(param) {
-	
-	SB.SceneComponent.call(this);
-	
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 } ;
 
 goog.inherits(SB.Visual, SB.SceneComponent);
@@ -3246,12 +2927,8 @@ goog.require('SB.Visual');
  * @constructor
  * @extends {SB.Visual}
  */
-<<<<<<< HEAD
 SB.Model = function(param)
 {
-=======
-SB.Model = function(param) {
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
     SB.Visual.call(this, param);
 
 	this.frame = 0;
@@ -3305,14 +2982,10 @@ SB.Model.loadModel = function(url, param)
 			modelClass = SB.ColladaModel;
 			loaderClass = THREE.ColladaLoader;
 			break;
-<<<<<<< HEAD
 		case 'JS' :
 			modelClass = SB.JsonModel;
 			loaderClass = THREE.JSONLoader;
 			break;
-=======
-		
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 		default :
 			break;
 	}
@@ -3329,7 +3002,6 @@ SB.Model.loadModel = function(url, param)
 		return model;
 	}
 }
-<<<<<<< HEAD
 /**
  *
  */
@@ -3655,333 +3327,6 @@ SB.Entity.prototype.addChild = function(child) {
     child.setParent(this);
     this._children.push(child);
 }
-=======
-/**
- *
- */
-goog.provide('SB.PhysicsSystem');
-
-/**
- * Interface for a PhysicsSystem.
- *
- * Allows multiple different backends for physics.
- * @interface
- */
-SB.PhysicsSystem = function() {};
-
-//---------------------------------------------------------------------
-// Initialization/Termination
-//---------------------------------------------------------------------
-
-/**
- * Initializes the physics world.
- */
-SB.PhysicsSystem.prototype.initialize = function() {};
-
-/**
- * Terminates the physics world.
- */
-SB.PhysicsSystem.prototype.terminate = function() {};
-
-//---------------------------------------------------------------------
-// Properties
-//---------------------------------------------------------------------
-
-/**
- * Sets the gravity of the simulation.
- * @param {number} x Gravity in the x direction.
- * @param {number} y Gravity in the y direction.
- * @param {number} z Gravity in the z direction.
- */
-SB.PhysicsSystem.prototype.setGravity = function(x, y, z) {};
-
-/**
- * Sets the bounds of the simulation.
- * @param {number} minX The minimum x value.
- * @param {number} maxX The maximum x value.
- * @param {number} minY The minimum y value.
- * @param {number} maxY The maximum y value.
- * @param {number] minZ The minimum z value.
- * @param {number} maxZ The maximum z value.
- */
-SB.PhysicsSystem.prototype.setBounds = function(minX, maxX, minY, maxY, minZ, maxZ) {};
-
-//---------------------------------------------------------------------
-// Methods
-//---------------------------------------------------------------------
-
-/**
- * Adds a PhysicsBody to the simulation.
- * @param {SB.PhysicsBody} body The body to add to the simulation.
- */
-SB.PhysicsSystem.prototype.addBody = function(body) {};
-
-/**
- * Removes a PhysicsBody from the simulation.
- * @param {SB.PhysicsBody} body The body to remove from the simulation.
- */
-SB.PhysicsSystem.prototype.removeBody = function(body) {};
-
-/**
- * Updates the PhysicsSystem.
- */
-SB.PhysicsSystem.prototype.update = function() {};/**
- *
- */
-goog.require('SB.Service');
-goog.provide('SB.PhysicsService');
-
-/**
- * Interface for a PhysicsService.
- *
- * Allows multiple different backends for physics.
- * @interface
- * @extends {SB.Service}
- */
-SB.PhysicsService = function() {};
-
-goog.inherits(SB.PhysicsService, SB.Service);
-
-//---------------------------------------------------------------------
-// Initialization/Termination
-//---------------------------------------------------------------------
-
-/**
- * Initializes the physics world.
- */
-SB.PhysicsService.prototype.initialize = function(param) {};
-
-/**
- * Terminates the physics world.
- */
-SB.PhysicsService.prototype.terminate = function() {};
-
-//---------------------------------------------------------------------
-// Properties
-//---------------------------------------------------------------------
-
-/**
- * Sets the gravity of the simulation.
- * @param {number} x Gravity in the x direction.
- * @param {number} y Gravity in the y direction.
- * @param {number} z Gravity in the z direction.
- */
-SB.PhysicsService.prototype.setGravity = function(x, y, z) {};
-
-/**
- * Sets the bounds of the simulation.
- * @param {number} minX The minimum x value.
- * @param {number} maxX The maximum x value.
- * @param {number} minY The minimum y value.
- * @param {number} maxY The maximum y value.
- * @param {number] minZ The minimum z value.
- * @param {number} maxZ The maximum z value.
- */
-SB.PhysicsService.prototype.setBounds = function(minX, maxX, minY, maxY, minZ, maxZ) {};
-
-//---------------------------------------------------------------------
-// Methods
-//---------------------------------------------------------------------
-
-/**
- * Adds a PhysicsBody to the simulation.
- * @param {SB.PhysicsBody} body The body to add to the simulation.
- */
-SB.PhysicsService.prototype.addBody = function(body) {};
-
-/**
- * Removes a PhysicsBody from the simulation.
- * @param {SB.PhysicsBody} body The body to remove from the simulation.
- */
-SB.PhysicsService.prototype.removeBody = function(body) {};
-
-/**
- * Updates the PhysicsService.
- */
-SB.PhysicsService.prototype.update = function() {};/**
- * @fileoverview
- */
-goog.provide('SB.PhysicsSystemBox2D');
-goog.require('SB.PhysicsService');
-
-/**
- * Implementation of a PhysicsSystem using Box2D.
- *
- * @constructor
- * @implements {PhysicsService}
- */
-SB.PhysicsSystemBox2D = function()
-{
-    /**
-     * @type {b2World}
-     */
-    this._world = null;
-
-    /**
-     * @type {b2AABB}
-     */
-    //this.worldBounds_ = new b2AABB();
-
-    /**
-     * @type {b2Vec2}
-     */
-    this._gravity = new b2Vec2(0, 0);
-
-} ;
-
-/**
- * @inheritDoc
- */
-SB.PhysicsSystemBox2D.prototype.setGravity = function(x, y, z)
-{
-    // Ignore the y, treat z as y
-    this._gravity.x = x;
-    this._gravity.y = z;
-} ;
-
-/**
- * @inheritDoc
- */
-SB.PhysicsSystemBox2D.prototype.setBounds = function(minX, maxX, minY, maxY, minZ, maxZ)
-{
-    // Ignore the y, treat z as y
-    //this.worldBounds_.minVertex.Set(minX, minZ);
-    //this.worldBounds_.maxVertex.Set(maxX, maxZ);
-} ;
-
-/**
- * @inheritDoc
- */
-SB.PhysicsSystemBox2D.prototype.initialize = function(param)
-{
-    if (this._world)
-    {
-        throw new Error('Cannot initialize the physics system twice');
-    }
-
-    // Create the world
-    this._world = new b2World(this._gravity, true);
-    this._world.SetWarmStarting(true);
-
-    this.setGravity(0, 0, 0);
-
-} ;
-
-/**
- * @inheritDoc
- */
-SB.PhysicsSystemBox2D.prototype.terminate = function()
-{
-    if (!this._world)
-    {
-        throw new Error('Cannot terminate the physics system before its initialized');
-    }
-
-    // Destroy the world
-    this._world = null;
-} ;
-
-/**
- * @inheritDoc
- */
-SB.PhysicsSystemBox2D.prototype.update = function() {
-	
-    var elapsed = 1 / 60;
-
-    this._world.ClearForces();
-    this._world.Step(elapsed, 6, 2);
-} ;
-
-SB.PhysicsSystemBox2D.prototype.addBody = function(body) {
-    return this._world.CreateBody(body);
-}
-/**
- * @fileoverview Entity collects a group of Components that define a game object and its behaviors
- * 
- * @author Tony Parisi
- * @author Don Olmstead
- */
-goog.provide('SB.Entity');
-goog.require('SB.PubSub');
-
-/**
- * Creates a new Entity.
- * @constructor
- * @extends {SB.PubSub}
- */
-SB.Entity = function() {
-    SB.PubSub.call(this);
-    
-    /**
-     * @type {number}
-     * @private
-     */
-    this._id = SB.Entity.nextId++;
-
-    /**
-     * @type {SB.Entity}
-     * @private
-     */
-    this._parent = null;
-
-    /**
-     * @type {Array.<SB.Entity>}
-     * @private
-     */
-    this._children = [];
-
-    /**
-     * @type {Array}
-     * @private
-     */
-    this._components = [];
-}
-
-goog.inherits(SB.Entity, SB.PubSub);
-
-/**
- * The next identifier to hand out.
- * @type {number}
- * @private
- */
-SB.Entity.nextId = 0;
-
-SB.Entity.prototype.getID = function() {
-    return this._id;
-}
-
-//---------------------------------------------------------------------
-// Hierarchy methods
-//---------------------------------------------------------------------
-
-/**
- * Sets the parent of the Entity.
- * @param {SB.Entity} parent The parent of the Entity.
- * @private
- */
-SB.Entity.prototype.setParent = function(parent) {
-    this._parent = parent;
-}
-
-/**
- * Adds a child to the Entity.
- * @param {SB.Entity} child The child to add.
- */
-SB.Entity.prototype.addChild = function(child) {
-    if (!child)
-    {
-        throw new Error('Cannot add a null child');
-    }
-
-    if (child._parent)
-    {
-        throw new Error('Child is already attached to an Entity');
-    }
-
-    child.setParent(this);
-    this._children.push(child);
-}
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 
 /**
  * Removes a child from the Entity
@@ -4138,10 +3483,6 @@ SB.Viewer = function(param)
 	}
 	
 	this.directionMatrix = new THREE.Matrix4;
-<<<<<<< HEAD
-	this.direction = new THREE.Vector3();
-=======
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 }
 
 goog.inherits(SB.Viewer, SB.Entity);
@@ -4154,21 +3495,13 @@ SB.Viewer.prototype.realize = function()
 SB.Viewer.prototype.update = function() 
 {
 	SB.Entity.prototype.update.call(this);
-<<<<<<< HEAD
-	this.calcDirection();
-=======
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 }
 
 SB.Viewer.prototype.move = function(dir)
 {
-<<<<<<< HEAD
-	dir.multiplySelf(this.direction);
-=======
 	this.directionMatrix.identity();
 	this.directionMatrix.setRotationFromEuler(this.transform.rotation);
 	dir = this.directionMatrix.multiplyVector3(dir);
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 	this.transform.position.addSelf(dir);
 }
 
@@ -4176,16 +3509,6 @@ SB.Viewer.prototype.turn = function(dir)
 {
 	this.transform.rotation.addSelf(dir);
 }
-<<<<<<< HEAD
-
-SB.Viewer.prototype.calcDirection = function()
-{
-	this.directionMatrix.identity();
-	this.directionMatrix.setRotationFromEuler(this.transform.rotation);
-	this.direction.set(0, 0, 1);
-	this.direction = this.directionMatrix.multiplyVector3(this.direction);
-}
-
 goog.provide('SB.PhysicsBody');
 
 /**
@@ -4235,57 +3558,6 @@ SB.PhysicsBodyBox2D.prototype.setShape = function(shape)
 {
     this._body.addShape(shape);
 } ;
-=======
-goog.provide('SB.PhysicsBody');
-
-/**
- * Interface for a PhysicsBody
- * @interface
- */
-SB.PhysicsBody = function() {};
-
-/**
- * Sets the PhysicsMaterial for the body.
- * @param {SB.PhysicsMaterial} material The material to attach to the body.
- */
-SB.PhysicsBody.prototype.setMaterial = function(material) {};
-/**
- * @fileoverview
- */
-goog.provide('SB.PhysicsBodyBox2D');
-
-/**
- * Implementation of a PhysicsBody using Box2D.
- *
- * @implements {SB.PhysicsBody}
- * @constructor
- */
-SB.PhysicsBodyBox2D = function()
-{
-    /**
-     * Internal representation of the body.
-     * @type {b2BodyDef}
-     */
-    this._body = new b2BodyDef();
-} ;
-
-/**
- * @inheritDoc
- */
-SB.PhysicsBodyBox2D.prototype.setMaterial = function(material)
-{
-    
-} ;
-
-/**
- * @protected
- * @inheritDoc
- */
-SB.PhysicsBodyBox2D.prototype.setShape = function(shape)
-{
-    this._body.addShape(shape);
-} ;
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview Tracker - converts x,y mouse motion into rotation about an axis (event-driven)
  * 
@@ -4619,7 +3891,6 @@ SB.DirectionalLight.prototype.update = function()
 	this.position = this.dirMatrix.multiplyVector3(this.position);
 	SB.SceneComponent.prototype.update.call(this);
 }
-<<<<<<< HEAD
 
 /**
  * @fileoverview
@@ -4700,88 +3971,6 @@ SB.RigidBodyBox2D.prototype.applyForce = function(x, y, z)
     this.body.ApplyImpulse(force, position);
 //    this.body.ApplyForce(force, position);
 }
-=======
-
-/**
- * @fileoverview
- */
-goog.provide('SB.RigidBodyBox2D');
-goog.require('SB.Component');
-goog.require('SB.PhysicsBody');
-
-/**
- * Component representing a rigid body.
- * @constructor
- * @extends {SB.Component}
- * @implements {SB.PhysicsBody}
- */
-SB.RigidBodyBox2D = function()
-{
-    SB.Component.call(this);
-
-    /**
-     * @type {b2BodyDef}
-     * @protected
-     */
-    this.body = new b2BodyDef();
-} ;
-
-goog.inherits(SB.RigidBodyBox2D, SB.Component);
-
-//---------------------------------------------------------------------
-// Initialization/Termination
-//---------------------------------------------------------------------
-
-/**
- * Initializes the RigidBody component.
- */
-SB.RigidBodyBox2D.prototype.realize = function()
-{
-    // Set the position based on the transform
-    var transform = this._entity.transform;
-
-    this.body.SetPosition(new b2Vec2(transform.position.x, transform.position.z));
-	SB.Component.prototype.realize.call(this);
-} ;
-
-/**
- * Terminates the RigidBody component.
- */
-SB.RigidBodyBox2D.prototype.terminate = function()
-{
-
-} ;
-
-//---------------------------------------------------------------------
-// PhysicsBody methods
-//---------------------------------------------------------------------
-
-SB.RigidBodyBox2D.prototype.setMaterial = function(material)
-{
-
-} ;
-
-SB.RigidBodyBox2D.prototype.update = function()
-{
-    var position = this.body.GetPosition();
-
-    // Set the position
-    var transform = this._entity.transform;
-    transform.position.x = position.x;
-    transform.position.z = position.y;
-
-    // \todo ROTATIONS
-} ;
-
-SB.RigidBodyBox2D.prototype.applyForce = function(x, y, z)
-{
-    var force = new b2Vec2(x, z);
-    var position = this.body.GetPosition();
-
-    this.body.ApplyImpulse(force, position);
-//    this.body.ApplyForce(force, position);
-}
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview A wire grid floor plane
  * @author Tony Parisi
@@ -4793,11 +3982,8 @@ goog.require('SB.Visual');
 SB.Grid = function(param)
 {
 	SB.Visual.call(this, param);
-<<<<<<< HEAD
-=======
 	param = param || {};
 	this.size = param.size || 10;
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 }
 
 goog.inherits(SB.Grid, SB.Visual);
@@ -4808,11 +3994,7 @@ SB.Grid.prototype.realize = function()
 	
 	var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
 		geometry = new THREE.Geometry(),
-<<<<<<< HEAD
-		floor = -0.04, step = 1, size = 14;
-=======
 		floor = -0.04, step = 1, size = this.size;
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 
 	for ( var i = 0; i <= size / step * 2; i ++ )
 	{
@@ -4888,7 +4070,6 @@ SB.Dragger.prototype.update = function()
     this.lasty = this.y;
 }
 /**
-<<<<<<< HEAD
  * @fileoverview A visual containing a model in JSON format
  * @author Don Olmstead
  */
@@ -4913,8 +4094,6 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	this.addToScene();
 }
 /**
-=======
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
  * @fileoverview Timer - component that generates time events
  * 
  * @author Tony Parisi
@@ -4967,7 +4146,6 @@ SB.Timer.prototype.stop = function()
 	this.running = false;
 }
 
-<<<<<<< HEAD
 /**
  * @fileoverview A visual containing a cylinder mesh.
  * @author Don Olmstead
@@ -5012,62 +4190,6 @@ SB.CylinderVisual.prototype.realize = function()
 	
     this.addToScene();
 }
-=======
-/**
- * @fileoverview A visual containing a cylinder mesh.
- * @author Don Olmstead
- */
-goog.provide('SB.CylinderVisual');
-goog.require('SB.Visual');
-
-/**
- * @param {Object} param supports the following options:
- *   radiusTop (number): The top radius of the cylinder
- *   radiusBottom (number): The bottom radius of the cylinder
- *   height (number): The height of the cylinder
- *   segmentsRadius (number): The radius of the segments
- *   segmentsHeight (number): The height of the segments
- *   openEnded (boolean): Whether the cylinder is open ended
- * @constructor
- * @extends {SB.Visual}
- */
-SB.CylinderVisual = function(param) {
-    SB.Visual.call(this, param);
-
-    this.param = param || {};
-}
-
-goog.inherits(SB.CylinderVisual, SB.Visual);
-
-SB.CylinderVisual.prototype.realize = function()
-{
-	SB.Visual.prototype.realize.call(this);
-	
-    var radiusTop = this.param.radiusTop || 1.0;
-    var radiusBottom = this.param.radiusBottom || 1.0;
-    var height = this.param.height || 1.0;
-    var segmentsRadius = this.param.segmentsRadius || 100;
-    var segmentsHeight = this.param.segmentsHeight || 100;
-    var openEnded = this.param.openEnded || false;
-    var color;
-    if (this.param.color === null)
-    {
-    	color = 0x262624;
-    }
-    else
-    {
-    	color = this.param.color;
-    }
-    
-    var ambient = this.param.ambient || 0;
-    
-	var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded);
-	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial( { color: color, opacity: 1, ambient: ambient, transparent: false, wireframe: false } ));
-	
-    this.addToScene();
-}
-
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview FSM - Finite State Machine class
  * 
@@ -5143,29 +4265,17 @@ SB.ColladaModel.prototype.update = function()
 	
 	if ( this.skin )
 	{
-<<<<<<< HEAD
-=======
-
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
     	var now = Date.now();
     	var deltat = (now - this.startTime) / 1000;
     	var fract = deltat - Math.floor(deltat);
     	this.frame = fract * this.frameRate;
 		
-<<<<<<< HEAD
-=======
-
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 		for ( var i = 0; i < this.skin.morphTargetInfluences.length; i++ )
 		{
 			this.skin.morphTargetInfluences[ i ] = 0;
 		}
 
 		this.skin.morphTargetInfluences[ Math.floor( this.frame ) ] = 1;
-<<<<<<< HEAD
-=======
-
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 	}
 }
 /**
@@ -5204,7 +4314,6 @@ SB.Pane.prototype.realize = function()
     this.addToScene();
 }
 
-<<<<<<< HEAD
 /**
  * @fileoverview
  */
@@ -5215,18 +4324,6 @@ goog.provide('SB.PhysicsMaterial');
  * Interface for a PhysicsMaterial.
  * @interface
  */
-=======
-/**
- * @fileoverview
- */
-
-goog.provide('SB.PhysicsMaterial');
-
-/**
- * Interface for a PhysicsMaterial.
- * @interface
- */
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 SB.PhysicsMaterial = function() {};
 goog.provide('SB.Picker');
 goog.require('SB.Component');
@@ -5443,36 +4540,6 @@ SB.Annotation.prototype.hide  = function()
 	this.dom.style.display = 'none';
 }
 
-<<<<<<< HEAD
-goog.provide('SB.Shaders');
-
-SB.Shaders = {} ;
-
-SB.Shaders.ToonShader = function(diffuseUrl, toonUrl)
-{
-	var params = {	
-		uniforms: THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "lights" ],
-			
-			{
-			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
-			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
-
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uDiffuseColor" : { type: "c", value: new THREE.Color( 0xFFFFFF ) },
-			"uAmbientColor" : { type: "c", value: new THREE.Color( 0x050505 ) },
-			"uShininess"    : { type: "f", value: 30 }
-			}
-
-		] ),
-
-		vertexShader: document.getElementById('toonVertexShader').textContent,
-		fragmentShader: document.getElementById('toonFragmentShader').textContent
-	} ;
-	
-	return params;
-} ;
-=======
 /**
  * @fileoverview General-purpose key frame animation
  * @author Tony Parisi
@@ -5615,6 +4682,34 @@ SB.CubeVisual.prototype.realize = function()
     this.addToScene();
 }
 
+goog.provide('SB.Shaders');
+
+SB.Shaders = {} ;
+
+SB.Shaders.ToonShader = function(diffuseUrl, toonUrl)
+{
+	var params = {	
+		uniforms: THREE.UniformsUtils.merge( [
+			THREE.UniformsLib[ "lights" ],
+			
+			{
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
+
+			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"uDiffuseColor" : { type: "c", value: new THREE.Color( 0xFFFFFF ) },
+			"uAmbientColor" : { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uShininess"    : { type: "f", value: 30 }
+			}
+
+		] ),
+
+		vertexShader: document.getElementById('toonVertexShader').textContent,
+		fragmentShader: document.getElementById('toonFragmentShader').textContent
+	} ;
+	
+	return params;
+} ;
 /**
  * @fileoverview General-purpose key frame animation
  * @author Tony Parisi
@@ -5743,7 +4838,6 @@ SB.Interpolator.prototype.tween = function(from, to, fract)
 	
 	return value;
 }
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview Rotator - converts x,y mouse motion into rotation about an axis (event-driven)
  * 
@@ -5886,35 +4980,6 @@ SB.ScreenTracker.prototype.calcPosition = function()
 
 	return new THREE.Vector2(eltx, elty);
 }
-<<<<<<< HEAD
-goog.provide('SB.RigidBodyCircleBox2D');
-goog.require('SB.RigidBodyBox2D');
-
-SB.RigidBodyCircleBox2D = function(radius)
-{
-    SB.RigidBodyBox2D.call(this);
-
-    // Create the fixture definition
-    var fixtureDef = new b2FixtureDef();
-	fixtureDef.shape = new b2CircleShape(radius);
-	fixtureDef.friction = 0.4;
-	fixtureDef.restitution = 0.6;
-	fixtureDef.density = 1.0;
-
-    // Create the body definition
-	var ballBd = new b2BodyDef();
-	ballBd.type = b2Body.b2_dynamicBody;
-	ballBd.position.Set(0,0);
-
-    // Create the body
-	this.body = SB.Services.physics.addBody(ballBd);
-
-    // Create the fixture
-	this.fixture = this.body.CreateFixture(fixtureDef);
-} ;
-
-goog.inherits(SB.RigidBodyCircleBox2D, SB.RigidBodyBox2D);
-=======
 goog.provide('SB.RigidBodyCircleBox2D');
 goog.require('SB.RigidBodyBox2D');
 
@@ -5982,7 +5047,6 @@ SB.NetworkClient.prototype.update = function()
         return;
     }
 }
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview Zoomer - converts scalar input to x,y,z scale output
  * 
@@ -6020,7 +5084,6 @@ SB.Zoomer.prototype.update = function()
         this.oldScale.z = this.scale.z;
     }
 }
-<<<<<<< HEAD
 goog.provide('SB.LightComponent');
 goog.require('SB.SceneComponent');
 
@@ -6040,8 +5103,6 @@ SB.LightComponent.prototype.realize = function()
 	
 	this.addToScene();
 }
-=======
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 /**
  * @fileoverview File Manager - load game assets using Ajax
  * 
@@ -6050,13 +5111,9 @@ SB.LightComponent.prototype.realize = function()
 
 goog.provide('SB.Modules');
 goog.require('SB.Config');
-<<<<<<< HEAD
-goog.require('SB.KeyFrame');
-=======
 goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
 goog.require('SB.KeyFrameAnimator');
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 goog.require('SB.Camera');
 goog.require('SB.Component');
 goog.require('SB.Entity');
@@ -6078,10 +5135,7 @@ goog.require('SB.Mouse');
 goog.require('SB.Picker');
 goog.require('SB.DirectionalLight');
 goog.require('SB.Loader');
-<<<<<<< HEAD
-=======
 goog.require('SB.NetworkClient');
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 goog.require('SB.PhysicsBody');
 goog.require('SB.PhysicsBodyBox2D');
 goog.require('SB.PhysicsMaterial');
@@ -6100,22 +5154,16 @@ goog.require('SB.Popup');
 goog.require('SB.View');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
-<<<<<<< HEAD
 goog.require('SB.JsonModel');
-=======
 goog.require('SB.CubeVisual');
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');
 goog.require('SB.Model');
 goog.require('SB.Pane');
 goog.require('SB.Visual');
 
-<<<<<<< HEAD
 goog.require('SB.Shaders');
 goog.require('SB.LightComponent');
-=======
->>>>>>> bdf95ae36dda724acec99a3059738860b493cc3a
 
 /**
  * @constructor

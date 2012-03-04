@@ -10,7 +10,9 @@ Gabatar = function(param)
     avParams.radiusTop    = 1;
     avParams.radiusBottom = 1;
     avParams.height       = 1.667;
-    avParams.color = 0x0000ff;
+    avParams.materialType = SB.MaterialType.Phong;
+    avParams.materialParam = { color: 0x0000ff };
+    
 //    avParams.ambient = 0x0000ff;
 
 	this.visual = new SB.CylinderVisual(avParams);
