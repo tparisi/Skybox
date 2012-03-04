@@ -91,28 +91,24 @@ Gabscape.prototype.createNetwork = function()
 {
 	this.network = new Gabscape_GabClient("tony", this);
 	this.network.connect();
-	var i, len = Gabscape.users.length;
-	for (i = 1; i < len; i++)
-	{
-		this.network.subscribeToUser(Gabscape.users[i]);
-	}
+
 	
 	this.lastNetworkUpdateTime = 0;
 }
 
 Gabscape.prototype.initModels = function()
 {
-  this.initModel('./models/trees01.js', -100, 0, 0);
-  this.initModel('./models/trees01.js', 100, 0, 0);
-  this.initModel('./models/trees01.js', 100, 0, 100);
-  this.initModel('./models/trees_conf01.js', -100, 0, -100);
-  this.initModel('./models/cloud01.js', -100, 100, -100);
-  this.initModel('./models/moon01.js', -100, 100, -100);
-  this.initModel('./models/body_base_nopane.js', -10, 0, -10);
-  this.initModel('./models/body_flying_nopane.js', 10, 0, 10);
-  this.initModel('./models/body_flying2_nopane.js', 10, 0, -10);
-  this.initModel('./models/body_hero_nopane.js', -10, 0, 10);
-  this.initModel('./models/body_inactive_nopane.js', 0, 0, -15); 
+  this.initModel('../../models/trees01.js', -100, 0, 0);
+  this.initModel('../../models/trees01.js', 100, 0, 0);
+  this.initModel('../../models/trees01.js', 100, 0, 100);
+  this.initModel('../../models/trees_conf01.js', -100, 0, -100);
+  this.initModel('../../models/cloud01.js', -100, 100, -100);
+  this.initModel('../../models/moon01.js', -100, 100, -100);
+  this.initModel('../../models/body_base_nopane.js', -10, 0, -10);
+  this.initModel('../../models/body_flying_nopane.js', 10, 0, 10);
+  this.initModel('../../models/body_flying2_nopane.js', 10, 0, -10);
+  this.initModel('../../models/body_hero_nopane.js', -10, 0, 10);
+  this.initModel('../../models/body_inactive_nopane.js', 0, 0, -15); 
 }
 
 Gabscape.prototype.initModel = function(url, x, y, z)
@@ -142,9 +138,25 @@ Gabscape.prototype.initModel = function(url, x, y, z)
        this.addEntity(entity);
 }
 				
+Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
+    var x = message.spawnposition.x;
+    var y = message.spawnposition.y;
+    var z = message.spawnposition.z;
+    console.log('Got selfspawn for ' + twitterId + ' ' + x + ' ' + y + ' ' + z);
+    this.viewer.transform.position.set(message.spawnposition.x, message.spawnposition.y, message.spawnposition.z);
+    this.viewer.transform.rotation.set(message.spawnorientation.pitch, message.spawnorientation.yaw, message.spawnorientation.roll);
+    var i, len = Gabscape.users.length;
+    for (i = 0; i < len; i++)
+    {
+        if (i == 0) {
+            continue;
+        }
+        this.network.subscribeToUser(Gabscape.users[i]);
+    }
+}
 
 Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
-    console.log('Got positionChangeEvent');
+    console.log('Got positionChangeEvent for ' + twitterId + ' ' + message.position.x + ' ' + message.position.y + ' ' + message.position.z);
 
     if (twitterId == "john")
 	{
@@ -169,6 +181,10 @@ Gabscape.prototype.actionEvent = function(twitterId, message) {
 
 Gabscape.prototype.updateNetwork = function(t) 
 {
+    if (this.network.spawned === false) {
+        // Don't send any updates until spawn occurs
+        return;
+    }
 	var deltat = t - this.lastNetworkUpdateTime;
 	if (deltat > 200)
 	{

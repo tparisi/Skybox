@@ -5,6 +5,10 @@ function Gabscape_GabClient(twitterId, target) {
 
 Gabscape_GabClient.prototype = new GabClient;
 
+Gabscape_GabClient.prototype.selfSpawnEvent = function(twitterId, message) {
+    this.target.selfSpawnEvent.call(this.target, twitterId, message);
+}
+
 Gabscape_GabClient.prototype.positionChangeEvent = function(twitterId, message) {
 	this.target.positionChangeEvent.call(this.target, twitterId, message)
 }

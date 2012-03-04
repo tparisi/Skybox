@@ -1,5 +1,6 @@
 function GabClient(twitterId) {
     this.yourTwitterId = twitterId;
+    this.spawned = false;
     this.cache = {};
     this.cache.position = {};
     this.cache.position.x = 0.0;
@@ -9,6 +10,10 @@ function GabClient(twitterId) {
     this.cache.orientation.pitch = 0.0;
     this.cache.orientation.yaw = 0.0;
     this.cache.orientation.roll = 0.0;
+}
+
+GabClient.prototype.selfSpawnEvent = function(twitterId, message) {
+    console.log('override selfSpawnEvent');
 }
 
 GabClient.prototype.positionChangeEvent = function(twitterId, message) {
@@ -24,9 +29,9 @@ GabClient.prototype.actionEvent = function(twitterId, message) {
 }
 
 GabClient.prototype._messageListener = function(path, message) {
-    pathChunks = path.split("/");
-    messageTarget = pathChunks[2];
-    messageType = pathChunks[3];
+    var pathChunks = path.split('/');
+    var messageTarget = pathChunks[2];
+    var messageType = pathChunks[3];
     switch (messageType) {
         case 'position_update':
             this.positionChangeEvent(messageTarget, message);
@@ -36,6 +41,10 @@ GabClient.prototype._messageListener = function(path, message) {
             break;
         case 'action':
             this.actionEvent(messageTarget, message);
+            break;
+        case 'selfspawn':
+            this.spawned = true;
+            this.selfSpawnEvent(messageTarget, message);
             break;
         default:
             alert('Got Gab message of unknown type' + messageType + ' from ' + message.senderTwitterId);
@@ -51,17 +60,21 @@ GabClient.prototype.connect = function() {
 }
 
 GabClient.prototype.connectListener = function() {
-    var me = this;
     // Subscribe to actions that target yourTwitterId
-    var msgPath = '/gab/' + this.yourTwitterId + '/action';
-    this.client.subscribe(msgPath, function gs_self_action_message(message) {
-        me._messageListener(msgPath, message);
+    var me = this;
+    var msgPathSelfspawn = '/gab/' + this.yourTwitterId + '/selfspawn';
+    this.client.subscribe(msgPathSelfspawn, function gs_self_selfspawn_message(message) {
+        me._messageListener(msgPathSelfspawn, message);
+    });
+    msgPathAction = '/gab/' + this.yourTwitterId + '/action';
+    this.client.subscribe(msgPathAction, function gs_self_action_message(message) {
+        me._messageListener(msgPathAction, message);
     });
 }
 
 GabClient.prototype.subscribeToUser = function(twitterId) {
-    var me = this;
     // Subscribe to users action trigger
+    var me = this;
     var msgPathAction = '/gab/' + twitterId + '/action';
     this.client.subscribe(msgPathAction, function gs_other_action_message(message) {
         me._messageListener(msgPathAction, message);
@@ -78,6 +91,9 @@ GabClient.prototype.subscribeToUser = function(twitterId) {
     this.client.subscribe(msgPathOrientation, function gs_other_action_message(message) {
         me._messageListener(msgPathOrientation, message);
     });
+
+    // Request spawn information for user
+    this.client.publish('/gab/' + this.yourTwitterId + '/spawn_positions', { users: [twitterId] });
 }
 
 GabClient.prototype.updatePosition = function(x,y,z) {
@@ -89,7 +105,7 @@ GabClient.prototype.updatePosition = function(x,y,z) {
         this.cache.position.x = x;
         this.cache.position.y = y;
         this.cache.position.z = z;
-        message = {};
+        var message = {};
         message.senderTwitterId = this.yourTwitterId;
         message.senderClientId = this.client.getClientId();
         message.position = this.cache.position;
@@ -105,7 +121,7 @@ GabClient.prototype.updateOrientation = function(pitch,yaw,roll) {
         this.cache.orientation.pitch = pitch;
         this.cache.orientation.yaw = yaw;
         this.cache.orientation.roll = roll;
-        message = {};
+        var message = {};
         message.senderTwitterId = this.yourTwitterId;
         message.senderClientId = this.client.getClientId();
         message.orientation = this.cache.orientation;
@@ -114,6 +130,9 @@ GabClient.prototype.updateOrientation = function(pitch,yaw,roll) {
 }
 
 GabClient.prototype.sendActionToUser = function(twitterId, action) {
-    action.senderTwitterId = this.yourTwitterId;
-    this.client.publish('/gab/' + twitterId + '/action', action);
+    var message = {};
+    message.action = action;
+    message.senderTwitterId = this.yourTwitterId;
+    message.senderClientId = this.client.getClientId();
+    this.client.publish('/gab/' + twitterId + '/action', message);
 }
