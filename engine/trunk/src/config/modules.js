@@ -30,6 +30,7 @@ goog.require('SB.Mouse');
 goog.require('SB.Picker');
 goog.require('SB.DirectionalLight');
 goog.require('SB.Loader');
+goog.require('SB.NetworkClient');
 goog.require('SB.PhysicsBody');
 goog.require('SB.PhysicsBodyBox2D');
 goog.require('SB.PhysicsMaterial');
