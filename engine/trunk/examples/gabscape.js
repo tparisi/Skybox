@@ -14,9 +14,6 @@ Gabscape.prototype.initialize = function(param)
 	if (!param)
 		param = {};
 	
-	if (!param.backgroundColor)
-		param.backgroundColor = Gabscape.default_bgcolor;
-
 	if (!param.displayStats)
 		param.displayStats = Gabscape.default_display_stats;
 
@@ -398,5 +395,4 @@ Gabscape.prototype.help = function()
 	this.helpScreen.show();
 }
 
-Gabscape.default_bgcolor = '#000000';
 Gabscape.default_display_stats = false;
