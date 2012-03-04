@@ -54,9 +54,6 @@ Gabscape.prototype.initEntities = function()
 	this.timer.subscribe("fraction", this, this.onTimeFractionChanged);
 	this.timer.start();
 	
-	var grid = new SB.Grid({size:64});
-	this.root.addComponent(grid);
-	
 	this.initModels();
 
     this.gabbers = [];
@@ -116,18 +113,59 @@ Gabscape.prototype.initModels = function()
 {
 	var modelpath = './models/';
 	
-	this.initModel(modelpath + 'trees01_rescaled.js', -50, 0, 0);
-	this.initModel(modelpath + 'trees01_rescaled.js', 50, 0, 0);
-	this.initModel(modelpath + 'trees01_rescaled.js', 50, 0, 50);
-	this.initModel(modelpath + 'trees_conf01_rescaled.js', -5, 0, -50);
-	this.initModel(modelpath + 'cloud01_rescaled.js', -20, 20, -50);
-	this.initModel(modelpath + 'moon01_rescaled.js', -50, 60, -50);
-	this.initModel(modelpath + 'body_base_nopane.js', -10, 0, -10);
-	this.initModel(modelpath + 'body_flying_nopane.js', 10, 0, 10);
-	this.initModel(modelpath + 'body_flying2_nopane.js', 10, 0, -10);
-	this.initModel(modelpath + 'body_hero_nopane.js', -10, 0, 10);
-	this.initModel(modelpath + 'body_inactive_nopane.js', 0, 0, -15); 
-	this.initModel(modelpath + 'failwhale.js', 30, 20, -20); 
+	  this.initModel(modelpath + 'flatland01.js', 0, -5, 0);
+		this.initModel(modelpath + 'trees01_rescaled.js', 15, 0, 15);
+		this.initModel(modelpath + 'trees01_rescaled.js', -15, 1, 15);
+		this.initModel(modelpath + 'trees01_rescaled.js', 15, 0, -15);
+	  this.initModel(modelpath + 'trees01_rescaled.js', -15, 0, -15);
+		this.initModel(modelpath + 'trees01_rescaled.js', 13, 0, 7);
+		this.initModel(modelpath + 'trees01_rescaled.js', -13, 0, 7);
+		this.initModel(modelpath + 'trees01_rescaled.js', 7, 0, 13);
+	  this.initModel(modelpath + 'trees01_rescaled.js', 7, 0, -13); 
+	  
+	  this.initModel(modelpath + 'flatland01.js', 0, -2, 0);
+		this.initModel(modelpath + 'trees01_rescaled.js', 8, 0, 9);
+		this.initModel(modelpath + 'trees01_rescaled.js', -8, 1, 9);
+		this.initModel(modelpath + 'trees01_rescaled.js', 8, 0, -9);
+	  this.initModel(modelpath + 'trees01_rescaled.js', -8, 0, -9);
+	  
+		this.initModel(modelpath + 'trees01_rescaled.js', 11, 0, 10);
+		this.initModel(modelpath + 'trees01_rescaled.js', -11, 0, 10);
+		this.initModel(modelpath + 'trees01_rescaled.js', 11, 0, -10);
+	  this.initModel(modelpath + 'trees01_rescaled.js', 11, 0, -10); 
+	  
+		this.initModel(modelpath + 'trees_conf01_rescaled.js', 12, 0, 0);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -12, 0, 0);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 0, 0, 12);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 0, 0, -12);
+	  
+		this.initModel(modelpath + 'trees_conf01_rescaled.js', 15, 0, -5);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -15, 0, -5);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 5, 0, 15);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -5, 0, -15);  
+	  
+		this.initModel(modelpath + 'cloud01_rescaled.js', -20, 8, -20);
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 20, 9, -20);
+	  this.initModel(modelpath + 'cloud01_rescaled.js', -20, 10, 20);
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 20, 11, 20);
+	  
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 15, 8, 0);
+	  this.initModel(modelpath + 'cloud01_rescaled.js', -15, 9, 0);
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 0, 10, 16);
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 0, 11, -16);
+	  
+		this.initModel(modelpath + 'mountan01.js', -48, 0, 0);
+	  this.initModel(modelpath + 'mountan01.js', 49, 0, -0);
+	  this.initModel(modelpath + 'mountan01.js', 3, 0, -45);
+	  this.initModel(modelpath + 'mountan01.js', -1, 0, 43);  
+	  
+		this.initModel(modelpath + 'moon01_rescaled.js', -50, 60, -50);
+		this.initModel(modelpath + 'body_base_nopane.js', -10, 0, -10);
+		this.initModel(modelpath + 'body_flying_nopane.js', 10, 0, 10);
+		this.initModel(modelpath + 'body_flying2_nopane.js', 10, 0, -10);
+		this.initModel(modelpath + 'body_hero_nopane.js', -10, 0, 10);
+		this.initModel(modelpath + 'body_inactive_nopane.js', 0, 0, -15); 
+		this.initModel(modelpath + 'failwhale.js', 20, 1.5, -25, 1); 
 }
 
 Gabscape.prototype.initModel = function(url, x, y, z)
