@@ -13,7 +13,7 @@ Gabber = function(param)
 	this.mover = new SB.KeyFrame({ loop : false, easeOut : true });
 	this.spinner = new SB.KeyFrame({ loop : true, easeOut : false });
 	this.timer = new SB.Timer( { duration : 3333 } );
-	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(0, 3.667, 0) });
+	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(1, 3.667, 0) });
 	
 	this.addComponent(this.transform);
 	this.addComponent(this.model);

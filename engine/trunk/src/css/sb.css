@@ -58,7 +58,10 @@
     
     z-index:100;
 
-    background-color:rgba(128, 128, 128, 0.5);
+/*
+    	background-color:rgba(128, 128, 128, 0.5);
+*/
+   	background-color:rgba(255, 255, 255, 1);
     padding:4px;
     
     -webkit-border-radius: 3px;
