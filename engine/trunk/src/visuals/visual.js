@@ -12,7 +12,9 @@ goog.require('SB.SceneComponent');
 SB.MaterialType = {
 	Shader: 0,
 	Phong: 1,
-	Basic: 2
+	Basic: 2,
+	User: 3,
+	FromFile: 4,
 } ;
 
 /**
@@ -44,6 +46,10 @@ SB.Visual.realizeMaterial = function(param)
 			return new THREE.ShaderMaterial(param.materialParam);
 		case SB.MaterialType.Phong:
 			return new THREE.MeshPhongMaterial(param.materialParam);
+		case SB.MaterialType.User:
+		case SB.MaterialType.FromFile:
+			param.material;
+			break;
 		default:
 			return new THREE.MeshBasicMaterial(param.materialParam);
 	} ;

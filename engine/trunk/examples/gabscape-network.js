@@ -14,9 +14,6 @@ Gabscape.prototype.initialize = function(param)
 	if (!param)
 		param = {};
 	
-	if (!param.backgroundColor)
-		param.backgroundColor = Gabscape.default_bgcolor;
-
 	if (!param.displayStats)
 		param.displayStats = Gabscape.default_display_stats;
 
@@ -100,6 +97,7 @@ Gabscape.prototype.createViewer = function()
 
 Gabscape.prototype.createNetwork = function()
 {
+
 	this.network = new Gabscape_GabClient(Gabscape.user, this);
 	this.network.connect();
 	this.lastNetworkUpdateTime = 0;
@@ -107,17 +105,20 @@ Gabscape.prototype.createNetwork = function()
 
 Gabscape.prototype.initModels = function()
 {
-  this.initModel('../../models/trees01.js', -100, 0, 0);
-  this.initModel('../../models/trees01.js', 100, 0, 0);
-  this.initModel('../../models/trees01.js', 100, 0, 100);
-  this.initModel('../../models/trees_conf01.js', -100, 0, -100);
-  this.initModel('../../models/cloud01.js', -100, 100, -100);
-  this.initModel('../../models/moon01.js', -100, 100, -100);
-  this.initModel('../../models/body_base_nopane.js', -10, 0, -10);
-  this.initModel('../../models/body_flying_nopane.js', 10, 0, 10);
-  this.initModel('../../models/body_flying2_nopane.js', 10, 0, -10);
-  this.initModel('../../models/body_hero_nopane.js', -10, 0, 10);
-  this.initModel('../../models/body_inactive_nopane.js', 0, 0, -15); 
+	var modelpath = './models/';
+	
+	this.initModel(modelpath + 'trees01_rescaled.js', -50, 0, 0);
+	this.initModel(modelpath + 'trees01_rescaled.js', 50, 0, 0);
+	this.initModel(modelpath + 'trees01_rescaled.js', 50, 0, 50);
+	this.initModel(modelpath + 'trees_conf01_rescaled.js', -5, 0, -50);
+	this.initModel(modelpath + 'cloud01_rescaled.js', -20, 20, -50);
+	this.initModel(modelpath + 'moon01_rescaled.js', -50, 60, -50);
+	this.initModel(modelpath + 'body_base_nopane.js', -10, 0, -10);
+	this.initModel(modelpath + 'body_flying_nopane.js', 10, 0, 10);
+	this.initModel(modelpath + 'body_flying2_nopane.js', 10, 0, -10);
+	this.initModel(modelpath + 'body_hero_nopane.js', -10, 0, 10);
+	this.initModel(modelpath + 'body_inactive_nopane.js', 0, 0, -15); 
+	this.initModel(modelpath + 'failwhale.js', 30, 20, -20); 
 }
 
 Gabscape.prototype.initModel = function(url, x, y, z)
@@ -133,7 +134,7 @@ Gabscape.prototype.initModel = function(url, x, y, z)
 
      // Create the params
        var params = {
-               materialType: SB.MaterialType.Phong,
+               materialType: SB.MaterialType.FromFile,
                //materialParam: {color: 0x00ff00, shading: THREE.SmoothShading }
                materialParam: {color: 0x00ff00 },
        } ;
@@ -520,7 +521,6 @@ Gabscape.prototype.help = function()
 	this.helpScreen.show();
 }
 
-Gabscape.default_bgcolor = '#000000';
 Gabscape.default_display_stats = false;
 Gabscape.users = ["tony", "john", "mark", "don", "theo"];
 Gabscape.user = "john";
