@@ -45,13 +45,18 @@ SB.Examples.ToonDemo.prototype.initModel = function(url, x, y, z)
 	
 	var diffuseTexture = './images/diffuse-tree.png';
 	var toonTexture = './images/toon-lookup.png';
-	
+
+	var params = {
+		materialType: SB.MaterialType.Phong
+		} ;
+
+/*
 	// Create the params
 	var params = {
 		materialType: SB.MaterialType.Shader,
 		materialParam: SB.Shaders.ToonShader(diffuseTexture, toonTexture)
 	} ;
-		
+*/		
 	var model = SB.Model.loadModel(url, params);
 	entity.addComponent(model);
 	
