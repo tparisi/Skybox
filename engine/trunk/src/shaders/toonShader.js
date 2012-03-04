@@ -18,6 +18,6 @@ SB.Shaders.ToonShader =
 
 	] ),
 
-	vertexShader: document.getElementById('toonVertexShader').textContent,
-	fragmentShader: document.getElementById('toonFragmenShader').textContent
+	//vertexShader: document.getElementById('toonVertexShader').textContent,
+	//fragmentShader: document.getElementById('toonFragmenShader').textContent
 } ;

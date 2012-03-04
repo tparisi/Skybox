@@ -19,14 +19,22 @@ SB.Examples.ToonDemo.prototype.initialize = function(param)
 
 SB.Examples.ToonDemo.prototype.initEntities = function()
 {
+	this.initModel('trees01.js', 0, 0, 0);
+	this.initModel('trees01.js', 100, 0, 0);
+}
+
+SB.Examples.ToonDemo.prototype.initModel = function(url, x, y, z)
+{
 	var entity = new SB.Entity();
 	
-	var transform = new SB.Transform();
-	entity.addComponent(transform);
-	entity.transform = transform;
+    var transform = new SB.Transform();
+    transform.position.x = x;
+    transform.position.y = y;
+    transform.position.z = z;
+    entity.addComponent(transform);
+    entity.transform = transform;
 	
-//	var model = new SB.CylinderVisual();
-	var model = SB.Model.loadModel('trees01.js');
+	var model = SB.Model.loadModel(url);
 	entity.addComponent(model);
 	
 	entity.realize();

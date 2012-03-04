@@ -4568,8 +4568,8 @@ SB.Shaders.ToonShader =
 
 	] ),
 
-	vertexShader: document.getElementById('toonVertexShader').textContent,
-	fragmentShader: document.getElementById('toonFragmenShader').textContent
+	//vertexShader: document.getElementById('toonVertexShader').textContent,
+	//fragmentShader: document.getElementById('toonFragmenShader').textContent
 } ;
 /**
  * @fileoverview Rotator - converts x,y mouse motion into rotation about an axis (event-driven)
