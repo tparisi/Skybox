@@ -89,7 +89,7 @@ Gabscape.prototype.createViewer = function()
 
 Gabscape.prototype.createNetwork = function()
 {
-	this.network = new Gabscape_GabClient("tony", this);
+	this.network = new Gabscape_GabClient("john", this);
 	this.network.connect();
 
 	
@@ -148,7 +148,7 @@ Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var i, len = Gabscape.users.length;
     for (i = 0; i < len; i++)
     {
-        if (i == 0) {
+        if (i == 1) {
             continue;
         }
         this.network.subscribeToUser(Gabscape.users[i]);
@@ -158,7 +158,7 @@ Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
 Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
     console.log('Got positionChangeEvent for ' + twitterId + ' ' + message.position.x + ' ' + message.position.y + ' ' + message.position.z);
 
-    if (twitterId == "john")
+    if (twitterId == "tony")
 	{
     	this.gabbers[0].transform.position.set(message.position.x, 
     			message.position.y, message.position.z);
@@ -168,7 +168,7 @@ Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
 Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
     console.log('Got orientationChangeEvent');
 
-    if (twitterId == "john")
+    if (twitterId == "tony")
 	{
     	this.gabbers[0].transform.rotation.set(message.orientation.pitch, 
     			message.orientation.yaw, message.orientation.roll);
@@ -181,10 +181,6 @@ Gabscape.prototype.actionEvent = function(twitterId, message) {
 
 Gabscape.prototype.updateNetwork = function(t) 
 {
-    if (this.network.spawned === false) {
-        // Don't send any updates until spawn occurs
-        return;
-    }
 	var deltat = t - this.lastNetworkUpdateTime;
 	if (deltat > 200)
 	{
