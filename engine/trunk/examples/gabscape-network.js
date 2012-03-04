@@ -23,10 +23,20 @@ Gabscape.prototype.initialize = function(param)
 	this.twitterInfo = param.info;
 	
 	SB.Game.prototype.initialize.call(this, param);
-	
+
 //	this.getTwitterData();
 }
 
+
+Gabscape.prototype.findGabber = function(gabberName) {
+    var i;
+    for (i = 0; i < this.gabbers.length; i++) {
+        if (this.gabbers[i].name === gabberName) {
+            return this.gabbers[i];
+        }
+    }
+    return undefined;
+}
 
 Gabscape.prototype.initEntities = function()
 {
@@ -51,27 +61,28 @@ Gabscape.prototype.initEntities = function()
 	this.root.addComponent(grid);
 	
 	this.initModels();
-	
-	var g1 = new Gabber({name: "Gabber1" });
-	g1.transform.position.set(15, 0, -20);
 
-	var g2 = new Gabber({name: "Gabber2" });
-	g2.transform.position.set(-25, 0, -33);
+    this.gabbers = [];
+    var i;
+    for (i = 0; i < Gabscape.users.length; i++) {
+        var g1 = new Gabber({name: Gabscape.users[i]});
+        g1.name = Gabscape.users[i];
+        g1.transform.position.set(0, 0, 0);
+        this.gabbers.push(g1);
+    }
 
-	var g3 = new Gabber({name: "Gabber3" });
-	g3.transform.position.set(0, 0, -15);
+
+    for (i = 0; i < this.gabbers.length; i++) {
+        this.root.addChild(this.gabbers[i]);
+    }
 
 	this.createViewer();
 	this.createNetwork();
-	
-	this.gabbers = [g1, g2, g3];
+
 	this.activeGabber = null;
-	
-	this.root.addChild(g1);
-	this.root.addChild(g2);
-	this.root.addChild(g3);
+
 	this.root.addChild(this.viewer);
-	
+
 	this.addEntity(this.root);
 
 	this.root.realize();
@@ -89,10 +100,8 @@ Gabscape.prototype.createViewer = function()
 
 Gabscape.prototype.createNetwork = function()
 {
-	this.network = new Gabscape_GabClient("john", this);
+	this.network = new Gabscape_GabClient(Gabscape.user, this);
 	this.network.connect();
-
-	
 	this.lastNetworkUpdateTime = 0;
 }
 
@@ -148,7 +157,8 @@ Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var i, len = Gabscape.users.length;
     for (i = 0; i < len; i++)
     {
-        if (i == 1) {
+        if (Gabscape.users[i] === Gabscape.user) {
+            // Don't subscribe to self.
             continue;
         }
         this.network.subscribeToUser(Gabscape.users[i]);
@@ -156,27 +166,29 @@ Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
 }
 
 Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
-    console.log('Got positionChangeEvent for ' + twitterId + ' ' + message.position.x + ' ' + message.position.y + ' ' + message.position.z);
+    console.log('Got positionChangeEvent for ' + twitterId);
 
-    if (twitterId == "tony")
-	{
-    	this.gabbers[0].transform.position.set(message.position.x, 
-    			message.position.y, message.position.z);
-	}
+    var gabber = this.findGabber(twitterId);
+    if (gabber === undefined) {
+        console.log('Could not find gabber: ' + twitterId);
+        return;
+    }
+    gabber.transform.position.set(message.position.x, message.position.y, message.position.z);
 }
 
 Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
-    console.log('Got orientationChangeEvent');
+    console.log('Got orientationChangeEvent for ' + twitterId);
 
-    if (twitterId == "tony")
-	{
-    	this.gabbers[0].transform.rotation.set(message.orientation.pitch, 
-    			message.orientation.yaw, message.orientation.roll);
-	}
+    var gabber = this.findGabber(twitterId);
+    if (gabber === undefined) {
+        console.log('Could not find gabber: ' + twitterId);
+        return;
+    }
+    gabber.transform.rotation.set(message.orientation.pitch, message.orientation.yaw, message.orientation.roll);
 }
 
 Gabscape.prototype.actionEvent = function(twitterId, message) {
-    console.log('Got actionEvent');
+    console.log('Got actionEvent for ' + twitterId);
 }
 
 Gabscape.prototype.updateNetwork = function(t) 
@@ -511,3 +523,4 @@ Gabscape.prototype.help = function()
 Gabscape.default_bgcolor = '#000000';
 Gabscape.default_display_stats = false;
 Gabscape.users = ["tony", "john", "mark", "don", "theo"];
+Gabscape.user = "john";
