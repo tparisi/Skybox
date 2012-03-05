@@ -4075,12 +4075,97 @@ SB.Dragger.prototype.update = function()
     this.lastx = this.x;
     this.lasty = this.y;
 }
+goog.provide('SB.Shaders');
+
+SB.Shaders = {} ;
+
+SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
+{
+	diffuse = diffuse || new THREE.Color( 0xFFFFFF );
+	ambient = ambient || new THREE.Color( 0x050505 );
+
+	var params = {	
+		uniforms: 
+			{
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
+			"specular": { type: "c", value: new THREE.Color( 0x333333 ) },
+			"diffuse" : { type: "c", value: diffuse },
+			"ambient" : { type: "c", value: ambient },
+			"shininess"    : { type: "f", value: 30 },
+			"ambientLightColor": { type: "c", value: new THREE.Color( 0x888888 ) }
+			},
+
+		fragmentShader: [
+			"uniform vec3 diffuse;",
+			"uniform vec3 ambient;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
+			"varying vec2 vUv;",
+			"uniform sampler2D uDiffuseTexture;",
+			"uniform sampler2D uToonTexture;",
+			"uniform vec3 ambientLightColor;",
+			"#if MAX_DIR_LIGHTS > 0",
+			"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
+			"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+			"#endif",
+			"varying vec3 vViewPosition;",
+			"varying vec3 vNormal;",
+
+			"void main() {",
+
+			"	vec3 normal = normalize( vNormal );",
+			"	vec3 viewPosition = normalize( vViewPosition );",
+
+			"	vec3 lightDir = normalize(vec3(1.0, 10.0, 0.0));",
+			"	vec3 lightColor = vec3(1.0, 0.4, 0.4);",
+				
+			"	vec4 lDirection = viewMatrix * vec4( lightDir, 0.0 );",
+			"	vec3 dirVector = normalize( lDirection.xyz );",
+			"	vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
+			"	float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
+			"	float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+			"	float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
+				
+			"	vec4 toonDiffuseWeight = texture2D(uToonTexture, vec2(dirDiffuseWeight, 0));",
+			"	vec4 toonSpecularWeight = texture2D(uToonTexture, vec2(dirSpecularWeight, 0));",
+			"	dirDiffuseWeight = toonDiffuseWeight.x;",
+			"	dirSpecularWeight = toonSpecularWeight.x;",
+			"	vec3 dirSpecular = specular * lightColor * dirSpecularWeight * dirDiffuseWeight;",
+			"	vec3 dirDiffuse = diffuse * lightColor * dirDiffuseWeight;",
+
+			"	gl_FragColor = vec4(( dirDiffuse + ambientLightColor * ambient ) + dirSpecular, 1.0);",
+			"}"
+		].join("\n"),
+		
+		vertexShader: [
+			"varying vec3 vViewPosition;",
+			"varying vec3 vNormal;",
+			"varying vec2 vUv;",
+			"uniform vec4 offsetRepeat;",
+
+			"void main() {",
+			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+			"	vUv = uv;",
+
+			"	vViewPosition = -mvPosition.xyz;",
+			"	vNormal = normalMatrix * normal;",
+
+			"	gl_Position = projectionMatrix * mvPosition;",
+			"}"
+		].join("\n")
+
+	} ;
+	
+	return params;
+} ;
 /**
  * @fileoverview A visual containing a model in JSON format
  * @author Don Olmstead
  */
 goog.provide('SB.JsonModel');
 goog.require('SB.Model');
+goog.require('SB.Shaders');
  
 /**
  * @constructor
@@ -4104,7 +4189,20 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	{
 		material = SB.Visual.realizeMaterial(this.param);
 	}
+
+	// HACK FOR TOON SHADING REMOVE
+	var diffuseTexture = './images/diffuse-tree.png';
+	var toonTexture = './images/toon-lookup.png';
 	
+	for (var i = 0; i < data.materials.length; i++)
+	{
+		var oldMaterial = data.materials[i];
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+	}
+
 	this.object = new THREE.Mesh(data, material);
 	
 	this.addToScene();
@@ -4524,6 +4622,11 @@ SB.Annotation = function(param)
 		this.setHTML(html);
 	}
 	
+	this.visible = param.visible || false;
+	if (this.visible)
+	{
+		this.show();
+	}
 }
         
 goog.inherits(SB.Annotation, SB.PubSub);
@@ -4548,12 +4651,14 @@ SB.Annotation.prototype.setPosition = function(pos)
 
 SB.Annotation.prototype.show  = function()
 {
-	this.dom.style.display = 'block';	
+	this.dom.style.display = 'block';
+	this.visible = true;
 }
 
 SB.Annotation.prototype.hide  = function()
 {
 	this.dom.style.display = 'none';
+	this.visible = false;
 }
 
 /**
@@ -4698,34 +4803,6 @@ SB.CubeVisual.prototype.realize = function()
     this.addToScene();
 }
 
-goog.provide('SB.Shaders');
-
-SB.Shaders = {} ;
-
-SB.Shaders.ToonShader = function(diffuseUrl, toonUrl)
-{
-	var params = {	
-		uniforms: THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "lights" ],
-			
-			{
-			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
-			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
-
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uDiffuseColor" : { type: "c", value: new THREE.Color( 0xFFFFFF ) },
-			"uAmbientColor" : { type: "c", value: new THREE.Color( 0x050505 ) },
-			"uShininess"    : { type: "f", value: 30 }
-			}
-
-		] ),
-
-		vertexShader: document.getElementById('toonVertexShader').textContent,
-		fragmentShader: document.getElementById('toonFragmentShader').textContent
-	} ;
-	
-	return params;
-} ;
 /**
  * @fileoverview General-purpose key frame animation
  * @author Tony Parisi
@@ -4968,10 +5045,9 @@ SB.ScreenTracker.prototype.update = function()
 
     var pos = this.calcPosition();
 	if (this.position.x != pos.x ||
-			this.position.y != pos.y)
+			this.position.y != pos.y ||
+			this.position.z != pos.z)
 	{
-		//console.log("Object screen position: " + pos.x + ", " + pos.y);
-
 	    this.publish("position", pos);
 	    this.position = pos;
 	}
@@ -4986,7 +5062,7 @@ SB.ScreenTracker.prototype.calcPosition = function()
 
 	var projected = pos.clone();
 	this.projector.projectVector(projected, this.camera);
-
+	
 	var eltx = (1 + projected.x) * this.container.offsetWidth / 2 ;
 	var elty = (1 - projected.y) * this.container.offsetHeight / 2;
 
@@ -4994,7 +5070,10 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	eltx += offset.left;
 	elty += offset.top;
 
-	return new THREE.Vector2(eltx, elty);
+	var cameramat = this.camera.matrixWorldInverse;
+	var cameraspacepos = cameramat.multiplyVector3(pos);
+	
+	return new THREE.Vector3(eltx, elty, -cameraspacepos.z);
 }
 goog.provide('SB.RigidBodyCircleBox2D');
 goog.require('SB.RigidBodyBox2D');

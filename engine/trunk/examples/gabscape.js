@@ -50,20 +50,22 @@ Gabscape.prototype.initEntities = function()
 	var g1 = new Gabber({name: "Gabber1" });
 	g1.transform.position.set(15, 0, -20);
 
+	/*
 	var g2 = new Gabber({name: "Gabber2" });
 	g2.transform.position.set(-25, 0, -33);
 
 	var g3 = new Gabber({name: "Gabber3" });
 	g3.transform.position.set(0, 0, -15);
-
+	*/
+	
 	this.createViewer();
 	
-	this.gabbers = [g1, g2, g3];
+	this.gabbers = [g1]; // , g2, g3];
 	this.activeGabber = null;
 	
 	this.root.addChild(g1);
-	this.root.addChild(g2);
-	this.root.addChild(g3);
+//	this.root.addChild(g2);
+//	this.root.addChild(g3);
 	this.root.addChild(this.viewer);
 	
 	this.addEntity(this.root);

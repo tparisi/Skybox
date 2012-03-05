@@ -52,10 +52,9 @@ SB.ScreenTracker.prototype.update = function()
 
     var pos = this.calcPosition();
 	if (this.position.x != pos.x ||
-			this.position.y != pos.y)
+			this.position.y != pos.y ||
+			this.position.z != pos.z)
 	{
-		//console.log("Object screen position: " + pos.x + ", " + pos.y);
-
 	    this.publish("position", pos);
 	    this.position = pos;
 	}
@@ -70,7 +69,7 @@ SB.ScreenTracker.prototype.calcPosition = function()
 
 	var projected = pos.clone();
 	this.projector.projectVector(projected, this.camera);
-
+	
 	var eltx = (1 + projected.x) * this.container.offsetWidth / 2 ;
 	var elty = (1 - projected.y) * this.container.offsetHeight / 2;
 
@@ -78,5 +77,8 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	eltx += offset.left;
 	elty += offset.top;
 
-	return new THREE.Vector2(eltx, elty);
+	var cameramat = this.camera.matrixWorldInverse;
+	var cameraspacepos = cameramat.multiplyVector3(pos);
+	
+	return new THREE.Vector3(eltx, elty, -cameraspacepos.z);
 }

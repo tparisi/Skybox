@@ -68,7 +68,7 @@ Gabber = function(param)
 	this.monsterID = Gabber.monsterID++;
 	this.annotation = new SB.Annotation( { style : "text300" } );
 	this.annotation.setHTML("@" + param.name);
-	this.annotation.show();
+	// this.annotation.show();
 }
 
 goog.inherits(Gabber, SB.Entity);
@@ -282,7 +282,17 @@ Gabber.prototype.turn = function(direction)
 
 Gabber.prototype.onScreenPositionChanged = function(pos)
 {
+	// console.log("Z = " + pos.z);
+
 	this.annotation.setPosition(pos);
+	if (pos.z < 0 && this.annotation.visible)
+	{
+		this.annotation.hide();
+	}
+	else if (pos.z >= 0 && !this.annotation.visible)
+	{
+		this.annotation.show();
+	}
 }
 
 Gabber.highlightColor = 0xcc00cc;

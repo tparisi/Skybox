@@ -20,6 +20,11 @@ SB.Annotation = function(param)
 		this.setHTML(html);
 	}
 	
+	this.visible = param.visible || false;
+	if (this.visible)
+	{
+		this.show();
+	}
 }
         
 goog.inherits(SB.Annotation, SB.PubSub);
@@ -44,11 +49,13 @@ SB.Annotation.prototype.setPosition = function(pos)
 
 SB.Annotation.prototype.show  = function()
 {
-	this.dom.style.display = 'block';	
+	this.dom.style.display = 'block';
+	this.visible = true;
 }
 
 SB.Annotation.prototype.hide  = function()
 {
 	this.dom.style.display = 'none';
+	this.visible = false;
 }
 
