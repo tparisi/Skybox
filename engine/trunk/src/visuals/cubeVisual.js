@@ -41,10 +41,12 @@ SB.CubeVisual.prototype.realize = function()
     	color = this.param.color;
     }
     
+    var map = this.param.map;
+    
     var ambient = this.param.ambient || 0;
     
 	var geometry = new THREE.CubeGeometry(width, height, depth);
-	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial( { color: color, opacity: 1, ambient: ambient, transparent: false, wireframe: false } ));
+	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial( { color: color, map:map, opacity: 1, ambient: ambient, transparent: false, wireframe: false } ));
 	
     this.addToScene();
 }

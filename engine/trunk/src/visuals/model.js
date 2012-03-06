@@ -37,7 +37,7 @@ SB.Model.prototype.animate  = function(animating)
 
 SB.Model.default_frame_rate = 30;
 
-SB.Model.loadModel = function(url, param)
+SB.Model.loadModel = function(url, param, callback)
 {
 	var spliturl = url.split('.');
 	var len = spliturl.length;
@@ -78,7 +78,11 @@ SB.Model.loadModel = function(url, param)
 		
 		var loader = new loaderClass;
 		loader.load(url, function (data) {
-			model.handleLoaded(data)
+			model.handleLoaded(data);
+			if (callback)
+			{
+				callback(data);
+			}
 		});
 		
 		return model;

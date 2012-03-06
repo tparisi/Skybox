@@ -26,7 +26,8 @@ Gabatar = function(param)
     var url = './models/body_hero_nopane.js';
     this.body = SB.Model.loadModel(url, params);
     url = './models/avatar_display.js';
-    this.display = SB.Model.loadModel(url, params);
+    this.display = new SB.CubeVisual({width:.444, height:.444, depth:.1, color:0xffffff, map: THREE.ImageUtils.loadTexture( "./images/Twitter1.jpg" )});
+    this.display.position.y = 2.62;
     url = './models/avatar_frame.js';
     this.displayFrame = SB.Model.loadModel(url, params);
 

@@ -23,25 +23,35 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	if (this.param.materialType == SB.MaterialType.FromFile)
 	{
 		material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
+		if (this.param.map)
+		{
+			for (var i = 0; i < data.materials.length; i++)
+			{
+				data.materials[i].map = this.param.map;
+			}
+		}
 	}
 	else
 	{
 		material = SB.Visual.realizeMaterial(this.param);
 	}
 
-	// HACK FOR TOON SHADING REMOVE
-	var diffuseTexture = './images/diffuse-tree.png';
-	var toonTexture = './images/toon-lookup.png';
-	
-	for (var i = 0; i < data.materials.length; i++)
+	if (false)
 	{
-		var oldMaterial = data.materials[i];
+		// HACK FOR TOON SHADING REMOVE
+		var diffuseTexture = './images/diffuse-tree.png';
+		var toonTexture = './images/toon-lookup.png';
 		
-		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
-		
-		data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		for (var i = 0; i < data.materials.length; i++)
+		{
+			var oldMaterial = data.materials[i];
+			
+			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+			
+			data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		}
 	}
-
+	
 	this.object = new THREE.Mesh(data, material);
 	
 	this.addToScene();

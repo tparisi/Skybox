@@ -2961,7 +2961,7 @@ SB.Model.prototype.animate  = function(animating)
 
 SB.Model.default_frame_rate = 30;
 
-SB.Model.loadModel = function(url, param)
+SB.Model.loadModel = function(url, param, callback)
 {
 	var spliturl = url.split('.');
 	var len = spliturl.length;
@@ -3002,7 +3002,11 @@ SB.Model.loadModel = function(url, param)
 		
 		var loader = new loaderClass;
 		loader.load(url, function (data) {
-			model.handleLoaded(data)
+			model.handleLoaded(data);
+			if (callback)
+			{
+				callback(data);
+			}
 		});
 		
 		return model;
@@ -4184,25 +4188,35 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	if (this.param.materialType == SB.MaterialType.FromFile)
 	{
 		material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
+		if (this.param.map)
+		{
+			for (var i = 0; i < data.materials.length; i++)
+			{
+				data.materials[i].map = this.param.map;
+			}
+		}
 	}
 	else
 	{
 		material = SB.Visual.realizeMaterial(this.param);
 	}
 
-	// HACK FOR TOON SHADING REMOVE
-	var diffuseTexture = './images/diffuse-tree.png';
-	var toonTexture = './images/toon-lookup.png';
-	
-	for (var i = 0; i < data.materials.length; i++)
+	if (false)
 	{
-		var oldMaterial = data.materials[i];
+		// HACK FOR TOON SHADING REMOVE
+		var diffuseTexture = './images/diffuse-tree.png';
+		var toonTexture = './images/toon-lookup.png';
 		
-		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
-		
-		data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		for (var i = 0; i < data.materials.length; i++)
+		{
+			var oldMaterial = data.materials[i];
+			
+			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+			
+			data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		}
 	}
-
+	
 	this.object = new THREE.Mesh(data, material);
 	
 	this.addToScene();
@@ -4795,10 +4809,12 @@ SB.CubeVisual.prototype.realize = function()
     	color = this.param.color;
     }
     
+    var map = this.param.map;
+    
     var ambient = this.param.ambient || 0;
     
 	var geometry = new THREE.CubeGeometry(width, height, depth);
-	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial( { color: color, opacity: 1, ambient: ambient, transparent: false, wireframe: false } ));
+	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial( { color: color, map:map, opacity: 1, ambient: ambient, transparent: false, wireframe: false } ));
 	
     this.addToScene();
 }
