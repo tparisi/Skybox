@@ -4201,7 +4201,7 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 		material = SB.Visual.realizeMaterial(this.param);
 	}
 
-	if (false)
+	if (true)
 	{
 		// HACK FOR TOON SHADING REMOVE
 		var diffuseTexture = './images/diffuse-tree.png';
