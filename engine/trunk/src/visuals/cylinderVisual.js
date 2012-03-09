@@ -34,11 +34,11 @@ SB.CylinderVisual.prototype.realize = function()
     var segmentsRadius = this.param.segmentsRadius || 100;
     var segmentsHeight = this.param.segmentsHeight || 100;
     var openEnded = this.param.openEnded || false;
-    
+    var color = this.param.color || 0xFFFFFF;
     var ambient = this.param.ambient || 0;
     
 	var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded);
-	this.object = new THREE.Mesh(geometry, SB.Visual.realizeMaterial(this.param));
+	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color : color }));
 	
     this.addToScene();
 }

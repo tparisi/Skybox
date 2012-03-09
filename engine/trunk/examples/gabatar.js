@@ -41,7 +41,7 @@ Gabatar = function(param)
 
 	this.screenTracker.subscribe("position", this, this.onScreenPositionChanged);
 
-	this.annotation = new SB.Annotation( { style : "text500" } );
+	this.annotation = new SB.Annotation( { style : "text300" } );
 	var userText = "Me";
 	if (param.info)
 	{
