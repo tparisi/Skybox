@@ -18,13 +18,18 @@ Gabber = function(param)
             map: THREE.ImageUtils.loadTexture( "./images/Twitter1.jpg" ),
     } ;
 
+    var that = this;
+    var callback = function(model) {
+    	that.onModelLoaded(model);
+    };
+    
     var url = './models/body_hero_nopane.js';
-    this.body = SB.Model.loadModel(url, params);
+    this.body = SB.Model.loadModel(url, params, callback);
 	url = './models/avatar_display.js';
     this.display = new SB.CubeVisual({width:.444, height:.444, depth:.1, color:0xffffff, map: THREE.ImageUtils.loadTexture( "./images/Twitter1.jpg" )});
     this.display.position.y = 2.62;
     url = './models/avatar_frame.js';
-    this.displayFrame = SB.Model.loadModel(url, params);
+    this.displayFrame = SB.Model.loadModel(url, params, callback);
 
 	this.picker = new SB.Picker();
 	this.rotator = new SB.Rotator();
@@ -85,6 +90,15 @@ Gabber.prototype.realize = function()
 {
 	SB.Entity.prototype.realize.call(this);
 	this.screenTracker.start();
+}
+
+
+Gabber.prototype.onModelLoaded = function(model)
+{
+	if (model)
+	{
+		model.applyShader(SB.Shaders.ToonShader);
+	}
 }
 
 Gabber.prototype.onMouseOver = function(x, y)

@@ -2959,6 +2959,14 @@ SB.Model.prototype.animate  = function(animating)
 	}
 }
 
+SB.Model.prototype.applyShader = function(shaderClass)
+{
+	if (this.object && this.object.geometry && shaderClass && shaderClass.applyShader)
+	{
+		shaderClass.applyShader(this.object);
+	}
+}
+
 SB.Model.default_frame_rate = 30;
 
 SB.Model.loadModel = function(url, param, callback)
@@ -3005,7 +3013,7 @@ SB.Model.loadModel = function(url, param, callback)
 			model.handleLoaded(data);
 			if (callback)
 			{
-				callback(data);
+				callback(model);
 			}
 		});
 		
@@ -4091,7 +4099,7 @@ SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
 	var params = {	
 		uniforms: 
 			{
-			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uDiffuseTexture" : { type: "t", value: 0, texture: null /*THREE.ImageUtils.loadTexture(diffuseUrl)*/ },
 			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
 			"specular": { type: "c", value: new THREE.Color( 0x333333 ) },
 			"diffuse" : { type: "c", value: diffuse },
@@ -4163,6 +4171,30 @@ SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
 	
 	return params;
 } ;
+
+
+SB.Shaders.ToonShader.applyShader = function(object)
+{
+	var geometry = object.geometry;
+	var material = object.material;
+	
+	if (material instanceof THREE.MeshFaceMaterial)
+	{
+		// HACK FOR TOON SHADING REMOVE
+		var diffuseTexture = './images/diffuse-tree.png';
+		var toonTexture = './images/toon-lookup.png';
+		
+		for (var i = 0; i < geometry.materials.length; i++)
+		{
+			var oldMaterial = geometry.materials[i];
+			
+			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+			
+			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		}
+	}
+}
+
 /**
  * @fileoverview A visual containing a model in JSON format
  * @author Don Olmstead
@@ -4201,7 +4233,7 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 		material = SB.Visual.realizeMaterial(this.param);
 	}
 
-	if (true)
+	if (false)
 	{
 		// HACK FOR TOON SHADING REMOVE
 		var diffuseTexture = './images/diffuse-tree.png';
@@ -4218,9 +4250,10 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	}
 	
 	this.object = new THREE.Mesh(data, material);
-	
+
 	this.addToScene();
 }
+
 /**
  * @fileoverview Timer - component that generates time events
  * 

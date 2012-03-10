@@ -35,6 +35,14 @@ SB.Model.prototype.animate  = function(animating)
 	}
 }
 
+SB.Model.prototype.applyShader = function(shaderClass)
+{
+	if (this.object && this.object.geometry && shaderClass && shaderClass.applyShader)
+	{
+		shaderClass.applyShader(this.object);
+	}
+}
+
 SB.Model.default_frame_rate = 30;
 
 SB.Model.loadModel = function(url, param, callback)
@@ -81,7 +89,7 @@ SB.Model.loadModel = function(url, param, callback)
 			model.handleLoaded(data);
 			if (callback)
 			{
-				callback(data);
+				callback(model);
 			}
 		});
 		

@@ -82,3 +82,27 @@ SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
 	
 	return params;
 } ;
+
+
+SB.Shaders.ToonShader.applyShader = function(object)
+{
+	var geometry = object.geometry;
+	var material = object.material;
+	
+	if (material instanceof THREE.MeshFaceMaterial)
+	{
+		// HACK FOR TOON SHADING REMOVE
+		var diffuseTexture = './images/diffuse-tree.png';
+		var toonTexture = './images/toon-lookup.png';
+		
+		for (var i = 0; i < geometry.materials.length; i++)
+		{
+			var oldMaterial = geometry.materials[i];
+			
+			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+			
+			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		}
+	}
+}
+

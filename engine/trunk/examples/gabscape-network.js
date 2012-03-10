@@ -187,12 +187,19 @@ Gabscape.prototype.initModel = function(url, x, y, z)
        } ;
 
 
-       var model = SB.Model.loadModel(url, params);
+       var that = this;
+       var model = SB.Model.loadModel(url, params, function(model) { that.onModelLoaded(model); });
        entity.addComponent(model);
 
-       entity.realize();
+       this.root.addChild(entity);
+}
 
-       this.addEntity(entity);
+Gabscape.prototype.onModelLoaded = function(model)
+{
+	if (model)
+	{
+		model.applyShader(SB.Shaders.ToonShader);
+	}
 }
 
 Gabscape.prototype.initSound = function()
