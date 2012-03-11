@@ -64,6 +64,7 @@ goog.inherits(Gabatar, SB.Entity);
 Gabatar.prototype.realize = function() 
 {
 	SB.Entity.prototype.realize.call(this);
+    SB.Shaders.ToonShader.applyShader(this.display.object);
 	this.screenTracker.start();
 }
 

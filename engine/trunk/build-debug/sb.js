@@ -4099,7 +4099,7 @@ SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
 	var params = {	
 		uniforms: 
 			{
-			"uDiffuseTexture" : { type: "t", value: 0, texture: null /*THREE.ImageUtils.loadTexture(diffuseUrl)*/ },
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
 			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
 			"specular": { type: "c", value: new THREE.Color( 0x333333 ) },
 			"diffuse" : { type: "c", value: diffuse },
@@ -4192,6 +4192,14 @@ SB.Shaders.ToonShader.applyShader = function(object)
 			
 			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
 		}
+	}
+	else
+	{
+		var oldMaterial = material;
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		object.material = new THREE.ShaderMaterial(newMaterialParams);
 	}
 }
 

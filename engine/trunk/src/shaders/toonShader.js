@@ -104,5 +104,13 @@ SB.Shaders.ToonShader.applyShader = function(object)
 			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
 		}
 	}
+	else
+	{
+		var oldMaterial = material;
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		object.material = new THREE.ShaderMaterial(newMaterialParams);
+	}
 }
 
