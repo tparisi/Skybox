@@ -2,7 +2,6 @@
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Time');
 

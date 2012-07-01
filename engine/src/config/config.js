@@ -1,6 +1,6 @@
 /**
- * @fileoverview Contains configuration options for the Forbidden Engine.
- * @author Don Olmstead
+ * @fileoverview Contains configuration options for the Skybox Engine.
+ * @author Tony Parisi
  */
 goog.provide('SB.Config');
 

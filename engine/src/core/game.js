@@ -2,7 +2,6 @@
  * @fileoverview The base Game class
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Game');
 goog.require('SB.Time');

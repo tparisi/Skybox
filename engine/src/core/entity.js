@@ -2,7 +2,6 @@
  * @fileoverview Entity collects a group of Components that define a game object and its behaviors
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Entity');
 goog.require('SB.PubSub');

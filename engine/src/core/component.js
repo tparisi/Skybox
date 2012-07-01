@@ -2,7 +2,6 @@
  * @fileoverview Component is the base class for defining objects used within an Entity
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Component');
 goog.require('SB.PubSub');

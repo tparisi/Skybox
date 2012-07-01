@@ -1,6 +1,6 @@
 /**
  * @fileoverview A visual containing a cylinder mesh.
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.CylinderVisual');
 goog.require('SB.Visual');

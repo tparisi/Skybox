@@ -1666,7 +1666,6 @@ SB.Input.instance = null;/**
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Time');
 
@@ -1695,8 +1694,8 @@ SB.Time.prototype.update = function()
 SB.Time.instance = null;
 	        
 /**
- * @fileoverview Contains configuration options for the Forbidden Engine.
- * @author Don Olmstead
+ * @fileoverview Contains configuration options for the Skybox Engine.
+ * @author Tony Parisi
  */
 goog.provide('SB.Config');
 
@@ -1708,7 +1707,6 @@ SB.Config.USE_WEBGL = true;
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Graphics');
 
@@ -1728,7 +1726,6 @@ SB.Graphics.instance = null;
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.require('SB.Graphics');
 goog.provide('SB.GraphicsThreeJS');
@@ -2129,7 +2126,6 @@ SB.Services.registerService = function(serviceName, object)
  * @fileoverview The base Game class
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Game');
 goog.require('SB.Time');
@@ -2449,7 +2445,6 @@ SB.PubSub.postMessages = false;
  * @fileoverview Component is the base class for defining objects used within an Entity
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Component');
 goog.require('SB.PubSub');
@@ -3263,7 +3258,6 @@ SB.PhysicsSystemBox2D.prototype.addBody = function(body) {
  * @fileoverview Entity collects a group of Components that define a game object and its behaviors
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Entity');
 goog.require('SB.PubSub');
@@ -4205,7 +4199,7 @@ SB.Shaders.ToonShader.applyShader = function(object)
 
 /**
  * @fileoverview A visual containing a model in JSON format
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.JsonModel');
 goog.require('SB.Model');
@@ -4317,7 +4311,7 @@ SB.Timer.prototype.stop = function()
 
 /**
  * @fileoverview A visual containing a cylinder mesh.
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.CylinderVisual');
 goog.require('SB.Visual');
@@ -4363,7 +4357,6 @@ SB.CylinderVisual.prototype.realize = function()
  * @fileoverview FSM - Finite State Machine class
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 
 goog.provide('SB.FSM');
@@ -4809,7 +4802,7 @@ SB.KeyFrameAnimator.prototype.update = function()
 SB.KeyFrameAnimator.default_duration = 1000;
 /**
  * @fileoverview A visual containing a cylinder mesh.
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.CubeVisual');
 goog.require('SB.Visual');

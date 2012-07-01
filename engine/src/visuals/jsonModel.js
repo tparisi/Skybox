@@ -1,6 +1,6 @@
 /**
  * @fileoverview A visual containing a model in JSON format
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.JsonModel');
 goog.require('SB.Model');

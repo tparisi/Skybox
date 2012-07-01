@@ -2,7 +2,6 @@
  * @fileoverview FSM - Finite State Machine class
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 
 goog.provide('SB.FSM');
