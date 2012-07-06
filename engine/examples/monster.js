@@ -13,7 +13,6 @@ SB.Examples.Monster = function(param)
 	this.mover = new SB.KeyFrame({ loop : false, easeOut : true });
 	this.spinner = new SB.KeyFrame({ loop : true, easeOut : false });
 	this.timer = new SB.Timer( { duration : 3333 } );
-	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(0, 3.667, 0) });
 	
 	this.addComponent(this.transform);
 	this.addComponent(this.model);
@@ -24,7 +23,6 @@ SB.Examples.Monster = function(param)
 	this.addComponent(this.spinner);
 	this.addComponent(this.mover);
 	this.addComponent(this.timer);
-	this.addComponent(this.screenTracker);
 
 	this.dragger.subscribe("move", this, this.onDraggerMove);
 	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
@@ -41,9 +39,7 @@ SB.Examples.Monster = function(param)
 	
 	this.timer.subscribe("time", this, this.onTimeChanged);
 	this.timer.subscribe("fraction", this, this.onTimeFractionChanged);
-	
-	this.screenTracker.subscribe("position", this, this.onScreenPositionChanged);
-	
+		
 	this.dragging = true;
 	this.rotating = true;
 	this.whichKeyDown = 0;
@@ -52,9 +48,6 @@ SB.Examples.Monster = function(param)
 	this.savedColor = null;
 	
 	this.monsterID = SB.Examples.Monster.monsterID++;
-	this.annotation = new SB.Annotation( { style : "text300" } );
-	this.annotation.setHTML("@Monster_" + (this.monsterID + 1));
-	this.annotation.show();
 }
 
 goog.inherits(SB.Examples.Monster, SB.Entity);
@@ -62,7 +55,6 @@ goog.inherits(SB.Examples.Monster, SB.Entity);
 SB.Examples.Monster.prototype.realize = function() 
 {
 	SB.Entity.prototype.realize.call(this);
-	this.screenTracker.start();
 }
 
 SB.Examples.Monster.prototype.onMouseOver = function(x, y)
@@ -262,13 +254,6 @@ SB.Examples.Monster.prototype.turn = function(direction)
 {
 	var delta = direction * .0333;
 	this.transform.rotation.y += delta;
-//	var delta = direction * this.turnFraction * (Math.PI * 2); // .0333;
-//	this.transform.rotation.y = delta; // += delta;
-}
-
-SB.Examples.Monster.prototype.onScreenPositionChanged = function(pos)
-{
-	this.annotation.setPosition(pos);
 }
 
 SB.Examples.Monster.highlightColor = 0xcc00cc;
