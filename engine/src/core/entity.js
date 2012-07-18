@@ -37,6 +37,13 @@ SB.Entity = function() {
      * @private
      */
     this._components = [];
+    
+    
+    /**
+     * @type {Boolean}
+     * @private
+     */
+    this._realized = false;
 }
 
 goog.inherits(SB.Entity, SB.PubSub);
@@ -82,6 +89,12 @@ SB.Entity.prototype.addChild = function(child) {
 
     child.setParent(this);
     this._children.push(child);
+
+    if (this._realized && !child._realized)
+    {
+    	child.realize();
+    }
+
 }
 
 /**
@@ -111,13 +124,29 @@ SB.Entity.prototype.addComponent = function(component) {
     {
         throw new Error('Cannot add a null component');
     }
-    if (component.entity)
+    
+    if (component._entity)
     {
         throw new Error('Component is already attached to an Entity')
     }
 
+    if (component instanceof SB.Transform)
+    {
+    	if (this.transform != null && component != this.transform)
+    	{
+            throw new Error('Entity already has a Transform component')
+    	}
+    	
+    	this.transform = component;
+    }
+    
     this._components.push(component);
     component.setEntity(this);
+    
+    if (this._realized && !component._realized)
+    {
+    	component.realize();
+    }
 }
 
 /**
@@ -134,6 +163,25 @@ SB.Entity.prototype.removeComponent = function(component) {
     }
 }
 
+/**
+ * Retrieves a Component of a given type in the Entity.
+ * @param {Object} type.
+ */
+SB.Entity.prototype.getComponent = function(type) {
+	var i, len = this._components.length;
+	
+	for (i = 0; i < len; i++)
+	{
+		var component = this._components[i];
+		if (component instanceof type)
+		{
+			return component;
+		}
+	}
+	
+	return null;
+}
+
 //---------------------------------------------------------------------
 //Initialize methods
 //---------------------------------------------------------------------
@@ -141,6 +189,8 @@ SB.Entity.prototype.removeComponent = function(component) {
 SB.Entity.prototype.realize = function() {
     this.realizeComponents();
     this.realizeChildren();
+        
+    this._realized = true;
 }
 
 /**

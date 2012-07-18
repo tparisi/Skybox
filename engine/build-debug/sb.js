@@ -2464,6 +2464,12 @@ SB.Component = function(param) {
      * @private
      */
     this._entity = null;
+    
+    /**
+     * @type {Boolean}
+     * @private
+     */
+    this._realized = false;
 }
 
 goog.inherits(SB.Component, SB.PubSub);
@@ -2485,7 +2491,7 @@ SB.Component.prototype.setEntity = function(entity) {
 }
 
 SB.Component.prototype.realize = function() {
-    
+    this._realized = true;
 }
 
 SB.Component.prototype.update = function() {
@@ -2781,6 +2787,11 @@ SB.Camera.prototype.realize = function()
 SB.Camera.prototype.bind = function() 
 {
 	SB.Graphics.instance.camera = this.object;
+}
+
+SB.Camera.prototype.lookAt = function(v) 
+{
+	this.object.lookAt(v);
 }
 /**
  *
@@ -3293,6 +3304,13 @@ SB.Entity = function() {
      * @private
      */
     this._components = [];
+    
+    
+    /**
+     * @type {Boolean}
+     * @private
+     */
+    this._realized = false;
 }
 
 goog.inherits(SB.Entity, SB.PubSub);
@@ -3338,6 +3356,12 @@ SB.Entity.prototype.addChild = function(child) {
 
     child.setParent(this);
     this._children.push(child);
+
+    if (this._realized && !child._realized)
+    {
+    	child.realize();
+    }
+
 }
 
 /**
@@ -3367,13 +3391,29 @@ SB.Entity.prototype.addComponent = function(component) {
     {
         throw new Error('Cannot add a null component');
     }
-    if (component.entity)
+    
+    if (component._entity)
     {
         throw new Error('Component is already attached to an Entity')
     }
 
+    if (component instanceof SB.Transform)
+    {
+    	if (this.transform != null && component != this.transform)
+    	{
+            throw new Error('Entity already has a Transform component')
+    	}
+    	
+    	this.transform = component;
+    }
+    
     this._components.push(component);
     component.setEntity(this);
+    
+    if (this._realized && !component._realized)
+    {
+    	component.realize();
+    }
 }
 
 /**
@@ -3390,6 +3430,25 @@ SB.Entity.prototype.removeComponent = function(component) {
     }
 }
 
+/**
+ * Retrieves a Component of a given type in the Entity.
+ * @param {Object} type.
+ */
+SB.Entity.prototype.getComponent = function(type) {
+	var i, len = this._components.length;
+	
+	for (i = 0; i < len; i++)
+	{
+		var component = this._components[i];
+		if (component instanceof type)
+		{
+			return component;
+		}
+	}
+	
+	return null;
+}
+
 //---------------------------------------------------------------------
 //Initialize methods
 //---------------------------------------------------------------------
@@ -3397,6 +3456,8 @@ SB.Entity.prototype.removeComponent = function(component) {
 SB.Entity.prototype.realize = function() {
     this.realizeComponents();
     this.realizeChildren();
+        
+    this._realized = true;
 }
 
 /**
@@ -4354,6 +4415,37 @@ SB.CylinderVisual.prototype.realize = function()
     this.addToScene();
 }
 /**
+ * @fileoverview A visual containing an arbitrary mesh.
+ * @author Tony Parisi
+ */
+goog.provide('SB.Mesh');
+goog.require('SB.Visual');
+
+/**
+ * @param {Object} param supports the following options:
+ * @constructor
+ * @extends {SB.Visual}
+ */
+SB.Mesh = function(param) {
+    SB.Visual.call(this, param);
+
+    this.param = param || {};
+}
+
+goog.inherits(SB.Mesh, SB.Visual);
+
+SB.Mesh.prototype.realize = function()
+{
+	SB.Visual.prototype.realize.call(this);
+	
+	this.geometry = new THREE.Geometry();
+	this.material = new THREE.MeshBasicMaterial({wireframe:true});
+	this.object = new THREE.Mesh(this.geometry, this.material);
+	
+    this.addToScene();
+}
+
+/**
  * @fileoverview FSM - Finite State Machine class
  * 
  * @author Tony Parisi
@@ -5193,6 +5285,53 @@ SB.NetworkClient.prototype.update = function()
     }
 }
 /**
+ * @fileoverview A PointSet visual
+ * @author Tony Parisi
+ */
+
+goog.provide('SB.PointSet');
+goog.require('SB.Visual');
+
+SB.PointSet = function(param) {
+
+    SB.Visual.call(this, param);
+
+    this.param = param || {};
+}
+
+goog.inherits(SB.PointSet, SB.Visual)
+
+SB.PointSet.prototype.realize = function()
+{
+	SB.Visual.prototype.realize.call(this);
+	
+	// Create a group to hold our particles
+	var group = new THREE.Object3D();
+
+	var i;
+	var geometry = new THREE.Geometry();
+
+	var nVerts = this.param.points.length;
+	
+	for ( i = 0; i < nVerts; i++)
+	{		
+		geometry.vertices.push( new THREE.Vertex( this.param.points[i] ) );
+	}
+
+	var material = new THREE.ParticleBasicMaterial( { color: this.param.color, 
+		size: 4, 
+		sizeAttenuation: false } );
+	
+	var particles = new THREE.ParticleSystem( geometry, material );
+
+	group.add( particles );
+
+	this.object = group;
+	    
+    this.addToScene();
+}
+
+/**
  * @fileoverview Zoomer - converts scalar input to x,y,z scale output
  * 
  * @author Tony Parisi
@@ -5303,8 +5442,10 @@ goog.require('SB.JsonModel');
 goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');
+goog.require('SB.Mesh');
 goog.require('SB.Model');
 goog.require('SB.Pane');
+goog.require('SB.PointSet');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');

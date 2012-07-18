@@ -53,8 +53,10 @@ goog.require('SB.JsonModel');
 goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');
+goog.require('SB.Mesh');
 goog.require('SB.Model');
 goog.require('SB.Pane');
+goog.require('SB.PointSet');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');

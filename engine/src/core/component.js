@@ -21,6 +21,12 @@ SB.Component = function(param) {
      * @private
      */
     this._entity = null;
+    
+    /**
+     * @type {Boolean}
+     * @private
+     */
+    this._realized = false;
 }
 
 goog.inherits(SB.Component, SB.PubSub);
@@ -42,7 +48,7 @@ SB.Component.prototype.setEntity = function(entity) {
 }
 
 SB.Component.prototype.realize = function() {
-    
+    this._realized = true;
 }
 
 SB.Component.prototype.update = function() {

@@ -22,3 +22,8 @@ SB.Camera.prototype.bind = function()
 {
 	SB.Graphics.instance.camera = this.object;
 }
+
+SB.Camera.prototype.lookAt = function(v) 
+{
+	this.object.lookAt(v);
+}
