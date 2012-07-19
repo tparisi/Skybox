@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <script src="../libs/JQuery/jquery-1.6.4.js"></script>
+    <script src="../libs/jquery-mousewheel-3.0.4/jquery.mousewheel.js"></script>
+    <script src="../libs/three/Three.js"></script>
+	<script src="../libs/three/Stats.js"></script>
+	<script src="../libs/requestAnimationFrame/RequestAnimationFrame.js"></script>
+    <script src="../build-debug/sb.js"></script>
+    <script src="meshTest.js"></script>
+    <script>
+      goog.require('SB.Game');
+    </script>
+</head>
+<body>
+<div id="container" style="width:98%; height:98%; position:absolute;"></div>
+    <script>
+        var game = new SB.Examples.MeshTest();
+		var container = document.getElementById("container");
+        game.initialize( { container : container, backgroundColor : "#000000" } );
+        game.run();
+    </script>
+</body>
+</html>

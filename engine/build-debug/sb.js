@@ -4439,13 +4439,24 @@ SB.Mesh.prototype.realize = function()
 	SB.Visual.prototype.realize.call(this);
 	
 	this.geometry = new THREE.Geometry();
-	this.material = new THREE.MeshBasicMaterial({wireframe:true});
+	this.material = new THREE.MeshBasicMaterial({wireframe:true, color: 0xff0000});
+	
 	this.object = new THREE.Mesh(this.geometry, this.material);
 	
     this.addToScene();
 }
 
-/**
+SB.Mesh.prototype.rebuild = function()
+{
+	this.geometry.computeCentroids();
+	this.geometry.computeFaceNormals();
+	this.geometry.computeBoundingBox();
+	this.geometry.computeBoundingSphere();
+	this.removeFromScene();
+	
+	this.object = new THREE.Mesh(this.geometry, this.material);
+	this.addToScene();
+}/**
  * @fileoverview FSM - Finite State Machine class
  * 
  * @author Tony Parisi
