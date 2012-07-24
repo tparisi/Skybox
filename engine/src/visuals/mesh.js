@@ -23,7 +23,8 @@ SB.Mesh.prototype.realize = function()
 	SB.Visual.prototype.realize.call(this);
 	
 	this.geometry = new THREE.Geometry();
-	this.material = new THREE.MeshBasicMaterial({wireframe:true, color: 0xff0000});
+	this.geometry.dynamic = true;
+	this.material = new THREE.MeshBasicMaterial({wireframe:true, color: 0xffffff});
 	
 	this.object = new THREE.Mesh(this.geometry, this.material);
 	

@@ -113,13 +113,17 @@ SB.Examples.MeshTest.prototype.onTimeFractionChanged = function(fract)
 		this.meshBuilt = true;
 	}
 	
+	var delta = fract - .5;
+	var cos = Math.cos(fract * Math.PI);
+	
 	var i, len = this.mesh.geometry.vertices.length;
 	for (i = 0; i < len; i++)
 	{
 		var vertex = this.mesh.geometry.vertices[i];
-		var pos = vertex.position;
-		pos.set(pos.x + 0.01, pos.y + 0.01, pos.z + 0.01);
+		vertex.position.x += delta;
+		vertex.position.y += cos / 2;
 	}
+//    this.mesh.geometry.__dirtyVertices = true;
 	
-	this.mesh.rotation.y = (fract * Math.PI * 2);	
+	//this.mesh.rotation.y = (fract * Math.PI * 2);	
 }
