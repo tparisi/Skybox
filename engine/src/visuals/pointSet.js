@@ -33,7 +33,8 @@ SB.PointSet.prototype.realize = function()
 	}
 
 	var material = new THREE.ParticleBasicMaterial( { color: this.param.color, 
-		size: 4, 
+		opacity : 0.5,
+		size: 2, 
 		sizeAttenuation: false } );
 	
 	var particles = new THREE.ParticleSystem( geometry, material );
