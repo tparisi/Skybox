@@ -43,20 +43,26 @@ SB.Examples.ToonDemo.prototype.initModel = function(url, x, y, z)
     entity.addComponent(transform);
     entity.transform = transform;
 	
-	/*
-	var diffuseTexture = './images/diffuse-tree.png';
-	var toonTexture = './images/toon-lookup.png';
-	*/
-	// Create the params
-	var params = {
-		materialType: SB.MaterialType.FromFile,
-		materialParam: { color: 0x00FF00 }
-	} ;
-	
-	var model = SB.Model.loadModel(url, params);
+    var that = this;
+    var callback = function(model) {
+    	that.onModelLoaded(model);
+    };
+    
+    var model = SB.Model.loadModel(url, null, callback);
 	entity.addComponent(model);
 	
 	entity.realize();
 	
 	this.addEntity(entity);
 }
+
+
+
+SB.Examples.ToonDemo.prototype.onModelLoaded = function(model)
+{
+	if (model)
+	{
+		model.applyShader(SB.Shaders.ToonShader);
+	}
+}
+

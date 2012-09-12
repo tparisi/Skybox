@@ -4,32 +4,18 @@ Gabber = function(param)
 	
 	this.transform = new SB.Transform();
 
-    // Create the params
-    var params = {
-            materialType: SB.MaterialType.FromFile,
-            //materialParam: {color: 0x00ff00, shading: THREE.SmoothShading }
-            materialParam: {color: 0x00ff00 },
-    } ;
-
-    var displayParams = {
-            materialType: SB.MaterialType.FromFile,
-            //materialParam: {color: 0x00ff00, shading: THREE.SmoothShading }
-            materialParam: {color: 0x00ff00 },
-            map: THREE.ImageUtils.loadTexture( "./images/Twitter1.jpg" ),
-    } ;
-
     var that = this;
     var callback = function(model) {
     	that.onModelLoaded(model);
     };
     
     var url = './models/body_hero_nopane.js';
-    this.body = SB.Model.loadModel(url, params, callback);
+    this.body = SB.Model.loadModel(url, null, callback);
 	url = './models/avatar_display.js';
     this.display = new SB.CubeVisual({width:.444, height:.444, depth:.1, color:0xffffff, map: THREE.ImageUtils.loadTexture( "./images/Twitter1.jpg" )});
     this.display.position.y = 2.62;
     url = './models/avatar_frame.js';
-    this.displayFrame = SB.Model.loadModel(url, params, callback);
+    this.displayFrame = SB.Model.loadModel(url, null, callback);
 
 	this.picker = new SB.Picker();
 	this.rotator = new SB.Rotator();

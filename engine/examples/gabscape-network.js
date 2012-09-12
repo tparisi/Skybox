@@ -179,16 +179,8 @@ Gabscape.prototype.initModel = function(url, x, y, z)
 	   entity.addComponent(transform);
 	   entity.transform = transform;
 
-     // Create the params
-       var params = {
-               materialType: SB.MaterialType.FromFile,
-               //materialParam: {color: 0x00ff00, shading: THREE.SmoothShading }
-               materialParam: {color: 0x00ff00 },
-       } ;
-
-
        var that = this;
-       var model = SB.Model.loadModel(url, params, function(model) { that.onModelLoaded(model); });
+       var model = SB.Model.loadModel(url, null, function(model) { that.onModelLoaded(model); });
        entity.addComponent(model);
 
        this.root.addChild(entity);

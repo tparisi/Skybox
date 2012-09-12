@@ -19,22 +19,7 @@ goog.inherits(SB.JsonModel, SB.Model);
 	       
 SB.JsonModel.prototype.handleLoaded = function(data)
 {
-	var material = null;
-	if (this.param.materialType == SB.MaterialType.FromFile)
-	{
-		material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
-		if (this.param.map)
-		{
-			for (var i = 0; i < data.materials.length; i++)
-			{
-				data.materials[i].map = this.param.map;
-			}
-		}
-	}
-	else
-	{
-		material = SB.Visual.realizeMaterial(this.param);
-	}
+	var material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
 	
 	this.object = new THREE.Mesh(data, material);
 

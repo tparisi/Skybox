@@ -2878,53 +2878,11 @@ goog.provide('SB.Visual');
 goog.require('SB.SceneComponent');
 
 /**
- * Enum for different material types.
- * @enum {number}
- */
-SB.MaterialType = {
-	Shader: 0,
-	Phong: 1,
-	Basic: 2,
-	User: 3,
-	FromFile: 4,
-} ;
-
-/**
  * @constructor
  */
 SB.Visual = function(param)
 {
 	SB.SceneComponent.call(this, param);	
-} ;
-
-/**
- * 
- */
-SB.Visual.realizeMaterial = function(param)
-{
-	if (param.materialType === null)
-	{
-		param.materialType = SB.MaterialType.Basic;
-		
-		param.materialParam = {
-			color: 0x262624,
-			wireframe: false
-		} ;
-	}
-	
-	switch (param.materialType)
-	{
-		case SB.MaterialType.Shader:
-			return new THREE.ShaderMaterial(param.materialParam);
-		case SB.MaterialType.Phong:
-			return new THREE.MeshPhongMaterial(param.materialParam);
-		case SB.MaterialType.User:
-		case SB.MaterialType.FromFile:
-			param.material;
-			break;
-		default:
-			return new THREE.MeshBasicMaterial(param.materialParam);
-	} ;
 } ;
 
 goog.inherits(SB.Visual, SB.SceneComponent);
@@ -4279,22 +4237,7 @@ goog.inherits(SB.JsonModel, SB.Model);
 	       
 SB.JsonModel.prototype.handleLoaded = function(data)
 {
-	var material = null;
-	if (this.param.materialType == SB.MaterialType.FromFile)
-	{
-		material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
-		if (this.param.map)
-		{
-			for (var i = 0; i < data.materials.length; i++)
-			{
-				data.materials[i].map = this.param.map;
-			}
-		}
-	}
-	else
-	{
-		material = SB.Visual.realizeMaterial(this.param);
-	}
+	var material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
 	
 	this.object = new THREE.Mesh(data, material);
 
