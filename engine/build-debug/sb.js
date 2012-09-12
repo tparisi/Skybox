@@ -4893,6 +4893,11 @@ SB.KeyFrameAnimator.prototype.update = function()
 	{
 		this.running = false;
 		this.publish("complete");
+		var i, len = this.interps.length;
+		for (i = 0; i < len; i++)
+		{
+			this.interps[i].interp(1);
+		}
 		return;
 	}
 	else
@@ -5311,6 +5316,9 @@ SB.PointSet = function(param) {
     SB.Visual.call(this, param);
 
     this.param = param || {};
+    this.param.color = this.param.color || 0;
+    this.param.opacity = this.param.opacity || 1;
+    this.param.size = this.param.size || 1;
 }
 
 goog.inherits(SB.PointSet, SB.Visual)
@@ -5333,8 +5341,8 @@ SB.PointSet.prototype.realize = function()
 	}
 
 	var material = new THREE.ParticleBasicMaterial( { color: this.param.color, 
-		opacity : 0.5,
-		size: 2, 
+		opacity : this.param.opacity,
+		size: this.param.size, 
 		sizeAttenuation: false } );
 	
 	var particles = new THREE.ParticleSystem( geometry, material );

@@ -76,6 +76,11 @@ SB.KeyFrameAnimator.prototype.update = function()
 	{
 		this.running = false;
 		this.publish("complete");
+		var i, len = this.interps.length;
+		for (i = 0; i < len; i++)
+		{
+			this.interps[i].interp(1);
+		}
 		return;
 	}
 	else
