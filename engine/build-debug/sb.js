@@ -1884,28 +1884,40 @@ SB.GraphicsThreeJS.prototype.objectFromMouse = function(pagex, pagey)
     var intersects = ray.intersectScene( this.scene );
 	
     if ( intersects.length > 0 ) {
-    	var intersected = intersects[0];
-    	return (this.findObjectFromIntersected(intersected.object, intersected.point));        	    	                             
+    	var i = 0;
+    	while(!intersects[i].object.visible)
+    	{
+    		i++;
+    	}
+    	
+    	var intersected = intersects[i];
+    	
+    	if (i >= intersects.length)
+    	{
+        	return { object : null, point : null, normal : null };
+    	}
+    	
+    	return (this.findObjectFromIntersected(intersected.object, intersected.point, intersected.face.normal));        	    	                             
     }
     else
     {
-    	return { object : null, point : null };
+    	return { object : null, point : null, normal : null };
     }
 }
 
-SB.GraphicsThreeJS.prototype.findObjectFromIntersected = function(object, point)
+SB.GraphicsThreeJS.prototype.findObjectFromIntersected = function(object, point, normal)
 {
 	if (object.data)
 	{
-		return { object: object.data, point: point };
+		return { object: object.data, point: point, normal: normal };
 	}
 	else if (object.parent)
 	{
-		return this.findObjectFromIntersected(object.parent, point);
+		return this.findObjectFromIntersected(object.parent, point, normal);
 	}
 	else
 	{
-		return null;
+		return { object : null, point : null, normal : null };
 	}
 }
 
