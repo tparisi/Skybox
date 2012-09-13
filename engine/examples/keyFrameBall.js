@@ -89,6 +89,6 @@ SB.Examples.KeyFrameBall.rotationValues = [ { z: 0 },
                                 { z: Math.PI * 2 },
                                 ];
 
-SB.Examples.KeyFrameBall.loopAnimation = true;
+SB.Examples.KeyFrameBall.loopAnimation = false;
 SB.Examples.KeyFrameBall.animation_time = 3000;
 
