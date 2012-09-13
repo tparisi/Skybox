@@ -2,7 +2,6 @@ SB.Examples.RotateMe = function(param)
 {
     // core services - maybe we move to service locator model?
     SB.Game.call(this);
-    this.initEntities();
 }
 
 goog.inherits(SB.Examples.RotateMe, SB.Game);
@@ -17,6 +16,7 @@ SB.Examples.RotateMe.prototype.initEntities = function()
 	entity.addComponent(rotator);
 	entity.addComponent(pane);
 	
-	this.entities.push(entity);
-
+	this.addEntity(entity);
+	
+	entity.realize();
 }

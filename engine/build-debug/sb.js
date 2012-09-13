@@ -3833,12 +3833,16 @@ goog.require('SB.Component');
 
 SB.PollingRotator = function(param)
 {
-    SB.Component.call(this);
-    this.lastState = SB.Mouse.instance.getState();
-    this.target = (param && param.target) ? param.target : null;
+    SB.Component.call(this, param);
 }
 
 goog.inherits(SB.PollingRotator, SB.Component);
+
+SB.PollingRotator.prototype.realize = function()
+{
+	this.lastState = SB.Mouse.instance.getState();
+	this.target = (this.param && this.param.target) ? this.param.target : null;
+}
 
 SB.PollingRotator.prototype.update = function()
 {
