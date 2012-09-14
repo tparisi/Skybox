@@ -9,7 +9,7 @@ SB.Examples.PlaneDraggerGame.prototype.initEntities = function()
 {
 	var root = new SB.Entity;
 	
-	var entity = new SB.Entity;
+	var cylinder = new SB.Entity;
 	
 	var transform = new SB.Transform();
     var visual = new SB.CylinderVisual({radiusTop : 1, radiusBottom : 1, height : 1.667, color : 0x0000ff });
@@ -23,17 +23,17 @@ SB.Examples.PlaneDraggerGame.prototype.initEntities = function()
     
     this.planeDragger = planeDragger;
     
-    entity.addComponent(transform);
-    entity.addComponent(visual);	
-    entity.addComponent(picker);	
-    entity.addComponent(planeDragger);	
+    cylinder.addComponent(transform);
+    cylinder.addComponent(visual);	
+    cylinder.addComponent(picker);	
+    cylinder.addComponent(planeDragger);	
 
-    root.addChild(entity);
+    root.addChild(cylinder);
     
-    this.draggableCylinder = entity;
+    this.cylinder = cylinder;
         
 	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.transform.position.z = 5;
+	this.viewer.viewpoint.transform.position.set(0, 0, 5);
 	root.addChild(this.viewer);
     
 	this.addEntity(root);
@@ -60,5 +60,5 @@ SB.Examples.PlaneDraggerGame.prototype.onPickerMouseMove = function(x, y)
 
 SB.Examples.PlaneDraggerGame.prototype.onDraggerDrag = function(pos)
 {
-    this.draggableCylinder.transform.position.copy(pos);
+    this.cylinder.transform.position.copy(pos);
 }
