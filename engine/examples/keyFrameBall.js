@@ -5,7 +5,7 @@ SB.Examples.KeyFrameBall = function()
 	SB.Entity.call(this);
 
 	this.transform = new SB.Transform();
-	this.picker = new SB.Picker();
+	this.picker = new SB.Picker({ overCursor : 'pointer' });
 	
     var avParams = {};
     avParams.radiusTop    = 1;
@@ -37,8 +37,6 @@ SB.Examples.KeyFrameBall = function()
     this.animator.subscribe("complete", this, this.onAnimationComplete)
 
     this.animating = false;
-
-    this.overCursor = 'pointer';
 }
 
 goog.inherits(SB.Examples.KeyFrameBall, SB.Entity);
@@ -59,16 +57,6 @@ SB.Examples.KeyFrameBall.prototype.animate = function(on)
 SB.Examples.KeyFrameBall.prototype.onAnimationComplete = function()
 {
 	this.animating = false;
-}
-
-SB.Examples.KeyFrameBall.prototype.onMouseOver = function()
-{
-	SB.Graphics.instance.container.style.cursor = 'pointer';
-}
-
-SB.Examples.KeyFrameBall.prototype.onMouseOut = function()
-{
-	SB.Graphics.instance.container.style.cursor = 'auto';
 }
 
 SB.Examples.KeyFrameBall.prototype.onMouseUp = function(x, y)

@@ -3,7 +3,7 @@ goog.provide('SB.Picker');
 goog.require('SB.Component');
 
 SB.Picker = function(param) {
-    SB.Component.call(this);
+    SB.Component.call(this, param);
 
     this.post = true; // these messages get posted to sim queue since they're async, kinda
 }
@@ -13,6 +13,9 @@ goog.inherits(SB.Picker, SB.Component);
 SB.Picker.prototype.realize = function()
 {
 	SB.Component.prototype.realize.call(this);
+	
+	this.overCursor = this.param.overCursor;
+	
 	if (this._entity)
 	{
 		var object = this._entity.transform;
@@ -72,14 +75,27 @@ SB.Picker.handleMouseMove = function(x, y)
 
         if (SB.Picker.overObject != oldObj)
         {
-            if (oldObj && oldObj.onMouseOut)
-            {
-                oldObj.onMouseOut(x, y);
-            }
+    		if (oldObj)
+    		{
+    			SB.Graphics.instance.setCursor('auto');
+    			
+    			if (oldObj.onMouseOut)
+                {
+                    oldObj.onMouseOut(x, y);
+                }
+    		}
 
-            if (SB.Picker.overObject && SB.Picker.overObject.onMouseOver)
-            {
-                SB.Picker.overObject.onMouseOver(x, y);
+            if (SB.Picker.overObject)
+            {            	
+	        	if (SB.Picker.overObject.overCursor)
+	        	{
+	        		SB.Graphics.instance.setCursor(SB.Picker.overObject.overCursor);
+	        	}
+	        	
+	        	if (SB.Picker.overObject.onMouseOver)
+	        	{
+	        		SB.Picker.overObject.onMouseOver(x, y);
+	        	}
             }
         }
     }

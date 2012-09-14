@@ -299,6 +299,12 @@ SB.GraphicsThreeJS.prototype.onWindowResize = function(event)
 	this.camera.updateProjectionMatrix();
 }
 
+SB.GraphicsThreeJS.prototype.setCursor = function(cursor)
+{
+	this.container.style.cursor = cursor;
+}
+
+
 SB.GraphicsThreeJS.prototype.update = function()
 {
     this.renderer.render( this.scene, this.camera );

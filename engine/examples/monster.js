@@ -6,7 +6,7 @@ SB.Examples.Monster = function(param)
 	this.model = new SB.Model.loadModel('./monster.dae');
 	this.model.scale.x = this.model.scale.y = this.model.scale.z = 0.002;
 	this.model.rotation.x = -Math.PI/2;
-	this.picker = new SB.Picker();
+	this.picker = new SB.Picker({ overCursor: 'pointer' });
 	this.rotator = new SB.Rotator();
 	this.dragger = new SB.Dragger();
 	this.zoomer = new SB.Zoomer();
