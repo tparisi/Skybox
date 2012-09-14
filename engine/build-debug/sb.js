@@ -1663,6 +1663,140 @@ SB.Input = function()
 goog.inherits(SB.Input, SB.Service);
 
 SB.Input.instance = null;/**
+ * @fileoverview PubSub is the base class for any object that sends/receives messages
+ * 
+ * @author Tony Parisi
+ */
+goog.provide('SB.PubSub');
+
+/**
+ * @constructor
+ */
+SB.PubSub = function() {
+    this.messageTypes = {};
+    this.messageQueue = [];
+    this.post = SB.PubSub.postMessages;
+}
+
+SB.PubSub.prototype.subscribe = function(message, subscriber, callback) {
+    var subscribers = this.messageTypes[message];
+    if (subscribers)
+    {
+        if (this.findSubscriber(subscribers, subscriber) != -1)
+        {
+            return;
+        }
+    }
+    else
+    {
+        subscribers = [];
+        this.messageTypes[message] = subscribers;
+    }
+
+    subscribers.push({ subscriber : subscriber, callback : callback });
+}
+
+SB.PubSub.prototype.unsubscribe =  function(message, subscriber, callback) {
+    if (subscriber)
+    {
+        var subscribers = this.messageTypes[message];
+
+        if (subscribers)
+        {
+            var i = this.findSubscriber(subscribers, subscriber, callback);
+            if (i != -1)
+            {
+                this.messageTypes[message].splice(i, 1);
+            }
+        }
+    }
+    else
+    {
+        delete this.messageTypes[message];
+    }
+}
+
+SB.PubSub.prototype.publish = function(message) {
+    var subscribers = this.messageTypes[message];
+
+    if (subscribers)
+    {
+        for (var i = 0; i < subscribers.length; i++)
+        {
+            if (this.post)
+            {
+                var args = [subscribers[i].callback];
+                for (var j = 0; j < arguments.length - 1; j++)
+                {
+                    args.push(arguments[j + 1]);
+                }
+                subscribers[i].subscriber.postMessage.apply(subscribers[i].subscriber, args);
+            }
+            else
+            {
+                var args = [];
+                for (var j = 0; j < arguments.length - 1; j++)
+                {
+                    args.push(arguments[j + 1]);
+                }
+                subscribers[i].callback.apply(subscribers[i].subscriber, args);
+            }
+        }
+    }
+}
+
+SB.PubSub.prototype.findSubscriber = function (subscribers, subscriber) {
+    for (var i = 0; i < subscribers.length; i++)
+    {
+        if (subscribers[i] == subscriber)
+        {
+            return i;
+        }
+    }
+    
+    return -1;
+}
+
+SB.PubSub.prototype.handleMessages = function() {
+    var message;
+    while (message = this.getMessage())
+    {
+        if (message.callback)
+        {
+            message.callback.apply(this, message.args);
+        }
+    }
+}
+
+SB.PubSub.prototype.postMessage = function (callback) {
+    var args = [];
+    var len = arguments.length - 1;
+    var i;
+    for (i = 0; i < len; i++)
+    {
+        args[i] = arguments[i+1];
+    }
+
+    this.messageQueue.push({callback : callback, args : args});
+}
+
+SB.PubSub.prototype.getMessage = function() {
+    if (this.messageQueue.length)
+    {
+        return this.messageQueue.shift();
+    }
+    else
+    {
+        return null;
+    }
+}
+
+SB.PubSub.prototype.peekMessage = function() {
+    return (this.messageQueue.length > 0) ? this.messageQueue[0] : null;
+}
+
+SB.PubSub.postMessages = false;
+/**
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
@@ -2146,6 +2280,7 @@ SB.Services.registerService = function(serviceName, object)
  * @author Tony Parisi
  */
 goog.provide('SB.Game');
+goog.require('SB.PubSub');
 goog.require('SB.Time');
 goog.require('SB.Input');
 goog.require('SB.Services');
@@ -2158,8 +2293,11 @@ SB.Game = function()
 	// N.B.: freak out if somebody tries to make 2
 	// throw (...)
 
+	SB.PubSub.call(this);
 	SB.Game.instance = this;
 }
+
+goog.inherits(SB.Game, SB.PubSub);
 
 SB.Game.prototype.initialize = function(param)
 {
@@ -2325,140 +2463,6 @@ SB.Game.handleKeyPress = function(keyCode, charCode)
     if (SB.Game.instance.onKeyPress)
     	SB.Game.instance.onKeyPress(keyCode, charCode);	            	
 }	        
-/**
- * @fileoverview PubSub is the base class for any object that sends/receives messages
- * 
- * @author Tony Parisi
- */
-goog.provide('SB.PubSub');
-
-/**
- * @constructor
- */
-SB.PubSub = function() {
-    this.messageTypes = {};
-    this.messageQueue = [];
-    this.post = SB.PubSub.postMessages;
-}
-
-SB.PubSub.prototype.subscribe = function(message, subscriber, callback) {
-    var subscribers = this.messageTypes[message];
-    if (subscribers)
-    {
-        if (this.findSubscriber(subscribers, subscriber) != -1)
-        {
-            return;
-        }
-    }
-    else
-    {
-        subscribers = [];
-        this.messageTypes[message] = subscribers;
-    }
-
-    subscribers.push({ subscriber : subscriber, callback : callback });
-}
-
-SB.PubSub.prototype.unsubscribe =  function(message, subscriber, callback) {
-    if (subscriber)
-    {
-        var subscribers = this.messageTypes[message];
-
-        if (subscribers)
-        {
-            var i = this.findSubscriber(subscribers, subscriber, callback);
-            if (i != -1)
-            {
-                this.messageTypes[message].splice(i, 1);
-            }
-        }
-    }
-    else
-    {
-        delete this.messageTypes[message];
-    }
-}
-
-SB.PubSub.prototype.publish = function(message) {
-    var subscribers = this.messageTypes[message];
-
-    if (subscribers)
-    {
-        for (var i = 0; i < subscribers.length; i++)
-        {
-            if (this.post)
-            {
-                var args = [subscribers[i].callback];
-                for (var j = 0; j < arguments.length - 1; j++)
-                {
-                    args.push(arguments[j + 1]);
-                }
-                subscribers[i].subscriber.postMessage.apply(subscribers[i].subscriber, args);
-            }
-            else
-            {
-                var args = [];
-                for (var j = 0; j < arguments.length - 1; j++)
-                {
-                    args.push(arguments[j + 1]);
-                }
-                subscribers[i].callback.apply(subscribers[i].subscriber, args);
-            }
-        }
-    }
-}
-
-SB.PubSub.prototype.findSubscriber = function (subscribers, subscriber) {
-    for (var i = 0; i < subscribers.length; i++)
-    {
-        if (subscribers[i] == subscriber)
-        {
-            return i;
-        }
-    }
-    
-    return -1;
-}
-
-SB.PubSub.prototype.handleMessages = function() {
-    var message;
-    while (message = this.getMessage())
-    {
-        if (message.callback)
-        {
-            message.callback.apply(this, message.args);
-        }
-    }
-}
-
-SB.PubSub.prototype.postMessage = function (callback) {
-    var args = [];
-    var len = arguments.length - 1;
-    var i;
-    for (i = 0; i < len; i++)
-    {
-        args[i] = arguments[i+1];
-    }
-
-    this.messageQueue.push({callback : callback, args : args});
-}
-
-SB.PubSub.prototype.getMessage = function() {
-    if (this.messageQueue.length)
-    {
-        return this.messageQueue.shift();
-    }
-    else
-    {
-        return null;
-    }
-}
-
-SB.PubSub.prototype.peekMessage = function() {
-    return (this.messageQueue.length > 0) ? this.messageQueue[0] : null;
-}
-
-SB.PubSub.postMessages = false;
 /**
  * @fileoverview Component is the base class for defining objects used within an Entity
  * 
@@ -4548,7 +4552,7 @@ goog.require('SB.Component');
 SB.Picker = function(param) {
     SB.Component.call(this, param);
 
-    this.post = true; // these messages get posted to sim queue since they're async, kinda
+    // this.post = true; // these messages get posted to sim queue since they're async, kinda
 }
 
 goog.inherits(SB.Picker, SB.Component);
@@ -5201,33 +5205,93 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	
 	return new THREE.Vector3(eltx, elty, -cameraspacepos.z);
 }
-goog.provide('SB.RigidBodyCircleBox2D');
-goog.require('SB.RigidBodyBox2D');
+/**
+ * @fileoverview PlaneDragger - converts x,y mouse motion into x, y object position output
+ * 
+ * @author Tony Parisi
+ */
 
-SB.RigidBodyCircleBox2D = function(radius)
+goog.provide('SB.PlaneDragger');
+goog.require('SB.Component');
+
+SB.PlaneDragger = function(param)
 {
-    SB.RigidBodyBox2D.call(this);
+	SB.Component.call(this, param);	
+}
 
-    // Create the fixture definition
-    var fixtureDef = new b2FixtureDef();
-	fixtureDef.shape = new b2CircleShape(radius);
-	fixtureDef.friction = 0.4;
-	fixtureDef.restitution = 0.6;
-	fixtureDef.density = 1.0;
+goog.inherits(SB.PlaneDragger, SB.Component);
 
-    // Create the body definition
-	var ballBd = new b2BodyDef();
-	ballBd.type = b2Body.b2_dynamicBody;
-	ballBd.position.Set(0,0);
+SB.PlaneDragger.prototype.realize = function(object)
+{
+	// Connect us to the object to drag
+    this.object = this._entity.transform.object;
+    
+    // Squirrel away some info
+    var instance = SB.Graphics.instance;
+	this.projector = instance.projector;
+	this.container = instance.container;
+	this.renderer = instance.renderer;
+	
+    // And some helpers
+	this.dragOffset = new THREE.Vector3;
+	this.dragHitPoint = new THREE.Vector3;
+	this.dragStartPoint = new THREE.Vector3;
+	this.dragPlane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+}
 
-    // Create the body
-	this.body = SB.Services.physics.addBody(ballBd);
+SB.PlaneDragger.prototype.beginDrag = function(x, y)
+{
+	var planeIntersects = this.getPlaneIntersection(x, y);
+	
+	if (planeIntersects.length)
+	{
+		this.dragOffset.copy( planeIntersects[ 0 ].point.subSelf( this.dragPlane.position ));
+		this.dragStartPoint = this.object.object3D.position.clone();
+	}
+}
 
-    // Create the fixture
-	this.fixture = this.body.CreateFixture(fixtureDef);
-} ;
+SB.PlaneDragger.prototype.drag = function(x, y)
+{
+	var planeIntersects = this.getPlaneIntersection(x, y);
+	
+	if (planeIntersects.length)
+	{
+		this.dragHitPoint.copy(planeIntersects[ 0 ].point.subSelf( this.dragOffset ) );
+		this.dragHitPoint.addSelf(this.dragStartPoint);
+		this.publish("drag", this.dragHitPoint);
+	}			
+}
 
-goog.inherits(SB.RigidBodyCircleBox2D, SB.RigidBodyBox2D);
+SB.PlaneDragger.prototype.endDrag = function(x, y)
+{
+	// Nothing to do, just here for completeness
+}
+
+SB.PlaneDragger.prototype.getPlaneIntersection = function(x, y)
+{
+	var camera = SB.Graphics.instance.camera;
+	
+	// Translate page coords to element coords
+	var offset = $(this.renderer.domElement).offset();	
+	var eltx = x - offset.left;
+	var elty = y - offset.top;
+	
+	// Translate client coords into viewport x,y
+	var vpx = ( eltx / this.container.offsetWidth ) * 2 - 1;
+	var vpy = - ( elty / this.container.offsetHeight ) * 2 + 1;
+	
+	var vector = new THREE.Vector3( vpx, vpy, 0.5 );
+	
+	this.projector.unprojectVector( vector, camera );
+	
+    var cameraPos = new THREE.Vector3;
+    cameraPos = camera.matrixWorld.multiplyVector3(cameraPos);
+    
+	var ray = new THREE.Ray( cameraPos, vector.subSelf( cameraPos ).normalize() );
+	
+	return ray.intersectObject( this.dragPlane );
+}
+
 /**
  * @fileoverview NetworkClient - Broadcast/listen on network
  * 
@@ -5375,6 +5439,33 @@ SB.LightComponent.prototype.realize = function()
 	
 	this.addToScene();
 }
+goog.provide('SB.RigidBodyCircleBox2D');
+goog.require('SB.RigidBodyBox2D');
+
+SB.RigidBodyCircleBox2D = function(radius)
+{
+    SB.RigidBodyBox2D.call(this);
+
+    // Create the fixture definition
+    var fixtureDef = new b2FixtureDef();
+	fixtureDef.shape = new b2CircleShape(radius);
+	fixtureDef.friction = 0.4;
+	fixtureDef.restitution = 0.6;
+	fixtureDef.density = 1.0;
+
+    // Create the body definition
+	var ballBd = new b2BodyDef();
+	ballBd.type = b2Body.b2_dynamicBody;
+	ballBd.position.Set(0,0);
+
+    // Create the body
+	this.body = SB.Services.physics.addBody(ballBd);
+
+    // Create the fixture
+	this.fixture = this.body.CreateFixture(fixtureDef);
+} ;
+
+goog.inherits(SB.RigidBodyCircleBox2D, SB.RigidBodyBox2D);
 /**
  * @fileoverview File Manager - load game assets using Ajax
  * 
@@ -5395,6 +5486,7 @@ goog.require('SB.Service');
 goog.require('SB.Services');
 goog.require('SB.PubSub');
 goog.require('SB.Dragger');
+goog.require('SB.PlaneDragger');
 goog.require('SB.PollingRotator');
 goog.require('SB.Rotator');
 goog.require('SB.Zoomer');

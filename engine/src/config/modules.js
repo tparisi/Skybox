@@ -18,6 +18,7 @@ goog.require('SB.Service');
 goog.require('SB.Services');
 goog.require('SB.PubSub');
 goog.require('SB.Dragger');
+goog.require('SB.PlaneDragger');
 goog.require('SB.PollingRotator');
 goog.require('SB.Rotator');
 goog.require('SB.Zoomer');

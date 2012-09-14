@@ -45,6 +45,8 @@
     <!-- KEYFRAME GAME -->
 	<script src="keyFrames.js"></script>
 	<script src="keyFrameBall.js"></script>
+    <!-- PLANE DRAGGER GAME -->
+	<script src="planeDraggerGame.js"></script>
 
 </head>
 <body>
@@ -73,6 +75,8 @@
 			options[5].text="Monsters!";
 			options[6]=document.createElement("option");
 			options[6].text="Key Frame Demo";
+			options[7]=document.createElement("option");
+			options[7].text="Plane Dragger Demo";
 			select.add(options[0]);
 			select.add(options[1]);
 			select.add(options[2]);
@@ -80,6 +84,7 @@
 			select.add(options[4]);
 			select.add(options[5]);
 			select.add(options[6]);
+			select.add(options[7]);
 		}
 	);
 
@@ -89,7 +94,8 @@
 	          		SB.Examples.MouseHandlerGame,
 	          		SB.Examples.DuckRiders,
 	          		SB.Examples.Monsters,
-	          		SB.Examples.KeyFrameGame] ;
+	          		SB.Examples.KeyFrameGame,
+	          		SB.Examples.PlaneDraggerGame] ;
 	
 	function selectGame()
 	{

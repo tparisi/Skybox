@@ -4,6 +4,7 @@
  * @author Tony Parisi
  */
 goog.provide('SB.Game');
+goog.require('SB.PubSub');
 goog.require('SB.Time');
 goog.require('SB.Input');
 goog.require('SB.Services');
@@ -16,8 +17,11 @@ SB.Game = function()
 	// N.B.: freak out if somebody tries to make 2
 	// throw (...)
 
+	SB.PubSub.call(this);
 	SB.Game.instance = this;
 }
+
+goog.inherits(SB.Game, SB.PubSub);
 
 SB.Game.prototype.initialize = function(param)
 {
