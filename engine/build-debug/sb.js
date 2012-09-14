@@ -4553,7 +4553,7 @@ goog.require('SB.Component');
 SB.Picker = function(param) {
     SB.Component.call(this, param);
 
-    this.post = true; // these messages get posted to sim queue since they're async, kinda
+    // this.post = true; // these messages get posted to sim queue since they're async, kinda
 }
 
 goog.inherits(SB.Picker, SB.Component);
