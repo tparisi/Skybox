@@ -86,6 +86,7 @@ SB.Game.prototype.runloop = function()
 	
 	if (deltat >= SB.Game.minFrameTime)
 	{
+		this.handleMessages();
 		this.updateServices();
         this.lastFrameTime = now;
 	}

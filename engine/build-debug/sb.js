@@ -2362,6 +2362,7 @@ SB.Game.prototype.runloop = function()
 	
 	if (deltat >= SB.Game.minFrameTime)
 	{
+		this.handleMessages();
 		this.updateServices();
         this.lastFrameTime = now;
 	}
@@ -2517,7 +2518,7 @@ SB.Component.prototype.realize = function() {
 }
 
 SB.Component.prototype.update = function() {
-    
+    this.handleMessages();
 }
 /**
  * @fileoverview General-purpose key frame animation
@@ -4552,7 +4553,7 @@ goog.require('SB.Component');
 SB.Picker = function(param) {
     SB.Component.call(this, param);
 
-    // this.post = true; // these messages get posted to sim queue since they're async, kinda
+    this.post = true; // these messages get posted to sim queue since they're async, kinda
 }
 
 goog.inherits(SB.Picker, SB.Component);
@@ -5246,7 +5247,7 @@ SB.PlaneDragger.prototype.beginDrag = function(x, y)
 	if (planeIntersects.length)
 	{
 		this.dragOffset.copy( planeIntersects[ 0 ].point.subSelf( this.dragPlane.position ));
-		this.dragStartPoint = this.object.object3D.position.clone();
+		this.dragStartPoint = this.object.position.clone();
 	}
 }
 

@@ -39,7 +39,7 @@ SB.PlaneDragger.prototype.beginDrag = function(x, y)
 	if (planeIntersects.length)
 	{
 		this.dragOffset.copy( planeIntersects[ 0 ].point.subSelf( this.dragPlane.position ));
-		this.dragStartPoint = this.object.object3D.position.clone();
+		this.dragStartPoint = this.object.position.clone();
 	}
 }
 

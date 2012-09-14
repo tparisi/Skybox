@@ -52,5 +52,5 @@ SB.Component.prototype.realize = function() {
 }
 
 SB.Component.prototype.update = function() {
-    
+    this.handleMessages();
 }
