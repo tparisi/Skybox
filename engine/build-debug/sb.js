@@ -1877,7 +1877,7 @@ SB.GraphicsThreeJS.prototype.objectFromMouse = function(pagex, pagey)
 
     this.projector.unprojectVector( vector, this.camera );
 	
-    var pos = this.camera.position.clone();
+    var pos = new THREE.Vector3;
     pos = this.camera.matrixWorld.multiplyVector3(pos);
     var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
 

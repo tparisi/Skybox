@@ -15,11 +15,19 @@ SB.Examples.MouseHandlerGame.prototype.initEntities = function()
 	var dd2 = new SB.Examples.DraggyDoor();
 	dd2.transform.position.x = -5;
 		        	
-	this.addEntity(root);
 	root.addChild(dd1);	        	
 	root.addChild(dd2);
+
+	this.addEntity(root);
+
+	this.viewer = new SB.Viewer({ headlight : true });
+	this.viewer.transform.position.z = 10;
+	root.addChild(this.viewer);
 	
 	root.realize();
+
+	// this.viewer.viewpoint.camera.bind();
+
 }
 
 SB.Examples.MouseHandlerGame.highlightColor = 0xcc00cc;

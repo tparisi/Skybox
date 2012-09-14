@@ -43,14 +43,14 @@ goog.inherits(SB.Examples.DraggyDoor, SB.Entity);
 SB.Examples.DraggyDoor.prototype.onMouseOver = function(x, y)
 {
     // console.log("Got delegate mouse over: " + x + ", " + y);
-    this.savedColor = this.pane.object.materials[0].color.getHex();
-    this.pane.object.materials[0].color.setHex(SB.Examples.DraggyDoor.highlightColor);
+    this.savedColor = this.pane.object.material.color.getHex();
+    this.pane.object.material.color.setHex(SB.Examples.DraggyDoor.highlightColor);
 } ;
 
 SB.Examples.DraggyDoor.prototype.onMouseOut = function(x, y)
 {
     // console.log("Got delegate mouse out: " + x + ", " + y);
-    this.pane.object.materials[0].color.setHex(this.savedColor);
+    this.pane.object.material.color.setHex(this.savedColor);
 } ;
 
 SB.Examples.DraggyDoor.prototype.onMouseMove = function(x, y)
