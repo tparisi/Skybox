@@ -6,6 +6,7 @@ goog.require('SB.ShooterComponent');
 SB.Examples.PhysicsGame = function()
 {
     SB.Game.call(this);
+	
 }
 
 goog.inherits(SB.Examples.PhysicsGame, SB.Game);
@@ -25,6 +26,7 @@ SB.Examples.PhysicsGame.prototype.initialize = function(param)
     SB.Graphics.instance.camera.position.set( 0, 100, 0 );
     SB.Graphics.instance.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+	this.initEntities();
 } ;
 
 SB.Game.prototype.addOptionalServices = function()

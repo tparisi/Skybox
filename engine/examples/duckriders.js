@@ -1,12 +1,14 @@
 SB.Examples.DuckRiders = function()
 {
-	SB.Game.call(this);	    	
+	SB.Game.call(this);	
 }
 
 goog.inherits(SB.Examples.DuckRiders, SB.Game);
 
-SB.Examples.DuckRiders.prototype.initEntities = function()
+SB.Examples.DuckRiders.prototype.initialize = function(param)
 {
+	SB.Game.prototype.initialize.call(this, param);
+
 	var root = new SB.Entity;
 	
 	var dr1 = new SB.Examples.DuckRider();

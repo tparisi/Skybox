@@ -5,8 +5,10 @@ SB.Examples.PlaneDraggerGame = function()
 
 goog.inherits(SB.Examples.PlaneDraggerGame, SB.Game);
 
-SB.Examples.PlaneDraggerGame.prototype.initEntities = function()
+SB.Examples.PlaneDraggerGame.prototype.initialize = function(param)
 {
+	SB.Game.prototype.initialize.call(this, param);
+
 	var root = new SB.Entity;
 	
 	var cylinder = new SB.Entity;

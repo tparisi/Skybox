@@ -1,12 +1,13 @@
 SB.Examples.StatefulRotatorGame = function(param)
 {
-    SB.Game.call(this);
+    SB.Game.call(this);	
 } ;
 
 goog.inherits(SB.Examples.StatefulRotatorGame, SB.Game);
 
-SB.Examples.StatefulRotatorGame.prototype.initEntities = function()
+SB.Examples.StatefulRotatorGame.prototype.initialize = function(param)
 {
+	SB.Game.prototype.initialize.call(this, param);
     var entity = new SB.Entity();
 
     var pane = new SB.Pane();

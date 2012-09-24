@@ -5,6 +5,7 @@ goog.require('SB.Mesh');
 SB.Examples.MeshTest = function()
 {
     SB.Game.call(this);
+	
 }
 
 goog.inherits(SB.Examples.MeshTest, SB.Game);
@@ -16,6 +17,7 @@ SB.Examples.MeshTest.prototype.initialize = function(param)
     SB.Graphics.instance.camera.position.set( 0, 0, 30 );
 //    SB.Graphics.instance.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+	this.initEntities();
 } ;
 
 SB.Examples.MeshTest.prototype.initEntities = function()

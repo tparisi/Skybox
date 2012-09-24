@@ -21,7 +21,8 @@ Gabscape.prototype.initialize = function(param)
 	
 	SB.Game.prototype.initialize.call(this, param);
 
-//	this.getTwitterData();
+	this.initEntities();
+
 }
 
 

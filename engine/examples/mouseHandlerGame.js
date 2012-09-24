@@ -1,12 +1,15 @@
 SB.Examples.MouseHandlerGame = function()
 {
     SB.Game.call(this);
+	
 } ;
 
 goog.inherits(SB.Examples.MouseHandlerGame, SB.Game);
 	        
-SB.Examples.MouseHandlerGame.prototype.initEntities = function()
-{
+SB.Examples.MouseHandlerGame.prototype.initialize = function(param)
+{	
+	SB.Game.prototype.initialize.call(this, param);
+ 
 	var root = new SB.Entity;
 	
 	var dd1 = new SB.Examples.DraggyDoor();

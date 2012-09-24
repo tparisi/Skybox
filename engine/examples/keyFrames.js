@@ -5,8 +5,10 @@ SB.Examples.KeyFrameGame = function()
 
 goog.inherits(SB.Examples.KeyFrameGame, SB.Game);
 
-SB.Examples.KeyFrameGame.prototype.initEntities = function()
+SB.Examples.KeyFrameGame.prototype.initialize = function(param)
 {
+	SB.Game.prototype.initialize.call(this, param);
+
 	var root = new SB.Entity;
 	
 	var b1 = new SB.Examples.KeyFrameBall();

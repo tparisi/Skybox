@@ -2317,8 +2317,6 @@ SB.Game.prototype.initialize = function(param)
 	
 	// Start all the services
 	this.initServices(param);
-		
-	this.initEntities();
 }
 
 SB.Game.prototype.addService = function(serviceName)

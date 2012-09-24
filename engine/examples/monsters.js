@@ -21,6 +21,8 @@ SB.Examples.Monsters.prototype.initialize = function(param)
 		param.displayStats = SB.Examples.Monsters.default_display_stats;
 	
 	SB.Game.prototype.initialize.call(this, param);
+	
+	this.initEntities();
 }
 
 
