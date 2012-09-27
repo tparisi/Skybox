@@ -18,7 +18,6 @@ SB.Viewer = function(param)
 	this.viewpoint.addComponent(camera);
 	this.viewpoint.transform = transform;
 	this.viewpoint.camera = camera;
-	this.viewpoint.transform.position.set(0, 2.5, 3.67);
 
 	this.addChild(this.viewpoint);
 

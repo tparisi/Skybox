@@ -25,16 +25,16 @@ SB.Examples.PlaneDraggerGame.prototype.initialize = function(param)
     
     this.planeDragger = planeDragger;
 
-	var viewer = new SB.Viewer({ headlight : true });
-	viewer.viewpoint.transform.position.set(0, 0, 5);
     
     cylinder.addComponent(transform);
     cylinder.addComponent(visual);	
     cylinder.addComponent(picker);	
     cylinder.addComponent(planeDragger);	
+	
+	var headlight = new SB.DirectionalLight({ color : 0xFFFFFF, intensity : 1});
+    root.addComponent(headlight);
 
     root.addChild(cylinder);
-    root.addChild(viewer);
     
     this.cylinder = cylinder;
         

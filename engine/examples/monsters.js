@@ -51,6 +51,7 @@ SB.Examples.Monsters.prototype.initEntities = function()
 	this.monsters = [m1, m2, m3];
 	this.activeMonster = null;
 	this.viewer = new SB.Viewer({ headlight : true });
+	this.viewer.viewpoint.transform.position.set(0, 2.5, 3.67);
 	
 	this.root.addChild(m1);
 	this.root.addChild(m2);

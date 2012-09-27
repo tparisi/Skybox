@@ -17,8 +17,8 @@ SB.Examples.DuckRiders.prototype.initialize = function(param)
 	var dr2 = new SB.Examples.DuckRider();
 	dr2.transform.position.x = -5;
 	
-	var viewer = new SB.Viewer({ headlight : true });
-	viewer.viewpoint.transform.position.set(0, 0, 5);
+	var headlight = new SB.DirectionalLight({ color : 0xFFFFFF, intensity : 1});
+    root.addComponent(headlight);
 
 	root.addChild(dr1);
 	root.addChild(dr2);
