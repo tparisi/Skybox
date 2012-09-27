@@ -76,6 +76,7 @@ Gabscape.prototype.initEntities = function()
 Gabscape.prototype.createViewer = function()
 {
 	this.viewer = new SB.Viewer({ headlight : true });
+	this.viewer.viewpoint.transform.position.set(0, 2.5, 3.67);
 	this.gabatar = new Gabatar({ info : this.twitterInfo });
 
 	this.viewer.addChild(this.gabatar);
