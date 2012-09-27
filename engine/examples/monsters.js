@@ -48,10 +48,9 @@ SB.Examples.Monsters.prototype.initEntities = function()
 	var m3 = new SB.Examples.Monster();
 	m3.transform.position.z = -5;
 
-	this.createViewer();
-		
 	this.monsters = [m1, m2, m3];
 	this.activeMonster = null;
+	this.viewer = new SB.Viewer({ headlight : true });
 	
 	this.root.addChild(m1);
 	this.root.addChild(m2);
@@ -62,13 +61,7 @@ SB.Examples.Monsters.prototype.initEntities = function()
 
 	this.root.realize();
 	
-	this.viewer.viewpoint.camera.bind();
-	
-}
-
-SB.Examples.Monsters.prototype.createViewer = function()
-{
-	this.viewer = new SB.Viewer({ headlight : true });
+	this.viewer.viewpoint.camera.setActive(true);	
 }
 
 SB.Examples.Monsters.prototype.onMouseMove = function(x, y)

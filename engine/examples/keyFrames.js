@@ -24,7 +24,7 @@ SB.Examples.KeyFrameGame.prototype.initialize = function(param)
 	
 	root.realize();
 
-	this.viewer.viewpoint.camera.bind();
+	this.viewer.viewpoint.camera.setActive(true);
 	
 }
 

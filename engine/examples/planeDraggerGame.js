@@ -41,7 +41,7 @@ SB.Examples.PlaneDraggerGame.prototype.initialize = function(param)
 	this.addEntity(root);
 	root.realize();
 
-	this.viewer.viewpoint.camera.bind();
+	this.viewer.viewpoint.camera.setActive(true);
 	
 }
 

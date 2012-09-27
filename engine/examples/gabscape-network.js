@@ -89,7 +89,7 @@ Gabscape.prototype.initEntities = function()
 
 	this.root.realize();
 	
-	this.viewer.viewpoint.camera.bind();
+	this.viewer.viewpoint.camera.setActive(true);
 	
 	this.initSound();
 }
