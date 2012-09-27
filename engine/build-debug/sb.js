@@ -2402,7 +2402,63 @@ SB.Game.prototype.removeEntity = function(e) {
         this._entities.splice(i, 1);
     }
 }
-	        
+	
+SB.Game.prototype.onMouseMove = function(x, y)
+{
+	if (this.mouseDelegate)
+	{
+		this.mouseDelegate.onMouseMove(x, y);
+	}
+}
+
+SB.Game.prototype.onMouseDown = function(x, y)
+{
+	if (this.mouseDelegate)
+	{
+		this.mouseDelegate.onMouseDown(x, y);
+	}
+}
+
+SB.Game.prototype.onMouseUp = function(x, y)
+{
+	if (this.mouseDelegate)
+	{
+		this.mouseDelegate.onMouseUp(x, y);
+	}
+}
+
+SB.Game.prototype.onMouseScroll = function(delta)
+{
+	if (this.mouseDelegate)
+	{
+		this.mouseDelegate.onMouseScroll(delta);
+	}
+}
+
+SB.Game.prototype.onKeyDown = function(keyCode, charCode)
+{
+	if (this.keyboardDelegate)
+	{
+		this.keyboardDelegate.onKeyDown(keyCode, charCode);
+	}
+}
+
+SB.Game.prototype.onKeyUp = function(keyCode, charCode)
+{
+	if (this.keyboardDelegate)
+	{
+		this.keyboardDelegate.onKeyUp(keyCode, charCode);
+	}
+}
+
+SB.Game.prototype.onKeyPress = function(keyCode, charCode)
+{
+	if (this.keyboardDelegate)
+	{
+		this.keyboardDelegate.onKeyPress(keyCode, charCode);
+	}
+}	
+
 /* statics */
 
 SB.Game.instance = null;

@@ -24,6 +24,9 @@ SB.Examples.PlaneDraggerGame.prototype.initialize = function(param)
     planeDragger.subscribe("drag", this, this.onDraggerDrag);
     
     this.planeDragger = planeDragger;
+
+	var viewer = new SB.Viewer({ headlight : true });
+	viewer.viewpoint.transform.position.set(0, 0, 5);
     
     cylinder.addComponent(transform);
     cylinder.addComponent(visual);	
@@ -31,6 +34,7 @@ SB.Examples.PlaneDraggerGame.prototype.initialize = function(param)
     cylinder.addComponent(planeDragger);	
 
     root.addChild(cylinder);
+    root.addChild(viewer);
     
     this.cylinder = cylinder;
         

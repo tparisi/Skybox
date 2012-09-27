@@ -14,7 +14,11 @@ SB.Examples.KeyFrameGame.prototype.initialize = function(param)
 	var b1 = new SB.Examples.KeyFrameBall();
 	b1.transform.position.x = 2;
 
+	var viewer = new SB.Viewer({ headlight : true });
+	viewer.viewpoint.transform.position.set(0, 0, 5);
+	
 	root.addChild(b1);
+	root.addChild(viewer);
 	
 	this.addEntity(root);
 
