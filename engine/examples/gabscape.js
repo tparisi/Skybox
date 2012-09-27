@@ -71,8 +71,6 @@ Gabscape.prototype.initEntities = function()
 	this.addEntity(this.root);
 
 	this.root.realize();
-	
-	this.viewer.viewpoint.camera.setActive(true);
 }
 
 Gabscape.prototype.createViewer = function()

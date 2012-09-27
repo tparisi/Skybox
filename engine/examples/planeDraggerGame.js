@@ -34,15 +34,8 @@ SB.Examples.PlaneDraggerGame.prototype.initialize = function(param)
     
     this.cylinder = cylinder;
         
-	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.viewpoint.transform.position.set(0, 0, 5);
-	root.addChild(this.viewer);
-    
 	this.addEntity(root);
 	root.realize();
-
-	this.viewer.viewpoint.camera.setActive(true);
-	
 }
 
 SB.Examples.PlaneDraggerGame.prototype.onPickerMouseDown = function(x, y)

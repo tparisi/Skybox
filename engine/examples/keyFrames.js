@@ -18,13 +18,6 @@ SB.Examples.KeyFrameGame.prototype.initialize = function(param)
 	
 	this.addEntity(root);
 
-	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.transform.position.z = 5;
-	root.addChild(this.viewer);
-	
 	root.realize();
-
-	this.viewer.viewpoint.camera.setActive(true);
-	
 }
 

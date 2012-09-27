@@ -22,13 +22,6 @@ SB.Examples.DuckRiders.prototype.initialize = function(param)
 	
 	this.addEntity(root);
 
-	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.transform.position.z = 10;
-	root.addChild(this.viewer);
-	
 	root.realize();
-
-	this.viewer.viewpoint.camera.setActive(true);
-	
 }
 

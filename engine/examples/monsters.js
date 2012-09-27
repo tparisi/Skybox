@@ -60,8 +60,6 @@ SB.Examples.Monsters.prototype.initEntities = function()
 	this.addEntity(this.root);
 
 	this.root.realize();
-	
-	this.viewer.viewpoint.camera.setActive(true);	
 }
 
 SB.Examples.Monsters.prototype.onMouseMove = function(x, y)
