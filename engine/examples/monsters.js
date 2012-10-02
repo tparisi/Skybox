@@ -50,16 +50,21 @@ SB.Examples.Monsters.prototype.initEntities = function()
 
 	this.monsters = [m1, m2, m3];
 	this.activeMonster = null;
-	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.viewpoint.transform.position.set(0, 2.5, 3.67);
 	
+	var viewer = SB.Prefabs.WalkthroughController({ headlight : true });
+	
+	var viewpoint = viewer.getChild(0);
+	viewpoint.transform.position.set(0, 2.5, 3.67);
+
+	this.controllerScript = viewer.getComponent(SB.WalkthroughControllerScript);
+
 	this.root.addChild(m1);
 	this.root.addChild(m2);
 	this.root.addChild(m3);
-	this.root.addChild(this.viewer);
+	this.root.addChild(viewer);
 	
 	this.addEntity(this.root);
-
+	
 	this.root.realize();
 }
 
@@ -144,9 +149,9 @@ SB.Examples.Monsters.prototype.onRotatorRotate = function(axis, delta)
 	
 	if (delta != 0)
 	{
-		// this.viewer.transform.rotation.y -= delta;
+		// this.controllerScript.transform.rotation.y -= delta;
 		var dir = new THREE.Vector3(0, -delta, 0);
-		this.viewer.turn(dir);
+		this.controllerScript.turn(dir);
 		this.lastrotate = delta;
 	}
 }
@@ -169,9 +174,9 @@ SB.Examples.Monsters.prototype.onDraggerMove = function(dx, dy)
 
 	if (dy != 0)
 	{
-		// this.viewer.transform.position.z -= dy;
+		// this.controllerScript.transform.position.z -= dy;
 		var dir = new THREE.Vector3(0, 0, -dy);
-		this.viewer.move(dir);
+		this.controllerScript.move(dir);
 	}
 }
 

@@ -2883,83 +2883,10 @@ SB.Camera.prototype.lookAt = function(v)
 	this.object.lookAt(v);
 }
 /**
- *
+ * @fileoverview Contains prefab assemblies for core Skybox package
+ * @author Tony Parisi
  */
-goog.provide('SB.Transform');
-goog.require('SB.Component');
-
-SB.Transform = function(param)
-{
-    SB.Component.call(this);
-    
-    this.position = new THREE.Vector3();
-    this.rotation = new THREE.Vector3();
-    this.scale = new THREE.Vector3(1, 1, 1);
-} ;
-
-goog.inherits(SB.Transform, SB.Component);
-
-SB.Transform.prototype.realize = function()
-{
-	this.object = new THREE.Object3D();
-	this.addToScene();
-
-	SB.Component.prototype.realize.call(this);
-}
-
-SB.Transform.prototype.update = function()
-{
-    this.object.position.x = this.position.x;
-    this.object.position.y = this.position.y;
-    this.object.position.z = this.position.z;
-    this.object.rotation.x = this.rotation.x;
-    this.object.rotation.y = this.rotation.y;
-    this.object.rotation.z = this.rotation.z;
-    this.object.scale.x = this.scale.x;
-    this.object.scale.y = this.scale.y;
-    this.object.scale.z = this.scale.z;
-}
-
-SB.Transform.prototype.addToScene = function() {
-	if (this._entity)
-	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
-		if (parent)
-		{
-		    parent.add(this.object);
-		    this.object.data = this; // backpointer for picking and such
-		}
-		else
-		{
-			// N.B.: throw something?
-		}
-	}
-	else
-	{
-		// N.B.: throw something?
-	}
-}
-
-SB.Transform.prototype.removeFromScene = function() {
-	if (this._entity)
-	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
-		if (parent)
-		{
-			this.object.data = null;
-		    parent.remove(this.object);
-		}
-		else
-		{
-			// N.B.: throw something?
-		}
-	}
-	else
-	{
-		// N.B.: throw something?
-	}
-}
-/**
+goog.provide('SB.Prefabs');/**
  * @fileoverview Base class for visual elements.
  * @author Tony Parisi
  */
@@ -3425,6 +3352,17 @@ SB.Entity.prototype.removeChild = function(child) {
     }
 }
 
+/**
+ * Removes a child from the Entity
+ * @param {SB.Entity} child The child to remove.
+ */
+SB.Entity.prototype.getChild = function(index) {
+	if (index >= this._children.length)
+		return null;
+	
+	return this._children[index];
+}
+
 //---------------------------------------------------------------------
 // Component methods
 //---------------------------------------------------------------------
@@ -3641,42 +3579,37 @@ SB.PhysicsBody = function() {};
  * @param {SB.PhysicsMaterial} material The material to attach to the body.
  */
 SB.PhysicsBody.prototype.setMaterial = function(material) {};
-/**
- * @fileoverview
- */
-goog.provide('SB.PhysicsBodyBox2D');
+goog.provide('SB.DirectionalLight');
+goog.require('SB.SceneComponent');
 
-/**
- * Implementation of a PhysicsBody using Box2D.
- *
- * @implements {SB.PhysicsBody}
- * @constructor
- */
-SB.PhysicsBodyBox2D = function()
+SB.DirectionalLight = function(param)
 {
-    /**
-     * Internal representation of the body.
-     * @type {b2BodyDef}
-     */
-    this._body = new b2BodyDef();
-} ;
+	param = param || {};
+	this.color = param.color;
+	this.intensity = param.intensity;
+	this.dirMatrix = new THREE.Matrix4;
+	SB.SceneComponent.call(this, param);
+}
 
-/**
- * @inheritDoc
- */
-SB.PhysicsBodyBox2D.prototype.setMaterial = function(material)
-{
-    
-} ;
+goog.inherits(SB.DirectionalLight, SB.SceneComponent);
 
-/**
- * @protected
- * @inheritDoc
- */
-SB.PhysicsBodyBox2D.prototype.setShape = function(shape)
+SB.DirectionalLight.prototype.realize = function() 
 {
-    this._body.addShape(shape);
-} ;
+	SB.SceneComponent.prototype.realize.call(this);
+	this.object = new THREE.DirectionalLight(this.color, this.intensity, 0);
+	this.position.set(0, 0, 1);
+	this.addToScene();
+}
+
+SB.DirectionalLight.prototype.update = function() 
+{
+	// D'oh Three.js doesn't seem to transform directional light positions automatically
+	this.position.set(0, 0, 1);
+	this.dirMatrix.identity();
+	this.dirMatrix.extractRotation(this.object.parent.matrixWorld);
+	this.position = this.dirMatrix.multiplyVector3(this.position);
+	SB.SceneComponent.prototype.update.call(this);
+}
 /**
  * @fileoverview Tracker - converts x,y mouse motion into rotation about an axis (event-driven)
  * 
@@ -3983,37 +3916,62 @@ SB.File.loadFile = function(url, callback)
     xmlhttp.send(null);
     
 }
-goog.provide('SB.DirectionalLight');
-goog.require('SB.SceneComponent');
 
-SB.DirectionalLight = function(param)
+goog.require('SB.Prefabs');
+
+SB.Prefabs.WalkthroughController = function(param)
 {
-	param = param || {};
-	this.color = param.color;
-	this.intensity = param.intensity;
-	this.dirMatrix = new THREE.Matrix4;
-	SB.SceneComponent.call(this, param);
+	var controller = new SB.Entity(param);
+	var transform = new SB.Transform;
+	controller.addComponent(transform);
+	controller.transform.position.set(0, 0, 5);
+	var controllerScript = new SB.WalkthroughControllerScript;
+	controller.addComponent(controllerScript);
+	
+	var viewpoint = new SB.Entity;
+	var transform = new SB.Transform;
+	var camera = new SB.Camera({active:true});
+	viewpoint.addComponent(transform);
+	viewpoint.addComponent(camera);
+	viewpoint.transform = transform;
+	viewpoint.camera = camera;
+
+	controller.addChild(viewpoint);
+
+	var intensity = param.headlight ? 1 : 0;
+	var color = param.headlight ? 0xFFFFFF : 0;
+	
+	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	controller.addComponent(headlight);
+	
+	return controller;
 }
 
-goog.inherits(SB.DirectionalLight, SB.SceneComponent);
+goog.provide('SB.WalkthroughControllerScript');
+goog.require('SB.Component');
 
-SB.DirectionalLight.prototype.realize = function() 
+SB.WalkthroughControllerScript = function(param)
 {
-	SB.SceneComponent.prototype.realize.call(this);
-	this.object = new THREE.DirectionalLight(0xffffff, 1, 1);
-	this.position.set(0, 0, 1);
-	this.addToScene();
+	SB.Component.call(this, param);
+
+	this.directionMatrix = new THREE.Matrix4;
 }
 
-SB.DirectionalLight.prototype.update = function() 
+goog.inherits(SB.WalkthroughControllerScript, SB.Component);
+
+SB.WalkthroughControllerScript.prototype.move = function(dir)
 {
-	// D'oh Three.js doesn't seem to transform directional light positions automatically
-	this.position.set(0, 0, 1);
-	this.dirMatrix.identity();
-	this.dirMatrix.extractRotation(this.object.parent.matrixWorld);
-	this.position = this.dirMatrix.multiplyVector3(this.position);
-	SB.SceneComponent.prototype.update.call(this);
+	this.directionMatrix.identity();
+	this.directionMatrix.setRotationFromEuler(this._entity.transform.rotation);
+	dir = this.directionMatrix.multiplyVector3(dir);
+	this._entity.transform.position.addSelf(dir);
 }
+
+SB.WalkthroughControllerScript.prototype.turn = function(dir)
+{
+	this._entity.transform.rotation.addSelf(dir);
+}
+
 
 /**
  * @fileoverview
@@ -4192,6 +4150,42 @@ SB.Dragger.prototype.update = function()
     this.lastx = this.x;
     this.lasty = this.y;
 }
+/**
+ * @fileoverview
+ */
+goog.provide('SB.PhysicsBodyBox2D');
+
+/**
+ * Implementation of a PhysicsBody using Box2D.
+ *
+ * @implements {SB.PhysicsBody}
+ * @constructor
+ */
+SB.PhysicsBodyBox2D = function()
+{
+    /**
+     * Internal representation of the body.
+     * @type {b2BodyDef}
+     */
+    this._body = new b2BodyDef();
+} ;
+
+/**
+ * @inheritDoc
+ */
+SB.PhysicsBodyBox2D.prototype.setMaterial = function(material)
+{
+    
+} ;
+
+/**
+ * @protected
+ * @inheritDoc
+ */
+SB.PhysicsBodyBox2D.prototype.setShape = function(shape)
+{
+    this._body.addShape(shape);
+} ;
 goog.provide('SB.Shaders');
 
 SB.Shaders = {} ;
@@ -4522,47 +4516,80 @@ SB.FSM.prototype.changeState = function(state, object)
     }
 }
 /**
- * @fileoverview A visual containing a model in Collada format
- * @author Tony Parisi
+ *
  */
-goog.provide('SB.ColladaModel');
-goog.require('SB.Model');
+goog.provide('SB.Transform');
+goog.require('SB.Component');
 
-SB.ColladaModel = function(param) 
+SB.Transform = function(param)
 {
-    SB.Model.call(this, param);
-}
-
-goog.inherits(SB.ColladaModel, SB.Model);
-	       
-SB.ColladaModel.prototype.handleLoaded = function(data)
-{
-	this.object = data.scene;
-    this.skin = data.skins[0];
+    SB.Component.call(this);
     
-    this.addToScene();
-}
-	        
-SB.ColladaModel.prototype.update = function()
-{
-	SB.Model.prototype.update.call(this);
-	
-	if (!this.animating)
-		return;
-	
-	if ( this.skin )
-	{
-    	var now = Date.now();
-    	var deltat = (now - this.startTime) / 1000;
-    	var fract = deltat - Math.floor(deltat);
-    	this.frame = fract * this.frameRate;
-		
-		for ( var i = 0; i < this.skin.morphTargetInfluences.length; i++ )
-		{
-			this.skin.morphTargetInfluences[ i ] = 0;
-		}
+    this.position = new THREE.Vector3();
+    this.rotation = new THREE.Vector3();
+    this.scale = new THREE.Vector3(1, 1, 1);
+} ;
 
-		this.skin.morphTargetInfluences[ Math.floor( this.frame ) ] = 1;
+goog.inherits(SB.Transform, SB.Component);
+
+SB.Transform.prototype.realize = function()
+{
+	this.object = new THREE.Object3D();
+	this.addToScene();
+
+	SB.Component.prototype.realize.call(this);
+}
+
+SB.Transform.prototype.update = function()
+{
+    this.object.position.x = this.position.x;
+    this.object.position.y = this.position.y;
+    this.object.position.z = this.position.z;
+    this.object.rotation.x = this.rotation.x;
+    this.object.rotation.y = this.rotation.y;
+    this.object.rotation.z = this.rotation.z;
+    this.object.scale.x = this.scale.x;
+    this.object.scale.y = this.scale.y;
+    this.object.scale.z = this.scale.z;
+}
+
+SB.Transform.prototype.addToScene = function() {
+	if (this._entity)
+	{
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		if (parent)
+		{
+		    parent.add(this.object);
+		    this.object.data = this; // backpointer for picking and such
+		}
+		else
+		{
+			// N.B.: throw something?
+		}
+	}
+	else
+	{
+		// N.B.: throw something?
+	}
+}
+
+SB.Transform.prototype.removeFromScene = function() {
+	if (this._entity)
+	{
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		if (parent)
+		{
+			this.object.data = null;
+		    parent.remove(this.object);
+		}
+		else
+		{
+			// N.B.: throw something?
+		}
+	}
+	else
+	{
+		// N.B.: throw something?
 	}
 }
 /**
@@ -4789,6 +4816,50 @@ SB.Picker.findObjectPicker = function(object)
 
 SB.Picker.clickedObject = null;
 SB.Picker.overObject  =  null;
+/**
+ * @fileoverview A visual containing a model in Collada format
+ * @author Tony Parisi
+ */
+goog.provide('SB.ColladaModel');
+goog.require('SB.Model');
+
+SB.ColladaModel = function(param) 
+{
+    SB.Model.call(this, param);
+}
+
+goog.inherits(SB.ColladaModel, SB.Model);
+	       
+SB.ColladaModel.prototype.handleLoaded = function(data)
+{
+	this.object = data.scene;
+    this.skin = data.skins[0];
+    
+    this.addToScene();
+}
+	        
+SB.ColladaModel.prototype.update = function()
+{
+	SB.Model.prototype.update.call(this);
+	
+	if (!this.animating)
+		return;
+	
+	if ( this.skin )
+	{
+    	var now = Date.now();
+    	var deltat = (now - this.startTime) / 1000;
+    	var fract = deltat - Math.floor(deltat);
+    	this.frame = fract * this.frameRate;
+		
+		for ( var i = 0; i < this.skin.morphTargetInfluences.length; i++ )
+		{
+			this.skin.morphTargetInfluences[ i ] = 0;
+		}
+
+		this.skin.morphTargetInfluences[ Math.floor( this.frame ) ] = 1;
+	}
+}
 /**
  *
  */
@@ -5544,6 +5615,7 @@ goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
 goog.require('SB.KeyFrameAnimator');
 goog.require('SB.Camera');
+goog.require('SB.WalkthroughControllerScript');
 goog.require('SB.Component');
 goog.require('SB.Entity');
 goog.require('SB.FSM');
@@ -5573,6 +5645,7 @@ goog.require('SB.PhysicsSystem');
 goog.require('SB.PhysicsSystemBox2D');
 goog.require('SB.RigidBodyCircleBox2D');
 goog.require('SB.RigidBodyBox2D');
+goog.require('SB.Prefabs');
 goog.require('SB.SceneComponent');
 goog.require('SB.Transform');
 goog.require('SB.ScreenTracker');

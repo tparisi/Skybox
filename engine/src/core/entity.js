@@ -111,6 +111,17 @@ SB.Entity.prototype.removeChild = function(child) {
     }
 }
 
+/**
+ * Removes a child from the Entity
+ * @param {SB.Entity} child The child to remove.
+ */
+SB.Entity.prototype.getChild = function(index) {
+	if (index >= this._children.length)
+		return null;
+	
+	return this._children[index];
+}
+
 //---------------------------------------------------------------------
 // Component methods
 //---------------------------------------------------------------------

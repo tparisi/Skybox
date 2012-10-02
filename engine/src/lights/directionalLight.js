@@ -15,7 +15,7 @@ goog.inherits(SB.DirectionalLight, SB.SceneComponent);
 SB.DirectionalLight.prototype.realize = function() 
 {
 	SB.SceneComponent.prototype.realize.call(this);
-	this.object = new THREE.DirectionalLight(0xffffff, 1, 1);
+	this.object = new THREE.DirectionalLight(this.color, this.intensity, 0);
 	this.position.set(0, 0, 1);
 	this.addToScene();
 }
