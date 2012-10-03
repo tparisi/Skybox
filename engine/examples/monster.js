@@ -252,7 +252,7 @@ SB.Examples.Monster.prototype.move = function(direction)
 
 SB.Examples.Monster.prototype.turn = function(direction)
 {
-	var delta = direction * .0333;
+	var delta = direction * .0666;
 	this.transform.rotation.y += delta;
 }
 
