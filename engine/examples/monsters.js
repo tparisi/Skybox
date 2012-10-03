@@ -2,8 +2,6 @@ SB.Examples.Monsters = function()
 {
 	SB.Game.call(this);	    	
 	
-	this.lastdy = 0;
-	this.dragging = false;
 	this.helpScreen = null;
 }
 
@@ -66,32 +64,6 @@ SB.Examples.Monsters.prototype.initEntities = function()
 	this.addEntity(this.root);
 	
 	this.root.realize();
-}
-
-SB.Examples.Monsters.prototype.onMouseMove = function(x, y)
-{
-	this.dragger.set(x, y);
-	this.rotator.set(x, y);
-}
-
-SB.Examples.Monsters.prototype.onMouseDown = function(x, y)
-{
-	this.dragger.start(x, y);
-	this.rotator.start(x, y);
-	this.dragging = true;
-}
-
-SB.Examples.Monsters.prototype.onMouseUp = function(x, y)
-{
-	this.dragger.stop(x, y);
-	this.rotator.stop(x, y);
-	this.dragging = false;
-	this.lastdy = 0;
-}
-
-SB.Examples.Monsters.prototype.onMouseScroll = function(delta)
-{
-	SB.Graphics.instance.camera.position.z -= delta;
 }
 
 SB.Examples.Monsters.prototype.onKeyDown = function(keyCode, charCode)

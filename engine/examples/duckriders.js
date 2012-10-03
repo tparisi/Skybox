@@ -22,7 +22,6 @@ SB.Examples.DuckRiders.prototype.initialize = function(param)
 
 	root.addChild(dr1);
 	root.addChild(dr2);
-	root.addChild(viewer);
 	
 	this.addEntity(root);
 
