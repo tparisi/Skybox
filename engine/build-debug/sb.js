@@ -3982,10 +3982,10 @@ SB.WalkthroughControllerScript.prototype.realize = function()
 	rotator.subscribe("rotate", this, this.onRotatorRotate);
 	timer.subscribe("time", this, this.onTimeChanged);
 	timer.subscribe("fraction", this, this.onTimeFractionChanged);
-	timer.start();
 	
 	this.dragger = dragger;
 	this.rotator = rotator;
+	this.timer = timer;
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
@@ -4034,6 +4034,8 @@ SB.WalkthroughControllerScript.prototype.onMouseScroll = function(delta)
 SB.WalkthroughControllerScript.prototype.onKeyDown = function(keyCode, charCode)
 {
 	this.whichKeyDown = keyCode;
+	
+	this.timer.start();
 }
 
 SB.WalkthroughControllerScript.prototype.onKeyUp = function(keyCode, charCode)
@@ -4041,6 +4043,8 @@ SB.WalkthroughControllerScript.prototype.onKeyUp = function(keyCode, charCode)
 	this.lastdy = 0;
 	this.whichKeyDown = 0;
 	this.turnFraction = 0;
+	
+	this.timer.stop();
 }
 
 SB.WalkthroughControllerScript.prototype.onKeyPress = function(keyCode, charCode)
