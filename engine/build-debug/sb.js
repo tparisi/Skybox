@@ -4096,7 +4096,7 @@ SB.WalkthroughControllerScript.prototype.onDraggerMove = function(dx, dy)
 
 SB.WalkthroughControllerScript.prototype.onTimeChanged = function(t)
 {
-	var turnfraction = .0833;
+	var turnfraction = .0416;
 	var movefraction = .1666;
 	var turnamount = 0;
 	var moveamount = 0;
