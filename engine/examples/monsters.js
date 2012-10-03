@@ -70,6 +70,9 @@ SB.Examples.Monsters.prototype.onKeyDown = function(keyCode, charCode)
 {
 	if (this.activeMonster)
 		this.activeMonster.onKeyDown(keyCode, charCode);
+	else
+		SB.Game.prototype.onKeyDown.call(this, keyCode, charCode)
+
 }
 
 SB.Examples.Monsters.prototype.onKeyUp = function(keyCode, charCode)
@@ -109,10 +112,14 @@ SB.Examples.Monsters.prototype.onKeyUp = function(keyCode, charCode)
 		var monster = this.monsters[mi-1];
 		this.setActiveMonster(monster);
 	}
+	
+	if (!handled)
+		SB.Game.prototype.onKeyUp.call(this, keyCode, charCode)
 }
 
 SB.Examples.Monsters.prototype.onKeyPress = function(keyCode, charCode)
 {
+	SB.Game.prototype.onKeyPress.call(this, keyCode, charCode)
 }
 
 SB.Examples.Monsters.prototype.onRotatorRotate = function(axis, delta)

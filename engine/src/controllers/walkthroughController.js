@@ -12,9 +12,12 @@ SB.Prefabs.WalkthroughController = function(param)
 
 	var dragger = new SB.Dragger();
 	var rotator = new SB.Rotator();
+	var timer = new SB.Timer( { duration : 3333 } );
+	
 	controller.addComponent(dragger);
 	controller.addComponent(rotator);
-		
+	controller.addComponent(timer);
+
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
 	var camera = new SB.Camera({active:true});
@@ -52,9 +55,13 @@ SB.WalkthroughControllerScript.prototype.realize = function()
 {
 	var dragger = this._entity.getComponent(SB.Dragger);
 	var rotator = this._entity.getComponent(SB.Rotator);
+	var timer = this._entity.getComponent(SB.Timer);
 	
 	dragger.subscribe("move", this, this.onDraggerMove);
 	rotator.subscribe("rotate", this, this.onRotatorRotate);
+	timer.subscribe("time", this, this.onTimeChanged);
+	timer.subscribe("fraction", this, this.onTimeFractionChanged);
+	timer.start();
 	
 	this.dragger = dragger;
 	this.rotator = rotator;
@@ -103,6 +110,23 @@ SB.WalkthroughControllerScript.prototype.onMouseScroll = function(delta)
 	SB.Graphics.instance.camera.position.z -= delta;
 }
 
+SB.WalkthroughControllerScript.prototype.onKeyDown = function(keyCode, charCode)
+{
+	this.whichKeyDown = keyCode;
+}
+
+SB.WalkthroughControllerScript.prototype.onKeyUp = function(keyCode, charCode)
+{
+	this.lastdy = 0;
+	this.whichKeyDown = 0;
+	this.turnFraction = 0;
+}
+
+SB.WalkthroughControllerScript.prototype.onKeyPress = function(keyCode, charCode)
+{
+}
+
+
 SB.WalkthroughControllerScript.prototype.onRotatorRotate = function(axis, delta)
 {
 	delta *= .666;
@@ -138,5 +162,51 @@ SB.WalkthroughControllerScript.prototype.onDraggerMove = function(dx, dy)
 		var dir = new THREE.Vector3(0, 0, -dy);
 		this.move(dir);
 	}
+}
+
+SB.WalkthroughControllerScript.prototype.onTimeChanged = function(t)
+{
+	var turnfraction = .0833;
+	var movefraction = .1666;
+	var turnamount = 0;
+	var moveamount = 0;
+	
+	switch (this.whichKeyDown)
+	{
+    	case SB.Keyboard.KEY_LEFT : 
+    		turnamount = +1 * turnfraction;
+    		break;
+    	case SB.Keyboard.KEY_UP : 
+    		moveamount = -1 * movefraction;
+    		break;
+    	case SB.Keyboard.KEY_RIGHT : 
+    		turnamount = -1 * turnfraction;
+    		break;
+    	case SB.Keyboard.KEY_DOWN : 
+    		moveamount = +1 * movefraction;
+    		break;
+	}
+
+	var dir = (moveamount || turnamount) ? new THREE.Vector3 : null;
+	if (dir)
+	{
+		if (moveamount)
+		{
+			dir.set(0, 0, moveamount);
+			this.move(dir);
+		}
+		
+		if (turnamount)
+		{
+			dir.set(0, turnamount, 0);
+			this.turn(dir);
+		}
+	}
+	
+}
+
+SB.WalkthroughControllerScript.prototype.onTimeFractionChanged = function(fraction)
+{
+	this.turnFraction = fraction;
 }
 
