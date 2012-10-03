@@ -45,6 +45,9 @@ SB.WalkthroughControllerScript = function(param)
 	SB.Component.call(this, param);
 
 	this.directionMatrix = new THREE.Matrix4;
+	this.moveDir = new THREE.Vector3;
+	this.turnDir = new THREE.Vector3;
+	
 	this.lastdy = 0;
 	this.dragging = false;
 }
@@ -134,8 +137,8 @@ SB.WalkthroughControllerScript.prototype.onRotatorRotate = function(axis, delta)
 	if (delta != 0)
 	{
 		// this.controllerScript.transform.rotation.y -= delta;
-		var dir = new THREE.Vector3(0, -delta, 0);
-		this.turn(dir);
+		this.turnDir.set(0, -delta, 0);
+		this.turn(this.turnDir);
 		this.lastrotate = delta;
 	}
 }
@@ -159,8 +162,8 @@ SB.WalkthroughControllerScript.prototype.onDraggerMove = function(dx, dy)
 	if (dy != 0)
 	{
 		// this.controllerScript.transform.position.z -= dy;
-		var dir = new THREE.Vector3(0, 0, -dy);
-		this.move(dir);
+		this.moveDir.set(0, 0, -dy);
+		this.move(this.moveDir);
 	}
 }
 
@@ -187,22 +190,17 @@ SB.WalkthroughControllerScript.prototype.onTimeChanged = function(t)
     		break;
 	}
 
-	var dir = (moveamount || turnamount) ? new THREE.Vector3 : null;
-	if (dir)
+	if (moveamount)
 	{
-		if (moveamount)
-		{
-			dir.set(0, 0, moveamount);
-			this.move(dir);
-		}
-		
-		if (turnamount)
-		{
-			dir.set(0, turnamount, 0);
-			this.turn(dir);
-		}
+		this.moveDir.set(0, 0, moveamount);
+		this.move(this.moveDir);
 	}
 	
+	if (turnamount)
+	{
+		this.turnDir.set(0, turnamount, 0);
+		this.turn(this.turnDir);
+	}
 }
 
 SB.WalkthroughControllerScript.prototype.onTimeFractionChanged = function(fraction)
