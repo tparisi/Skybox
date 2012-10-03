@@ -18,6 +18,11 @@ SB.Prefabs.WalkthroughController = function(param)
 	controller.addComponent(rotator);
 	controller.addComponent(timer);
 
+	dragger.subscribe("move", controllerScript, controllerScript.onDraggerMove);
+	rotator.subscribe("rotate", controllerScript, controllerScript.onRotatorRotate);
+	timer.subscribe("time", controllerScript, controllerScript.onTimeChanged);
+	timer.subscribe("fraction", controllerScript, controllerScript.onTimeFractionChanged);	
+	
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
 	var camera = new SB.Camera({active:true});
