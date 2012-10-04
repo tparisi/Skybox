@@ -27,12 +27,6 @@ SB.Examples.Monsters.prototype.initialize = function(param)
 SB.Examples.Monsters.prototype.initEntities = function()
 {
 	this.root = new SB.Entity;
-	this.dragger = new SB.Dragger();
-	this.rotator = new SB.Rotator();
-	this.root.addComponent(this.dragger);
-	this.root.addComponent(this.rotator);
-	this.dragger.subscribe("move", this, this.onDraggerMove);
-	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
 	
 	var grid = new SB.Grid({size: 14});
 	this.root.addComponent(grid);
@@ -77,7 +71,6 @@ SB.Examples.Monsters.prototype.onKeyDown = function(keyCode, charCode)
 
 SB.Examples.Monsters.prototype.onKeyUp = function(keyCode, charCode)
 {
-	this.lastdy = 0;
 	var mi;
 	
 	var handled = false;
@@ -120,43 +113,6 @@ SB.Examples.Monsters.prototype.onKeyUp = function(keyCode, charCode)
 SB.Examples.Monsters.prototype.onKeyPress = function(keyCode, charCode)
 {
 	SB.Game.prototype.onKeyPress.call(this, keyCode, charCode)
-}
-
-SB.Examples.Monsters.prototype.onRotatorRotate = function(axis, delta)
-{
-	delta *= .666;
-	
-	if (delta != 0)
-	{
-		// this.controllerScript.transform.rotation.y -= delta;
-		var dir = new THREE.Vector3(0, -delta, 0);
-		this.controllerScript.turn(dir);
-		this.lastrotate = delta;
-	}
-}
-
-SB.Examples.Monsters.prototype.onDraggerMove = function(dx, dy)
-{
-	if (Math.abs(dy) <= 2)
-		dy = 0;
-	
-	dy *= .02;
-	
-	if (dy)
-	{
-		this.lastdy = dy;
-	}
-	else if (this.lastdy && this.dragging)
-	{
-		dy = this.lastdy;
-	}
-
-	if (dy != 0)
-	{
-		// this.controllerScript.transform.position.z -= dy;
-		var dir = new THREE.Vector3(0, 0, -dy);
-		this.controllerScript.move(dir);
-	}
 }
 
 SB.Examples.Monsters.prototype.setActiveMonster = function(monster)

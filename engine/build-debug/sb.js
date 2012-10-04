@@ -3876,6 +3876,83 @@ SB.PollingRotator.prototype.update = function()
     };
 }
 /**
+ *
+ */
+goog.provide('SB.Transform');
+goog.require('SB.Component');
+
+SB.Transform = function(param)
+{
+    SB.Component.call(this);
+    
+    this.position = new THREE.Vector3();
+    this.rotation = new THREE.Vector3();
+    this.scale = new THREE.Vector3(1, 1, 1);
+} ;
+
+goog.inherits(SB.Transform, SB.Component);
+
+SB.Transform.prototype.realize = function()
+{
+	this.object = new THREE.Object3D();
+	this.addToScene();
+
+	SB.Component.prototype.realize.call(this);
+}
+
+SB.Transform.prototype.update = function()
+{
+    this.object.position.x = this.position.x;
+    this.object.position.y = this.position.y;
+    this.object.position.z = this.position.z;
+    this.object.rotation.x = this.rotation.x;
+    this.object.rotation.y = this.rotation.y;
+    this.object.rotation.z = this.rotation.z;
+    this.object.scale.x = this.scale.x;
+    this.object.scale.y = this.scale.y;
+    this.object.scale.z = this.scale.z;
+}
+
+SB.Transform.prototype.addToScene = function() {
+	if (this._entity)
+	{
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		if (parent)
+		{
+		    parent.add(this.object);
+		    this.object.data = this; // backpointer for picking and such
+		}
+		else
+		{
+			// N.B.: throw something?
+		}
+	}
+	else
+	{
+		// N.B.: throw something?
+	}
+}
+
+SB.Transform.prototype.removeFromScene = function() {
+	if (this._entity)
+	{
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		if (parent)
+		{
+			this.object.data = null;
+		    parent.remove(this.object);
+		}
+		else
+		{
+			// N.B.: throw something?
+		}
+	}
+	else
+	{
+		// N.B.: throw something?
+	}
+}
+/**
  * @fileoverview File Manager - load game assets using Ajax
  * 
  * @author Tony Parisi
@@ -4678,83 +4755,225 @@ SB.FSM.prototype.changeState = function(state, object)
         this._currentState = state;
     }
 }
-/**
- *
- */
-goog.provide('SB.Transform');
+
+goog.require('SB.Prefabs');
+
+SB.Prefabs.FPSController = function(param)
+{
+	var controller = new SB.Entity(param);
+	var transform = new SB.Transform;
+	controller.addComponent(transform);
+	controller.transform.position.set(0, 0, 5);
+	var controllerScript = new SB.FPSControllerScript;
+	controller.addComponent(controllerScript);
+
+	var dragger = new SB.Dragger();
+	var rotator = new SB.Rotator();
+	var timer = new SB.Timer( { duration : 3333 } );
+	
+	controller.addComponent(dragger);
+	controller.addComponent(rotator);
+	controller.addComponent(timer);
+
+	dragger.subscribe("move", controllerScript, controllerScript.onDraggerMove);
+	rotator.subscribe("rotate", controllerScript, controllerScript.onRotatorRotate);
+	timer.subscribe("time", controllerScript, controllerScript.onTimeChanged);
+	timer.subscribe("fraction", controllerScript, controllerScript.onTimeFractionChanged);	
+	
+	var viewpoint = new SB.Entity;
+	var transform = new SB.Transform;
+	var camera = new SB.Camera({active:true});
+	viewpoint.addComponent(transform);
+	viewpoint.addComponent(camera);
+	viewpoint.transform = transform;
+	viewpoint.camera = camera;
+
+	controller.addChild(viewpoint);
+
+	var intensity = param.headlight ? 1 : 0;
+	var color = param.headlight ? 0xFFFFFF : 0;
+	
+	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	controller.addComponent(headlight);
+	
+	return controller;
+}
+
+goog.provide('SB.FPSControllerScript');
 goog.require('SB.Component');
 
-SB.Transform = function(param)
+SB.FPSControllerScript = function(param)
 {
-    SB.Component.call(this);
-    
-    this.position = new THREE.Vector3();
-    this.rotation = new THREE.Vector3();
-    this.scale = new THREE.Vector3(1, 1, 1);
-} ;
+	SB.Component.call(this, param);
 
-goog.inherits(SB.Transform, SB.Component);
+	this.directionMatrix = new THREE.Matrix4;
+	this.moveDir = new THREE.Vector3;
+	this.turnDir = new THREE.Vector3;
+	
+	this.lastdy = 0;
+	this.dragging = false;
+}
 
-SB.Transform.prototype.realize = function()
+goog.inherits(SB.FPSControllerScript, SB.Component);
+
+SB.FPSControllerScript.prototype.realize = function()
 {
-	this.object = new THREE.Object3D();
-	this.addToScene();
-
-	SB.Component.prototype.realize.call(this);
+	var dragger = this._entity.getComponent(SB.Dragger);
+	var rotator = this._entity.getComponent(SB.Rotator);
+	var timer = this._entity.getComponent(SB.Timer);
+	
+	dragger.subscribe("move", this, this.onDraggerMove);
+	rotator.subscribe("rotate", this, this.onRotatorRotate);
+	timer.subscribe("time", this, this.onTimeChanged);
+	timer.subscribe("fraction", this, this.onTimeFractionChanged);
+	
+	this.dragger = dragger;
+	this.rotator = rotator;
+	this.timer = timer;
+	
+	SB.Game.instance.mouseDelegate = this;
+	SB.Game.instance.keyboardDelegate = this;
 }
 
-SB.Transform.prototype.update = function()
+SB.FPSControllerScript.prototype.move = function(dir)
 {
-    this.object.position.x = this.position.x;
-    this.object.position.y = this.position.y;
-    this.object.position.z = this.position.z;
-    this.object.rotation.x = this.rotation.x;
-    this.object.rotation.y = this.rotation.y;
-    this.object.rotation.z = this.rotation.z;
-    this.object.scale.x = this.scale.x;
-    this.object.scale.y = this.scale.y;
-    this.object.scale.z = this.scale.z;
+	this.directionMatrix.identity();
+	this.directionMatrix.setRotationFromEuler(this._entity.transform.rotation);
+	dir = this.directionMatrix.multiplyVector3(dir);
+	this._entity.transform.position.addSelf(dir);
 }
 
-SB.Transform.prototype.addToScene = function() {
-	if (this._entity)
+SB.FPSControllerScript.prototype.turn = function(dir)
+{
+	this._entity.transform.rotation.addSelf(dir);
+}
+
+
+SB.FPSControllerScript.prototype.onMouseMove = function(x, y)
+{
+	this.dragger.set(x, y);
+	this.rotator.set(x, y);
+}
+
+SB.FPSControllerScript.prototype.onMouseDown = function(x, y)
+{
+	this.dragger.start(x, y);
+	this.rotator.start(x, y);
+	this.dragging = true;
+}
+
+SB.FPSControllerScript.prototype.onMouseUp = function(x, y)
+{
+	this.dragger.stop(x, y);
+	this.rotator.stop(x, y);
+	this.dragging = false;
+	this.lastdy = 0;
+}
+
+SB.FPSControllerScript.prototype.onMouseScroll = function(delta)
+{
+	SB.Graphics.instance.camera.position.z -= delta;
+}
+
+SB.FPSControllerScript.prototype.onKeyDown = function(keyCode, charCode)
+{
+	this.whichKeyDown = keyCode;
+	
+	this.timer.start();
+}
+
+SB.FPSControllerScript.prototype.onKeyUp = function(keyCode, charCode)
+{
+	this.lastdy = 0;
+	this.whichKeyDown = 0;
+	this.turnFraction = 0;
+	
+	this.timer.stop();
+}
+
+SB.FPSControllerScript.prototype.onKeyPress = function(keyCode, charCode)
+{
+}
+
+
+SB.FPSControllerScript.prototype.onRotatorRotate = function(axis, delta)
+{
+	delta *= .666;
+	
+	if (delta != 0)
 	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
-		if (parent)
-		{
-		    parent.add(this.object);
-		    this.object.data = this; // backpointer for picking and such
-		}
-		else
-		{
-			// N.B.: throw something?
-		}
-	}
-	else
-	{
-		// N.B.: throw something?
+		// this.controllerScript.transform.rotation.y -= delta;
+		this.turnDir.set(0, -delta, 0);
+		this.turn(this.turnDir);
+		this.lastrotate = delta;
 	}
 }
 
-SB.Transform.prototype.removeFromScene = function() {
-	if (this._entity)
+SB.FPSControllerScript.prototype.onDraggerMove = function(dx, dy)
+{
+	if (Math.abs(dy) <= 2)
+		dy = 0;
+	
+	dy *= .02;
+	
+	if (dy)
 	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
-		if (parent)
-		{
-			this.object.data = null;
-		    parent.remove(this.object);
-		}
-		else
-		{
-			// N.B.: throw something?
-		}
+		this.lastdy = dy;
 	}
-	else
+	else if (this.lastdy && this.dragging)
 	{
-		// N.B.: throw something?
+		dy = this.lastdy;
+	}
+
+	if (dy != 0)
+	{
+		// this.controllerScript.transform.position.z -= dy;
+		this.moveDir.set(0, 0, -dy);
+		this.move(this.moveDir);
 	}
 }
+
+SB.FPSControllerScript.prototype.onTimeChanged = function(t)
+{
+	var turnfraction = .0416;
+	var movefraction = .1666;
+	var turnamount = 0;
+	var moveamount = 0;
+	
+	switch (this.whichKeyDown)
+	{
+    	case SB.Keyboard.KEY_LEFT : 
+    		turnamount = +1 * turnfraction;
+    		break;
+    	case SB.Keyboard.KEY_UP : 
+    		moveamount = -1 * movefraction;
+    		break;
+    	case SB.Keyboard.KEY_RIGHT : 
+    		turnamount = -1 * turnfraction;
+    		break;
+    	case SB.Keyboard.KEY_DOWN : 
+    		moveamount = +1 * movefraction;
+    		break;
+	}
+
+	if (moveamount)
+	{
+		this.moveDir.set(0, 0, moveamount);
+		this.move(this.moveDir);
+	}
+	
+	if (turnamount)
+	{
+		this.turnDir.set(0, turnamount, 0);
+		this.turn(this.turnDir);
+	}
+}
+
+SB.FPSControllerScript.prototype.onTimeFractionChanged = function(fraction)
+{
+	this.turnFraction = fraction;
+}
+
 /**
  * @fileoverview A rectangle visual
  * @author Tony Parisi
@@ -5779,6 +5998,7 @@ goog.require('SB.KeyFrame');
 goog.require('SB.KeyFrameAnimator');
 goog.require('SB.Camera');
 goog.require('SB.WalkthroughControllerScript');
+goog.require('SB.FPSControllerScript');
 goog.require('SB.Component');
 goog.require('SB.Entity');
 goog.require('SB.FSM');
