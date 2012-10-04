@@ -4056,13 +4056,9 @@ goog.inherits(SB.WalkthroughControllerScript, SB.Component);
 
 SB.WalkthroughControllerScript.prototype.realize = function()
 {
-	var dragger = this._entity.getComponent(SB.Dragger);
-	var rotator = this._entity.getComponent(SB.Rotator);
-	var timer = this._entity.getComponent(SB.Timer);
-	
-	this.dragger = dragger;
-	this.rotator = rotator;
-	this.timer = timer;
+	this.dragger = this._entity.getComponent(SB.Dragger);
+	this.rotator = this._entity.getComponent(SB.Rotator);
+	this.timer = this._entity.getComponent(SB.Timer);
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
