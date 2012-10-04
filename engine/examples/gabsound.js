@@ -278,7 +278,7 @@ function sound_init() {
     convolver3 = context.createConvolver();
     convolver4 = context.createConvolver();
 
-    setReverbImpulseResponse('sounds/mysounds/diffusor2.wav');
+    setReverbImpulseResponse('audio/mysounds/diffusor2.wav');
     
     // panning
     panner1 = context.createPanner();

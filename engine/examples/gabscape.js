@@ -1,10 +1,6 @@
 Gabscape = function()
 {
 	SB.Game.call(this);	    	
-	
-	this.lastdy = 0;
-	this.dragging = false;
-	this.helpScreen = null;
 }
 
 goog.inherits(Gabscape, SB.Game);
@@ -27,22 +23,7 @@ Gabscape.prototype.initialize = function(param)
 
 Gabscape.prototype.initEntities = function()
 {
-	this.whichKeyDown = 0;
-	this.turnFraction = 0;
-
 	this.root = new SB.Entity;
-	this.dragger = new SB.Dragger();
-	this.rotator = new SB.Rotator();
-	this.root.addComponent(this.dragger);
-	this.root.addComponent(this.rotator);
-	this.dragger.subscribe("move", this, this.onDraggerMove);
-	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
-
-	this.timer = new SB.Timer( { duration : 3333 } );
-	this.root.addComponent(this.timer);
-	this.timer.subscribe("time", this, this.onTimeChanged);
-	this.timer.subscribe("fraction", this, this.onTimeFractionChanged);
-	this.timer.start();
 	
 	var grid = new SB.Grid({size:64});
 	this.root.addComponent(grid);
@@ -58,7 +39,13 @@ Gabscape.prototype.initEntities = function()
 	g3.transform.position.set(0, 0, -15);
 	*/
 	
-	this.createViewer();
+	var viewer = SB.Prefabs.FPSController({ headlight : true });
+	this.gabatar = new Gabatar({ info : this.twitterInfo });
+	this.gabatar.transform.position.set(0, -2.5, -3.67);
+	viewer.addChild(this.gabatar);
+	
+	var controllerScript = viewer.getComponent(SB.FPSControllerScript);
+	controllerScript.setCameraPos(new THREE.Vector3(0, 2.5, 3.67));
 	
 	this.gabbers = [g1]; // , g2, g3];
 	this.activeGabber = null;
@@ -66,20 +53,11 @@ Gabscape.prototype.initEntities = function()
 	this.root.addChild(g1);
 //	this.root.addChild(g2);
 //	this.root.addChild(g3);
-	this.root.addChild(this.viewer);
+	this.root.addChild(viewer);
 	
 	this.addEntity(this.root);
 
 	this.root.realize();
-}
-
-Gabscape.prototype.createViewer = function()
-{
-	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.viewpoint.transform.position.set(0, 2.5, 3.67);
-	this.gabatar = new Gabatar({ info : this.twitterInfo });
-
-	this.viewer.addChild(this.gabatar);
 }
 
 Gabscape.prototype.getTwitterData = function()
@@ -168,44 +146,17 @@ Gabscape.prototype.updatePublicTimeline = function(message)
 	// document.getElementById("public").innerHTML = message;
 }
 
-
-
-Gabscape.prototype.onMouseMove = function(x, y)
-{
-	this.dragger.set(x, y);
-	this.rotator.set(x, y);
-}
-
-Gabscape.prototype.onMouseDown = function(x, y)
-{
-	this.dragger.start(x, y);
-	this.rotator.start(x, y);
-	this.dragging = true;
-}
-
-Gabscape.prototype.onMouseUp = function(x, y)
-{
-	this.dragger.stop(x, y);
-	this.rotator.stop(x, y);
-	this.dragging = false;
-	this.lastdy = 0;
-}
-
-Gabscape.prototype.onMouseScroll = function(delta)
-{
-	SB.Graphics.instance.camera.position.z -= delta;
-}
-
 Gabscape.prototype.onKeyDown = function(keyCode, charCode)
 {
 	this.whichKeyDown = keyCode;
 	if (this.activeGabber)
 		this.activeGabber.onKeyDown(keyCode, charCode);
+	else
+		SB.Game.prototype.onKeyDown.call(this, keyCode, charCode)
 }
 
 Gabscape.prototype.onKeyUp = function(keyCode, charCode)
 {
-	this.lastdy = 0;
 	var mi;
 	
 	var handled = false;
@@ -241,13 +192,13 @@ Gabscape.prototype.onKeyUp = function(keyCode, charCode)
 		this.setActiveGabber(gabber);
 	}
 
-	this.whichKeyDown = 0;
-	this.turnFraction = 0;
-	
+	if (!handled)
+		SB.Game.prototype.onKeyUp.call(this, keyCode, charCode)
 }
 
 Gabscape.prototype.onKeyPress = function(keyCode, charCode)
 {
+	SB.Game.prototype.onKeyPress.call(this, keyCode, charCode)
 }
 
 Gabscape.prototype.onRotatorRotate = function(axis, delta)
@@ -274,6 +225,8 @@ Gabscape.prototype.onRotatorRotate = function(axis, delta)
 
 Gabscape.prototype.onDraggerMove = function(dx, dy)
 {
+	return;
+	
 	if (Math.abs(dy) <= 2)
 		dy = 0;
 	
@@ -301,6 +254,8 @@ Gabscape.prototype.onDraggerMove = function(dx, dy)
 
 Gabscape.prototype.onTimeChanged = function(t)
 {
+	return;
+	
 	if (!this.activeGabber)
 	{
 		var handled = false;
@@ -357,21 +312,6 @@ Gabscape.prototype.onTimeChanged = function(t)
 Gabscape.prototype.onTimeFractionChanged = function(fraction)
 {
 	this.turnFraction = fraction;
-}
-
-Gabscape.prototype.move = function(direction)
-{
-	var delta = direction * .1666;
-	var dir = new THREE.Vector3(0, 0, delta);
-	this.viewer.move(dir);
-}
-
-Gabscape.prototype.turn = function(direction)
-{
-	var delta = direction * .0333;
-	// this.viewer.transform.rotation.y -= delta;
-	var dir = new THREE.Vector3(0, delta, 0);
-	this.viewer.turn(dir);
 }
 
 Gabscape.prototype.setActiveGabber = function(gabber)

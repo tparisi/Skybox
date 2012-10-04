@@ -4070,7 +4070,7 @@ SB.WalkthroughControllerScript.prototype.update = function()
 {
 	if (this.cameraPos)
 	{
-		this.viewpoint.transform.position.copy(this.cameraPos);
+		this._entity.transform.position.copy(this.cameraPos);
 		this.cameraPos = null;
 	}
 }
@@ -4856,6 +4856,7 @@ SB.FPSControllerScript = function(param)
 	this.directionMatrix = new THREE.Matrix4;
 	this.moveDir = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
+	this.lookDir = new THREE.Vector3;
 	this.cameraPos = null;
 	
 	this.lastdy = 0;
@@ -4869,6 +4870,7 @@ SB.FPSControllerScript.prototype.realize = function()
 	this.dragger = this._entity.getComponent(SB.Dragger);
 	this.rotator = this._entity.getComponent(SB.Rotator);
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.viewpoint = this._entity.getChild(0);
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
@@ -4878,7 +4880,7 @@ SB.FPSControllerScript.prototype.update = function()
 {
 	if (this.cameraPos)
 	{
-		this.viewpoint.transform.position.copy(this.cameraPos);
+		this._entity.transform.position.copy(this.cameraPos);
 		this.cameraPos = null;
 	}
 }
@@ -4906,6 +4908,11 @@ SB.FPSControllerScript.prototype.move = function(dir)
 SB.FPSControllerScript.prototype.turn = function(dir)
 {
 	this._entity.transform.rotation.addSelf(dir);
+}
+
+SB.FPSControllerScript.prototype.mouseLook = function(dir)
+{
+	this.viewpoint.transform.rotation.addSelf(dir);
 }
 
 
@@ -4959,14 +4966,15 @@ SB.FPSControllerScript.prototype.onKeyPress = function(keyCode, charCode)
 
 SB.FPSControllerScript.prototype.onRotatorRotate = function(axis, delta)
 {
+	return; // this don' work yet
+	
 	delta *= .666;
 	
 	if (delta != 0)
 	{
 		// this.controllerScript.transform.rotation.y -= delta;
-		this.turnDir.set(0, -delta, 0);
-		this.turn(this.turnDir);
-		this.lastrotate = delta;
+		this.lookDir.set(0, -delta, 0);
+		this.mouseLook(this.lookDir);
 	}
 }
 
@@ -4975,7 +4983,7 @@ SB.FPSControllerScript.prototype.onDraggerMove = function(dx, dy)
 	if (Math.abs(dy) <= 2)
 		dy = 0;
 	
-	dy *= .02;
+	dy *= .002;
 	
 	if (dy)
 	{
@@ -4989,9 +4997,9 @@ SB.FPSControllerScript.prototype.onDraggerMove = function(dx, dy)
 	if (dy != 0)
 	{
 		// this.controllerScript.transform.position.z -= dy;
-		this.moveDir.set(0, 0, -dy);
-		this.move(this.moveDir);
-	}
+		this.lookDir.set(dy, 0, 0);
+		this.mouseLook(this.lookDir);
+	}	
 }
 
 SB.FPSControllerScript.prototype.onTimeChanged = function(t)

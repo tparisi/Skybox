@@ -75,7 +75,7 @@ SB.WalkthroughControllerScript.prototype.update = function()
 {
 	if (this.cameraPos)
 	{
-		this.viewpoint.transform.position.copy(this.cameraPos);
+		this._entity.transform.position.copy(this.cameraPos);
 		this.cameraPos = null;
 	}
 }

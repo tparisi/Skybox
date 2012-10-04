@@ -1,10 +1,6 @@
 Gabscape = function()
 {
-	SB.Game.call(this);	    	
-	
-	this.lastdy = 0;
-	this.dragging = false;
-	this.helpScreen = null;
+	SB.Game.call(this);	
 }
 
 goog.inherits(Gabscape, SB.Game);
@@ -38,17 +34,8 @@ Gabscape.prototype.findGabber = function(gabberName) {
 
 Gabscape.prototype.initEntities = function()
 {
-	this.whichKeyDown = 0;
-	this.turnFraction = 0;
-
 	this.root = new SB.Entity;
-	this.dragger = new SB.Dragger();
-	this.rotator = new SB.Rotator();
-	this.root.addComponent(this.dragger);
-	this.root.addComponent(this.rotator);
-	this.dragger.subscribe("move", this, this.onDraggerMove);
-	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
-
+	
 	this.timer = new SB.Timer( { duration : 3333 } );
 	this.root.addComponent(this.timer);
 	this.timer.subscribe("time", this, this.onTimeChanged);
@@ -83,8 +70,6 @@ Gabscape.prototype.initEntities = function()
 
 	this.activeGabber = null;
 
-	this.root.addChild(this.viewer);
-
 	this.addEntity(this.root);
 
 	this.root.realize();
@@ -94,11 +79,16 @@ Gabscape.prototype.initEntities = function()
 
 Gabscape.prototype.createViewer = function()
 {
-	this.viewer = new SB.Viewer({ headlight : true });
-	this.viewer.viewpoint.transform.position.set(0, 2.5, 3.67);
+	this.viewer = SB.Prefabs.FPSController({ headlight : true });
 	this.gabatar = new Gabatar({ info : this.twitterInfo });
+	this.gabatar.transform.position.set(0, -2.5, -3.67);
 
 	this.viewer.addChild(this.gabatar);
+
+	this.root.addChild(this.viewer);
+	
+	var controllerScript = this.viewer.getComponent(SB.FPSControllerScript);
+	controllerScript.setCameraPos(new THREE.Vector3(0, 2.5, 3.67));
 }
 
 Gabscape.prototype.createNetwork = function()
@@ -196,6 +186,9 @@ Gabscape.prototype.onModelLoaded = function(model)
 
 Gabscape.prototype.initSound = function()
 {
+	// Yikes, sound is broken --TP 2012/10/04
+	return;
+	
 	sound_init();
 }
 
@@ -415,43 +408,17 @@ Gabscape.prototype.updatePublicTimeline = function(message)
 }
 
 
-
-Gabscape.prototype.onMouseMove = function(x, y)
-{
-	this.dragger.set(x, y);
-	this.rotator.set(x, y);
-}
-
-Gabscape.prototype.onMouseDown = function(x, y)
-{
-	this.dragger.start(x, y);
-	this.rotator.start(x, y);
-	this.dragging = true;
-}
-
-Gabscape.prototype.onMouseUp = function(x, y)
-{
-	this.dragger.stop(x, y);
-	this.rotator.stop(x, y);
-	this.dragging = false;
-	this.lastdy = 0;
-}
-
-Gabscape.prototype.onMouseScroll = function(delta)
-{
-	SB.Graphics.instance.camera.position.z -= delta;
-}
-
 Gabscape.prototype.onKeyDown = function(keyCode, charCode)
 {
 	this.whichKeyDown = keyCode;
 	if (this.activeGabber)
 		this.activeGabber.onKeyDown(keyCode, charCode);
+	else
+		SB.Game.prototype.onKeyDown.call(this, keyCode, charCode)
 }
 
 Gabscape.prototype.onKeyUp = function(keyCode, charCode)
 {
-	this.lastdy = 0;
 	var mi;
 	
 	var handled = false;
@@ -487,13 +454,13 @@ Gabscape.prototype.onKeyUp = function(keyCode, charCode)
 		this.setActiveGabber(gabber);
 	}
 
-	this.whichKeyDown = 0;
-	this.turnFraction = 0;
-	
+	if (!handled)
+		SB.Game.prototype.onKeyUp.call(this, keyCode, charCode)
 }
 
 Gabscape.prototype.onKeyPress = function(keyCode, charCode)
 {
+	SB.Game.prototype.onKeyPress.call(this, keyCode, charCode)
 }
 
 Gabscape.prototype.onRotatorRotate = function(axis, delta)
@@ -520,6 +487,8 @@ Gabscape.prototype.onRotatorRotate = function(axis, delta)
 
 Gabscape.prototype.onDraggerMove = function(dx, dy)
 {
+	return;
+	
 	if (Math.abs(dy) <= 2)
 		dy = 0;
 	
@@ -547,6 +516,7 @@ Gabscape.prototype.onDraggerMove = function(dx, dy)
 
 Gabscape.prototype.onTimeChanged = function(t)
 {
+/*	
 	if (!this.activeGabber)
 	{
 		var handled = false;
@@ -598,6 +568,9 @@ Gabscape.prototype.onTimeChanged = function(t)
 			}
 		}
 	}
+	
+*/
+	
 	this.updateNetworkPositions(t);
 	this.updateNetwork(t);
 }
