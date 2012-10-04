@@ -4809,18 +4809,9 @@ goog.inherits(SB.FPSControllerScript, SB.Component);
 
 SB.FPSControllerScript.prototype.realize = function()
 {
-	var dragger = this._entity.getComponent(SB.Dragger);
-	var rotator = this._entity.getComponent(SB.Rotator);
-	var timer = this._entity.getComponent(SB.Timer);
-	
-	dragger.subscribe("move", this, this.onDraggerMove);
-	rotator.subscribe("rotate", this, this.onRotatorRotate);
-	timer.subscribe("time", this, this.onTimeChanged);
-	timer.subscribe("fraction", this, this.onTimeFractionChanged);
-	
-	this.dragger = dragger;
-	this.rotator = rotator;
-	this.timer = timer;
+	this.dragger = this._entity.getComponent(SB.Dragger);
+	this.rotator = this._entity.getComponent(SB.Rotator);
+	this.timer = this._entity.getComponent(SB.Timer);
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
