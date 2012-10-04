@@ -52,6 +52,7 @@ SB.FPSControllerScript = function(param)
 	this.directionMatrix = new THREE.Matrix4;
 	this.moveDir = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
+	this.cameraPos = null;
 	
 	this.lastdy = 0;
 	this.dragging = false;
@@ -67,6 +68,27 @@ SB.FPSControllerScript.prototype.realize = function()
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
+}
+
+SB.FPSControllerScript.prototype.update = function()
+{
+	if (this.cameraPos)
+	{
+		this.viewpoint.transform.position.copy(this.cameraPos);
+		this.cameraPos = null;
+	}
+}
+
+SB.FPSControllerScript.prototype.setCameraPos = function(pos)
+{
+	if (this.cameraPos)
+	{
+		this.cameraPos.copy(pos);
+	}
+	else
+	{
+		this.cameraPos = pos.clone();
+	}
 }
 
 SB.FPSControllerScript.prototype.move = function(dir)
@@ -106,7 +128,8 @@ SB.FPSControllerScript.prototype.onMouseUp = function(x, y)
 
 SB.FPSControllerScript.prototype.onMouseScroll = function(delta)
 {
-	SB.Graphics.instance.camera.position.z -= delta;
+	this.moveDir.set(0, 0, -delta);
+	this.move(this.moveDir);
 }
 
 SB.FPSControllerScript.prototype.onKeyDown = function(keyCode, charCode)

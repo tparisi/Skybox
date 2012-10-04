@@ -52,6 +52,7 @@ SB.WalkthroughControllerScript = function(param)
 	this.directionMatrix = new THREE.Matrix4;
 	this.moveDir = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
+	this.cameraPos = null;
 	
 	this.lastdy = 0;
 	this.dragging = false;
@@ -64,9 +65,31 @@ SB.WalkthroughControllerScript.prototype.realize = function()
 	this.dragger = this._entity.getComponent(SB.Dragger);
 	this.rotator = this._entity.getComponent(SB.Rotator);
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.viewpoint = this._entity.getChild(0);
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
+}
+
+SB.WalkthroughControllerScript.prototype.update = function()
+{
+	if (this.cameraPos)
+	{
+		this.viewpoint.transform.position.copy(this.cameraPos);
+		this.cameraPos = null;
+	}
+}
+
+SB.WalkthroughControllerScript.prototype.setCameraPos = function(pos)
+{
+	if (this.cameraPos)
+	{
+		this.cameraPos.copy(pos);
+	}
+	else
+	{
+		this.cameraPos = pos.clone();
+	}
 }
 
 SB.WalkthroughControllerScript.prototype.move = function(dir)
@@ -106,7 +129,8 @@ SB.WalkthroughControllerScript.prototype.onMouseUp = function(x, y)
 
 SB.WalkthroughControllerScript.prototype.onMouseScroll = function(delta)
 {
-	SB.Graphics.instance.camera.position.z -= delta;
+	this.moveDir.set(0, 0, -delta);
+	this.move(this.moveDir);
 }
 
 SB.WalkthroughControllerScript.prototype.onKeyDown = function(keyCode, charCode)
