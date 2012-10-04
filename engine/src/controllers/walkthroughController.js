@@ -197,21 +197,53 @@ SB.WalkthroughControllerScript.prototype.onTimeChanged = function(t)
 	var movefraction = .1666;
 	var turnamount = 0;
 	var moveamount = 0;
+	var handled = false;
 	
 	switch (this.whichKeyDown)
 	{
     	case SB.Keyboard.KEY_LEFT : 
     		turnamount = +1 * turnfraction;
+			handled = true;
     		break;
     	case SB.Keyboard.KEY_UP : 
     		moveamount = -1 * movefraction;
+			handled = true;
     		break;
     	case SB.Keyboard.KEY_RIGHT : 
     		turnamount = -1 * turnfraction;
+			handled = true;
     		break;
     	case SB.Keyboard.KEY_DOWN : 
     		moveamount = +1 * movefraction;
+			handled = true;
     		break;
+	}
+
+	if (!handled)
+	{
+		switch (String.fromCharCode(this.whichKeyDown))
+		{
+	    	case 'A' :
+	    		turnamount = +1 * turnfraction;
+	    		handled = true;
+	    		break;
+	    		
+	    	case 'W' :
+	    		moveamount = -1 * movefraction;
+	    		handled = true;
+	    		break;
+	    	case 'D' :
+	    		turnamount = -1 * turnfraction;
+				handled = true;
+	    		break;
+	    	case 'S' :
+	    		moveamount = +1 * movefraction;
+				handled = true;
+	    		break;
+	    		
+	    	default : 
+	    		break;
+		}
 	}
 
 	if (moveamount)
