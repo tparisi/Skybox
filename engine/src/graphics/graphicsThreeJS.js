@@ -157,7 +157,7 @@ SB.GraphicsThreeJS.prototype.objectFromMouse = function(pagex, pagey)
     pos = this.camera.matrixWorld.multiplyVector3(pos);
     var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
 
-    var intersects = ray.intersectScene( this.scene );
+    var intersects = ray.intersectObject( this.scene, true );
 	
     if ( intersects.length > 0 ) {
     	var i = 0;

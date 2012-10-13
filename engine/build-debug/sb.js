@@ -2015,7 +2015,7 @@ SB.GraphicsThreeJS.prototype.objectFromMouse = function(pagex, pagey)
     pos = this.camera.matrixWorld.multiplyVector3(pos);
     var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
 
-    var intersects = ray.intersectScene( this.scene );
+    var intersects = ray.intersectObject( this.scene, true );
 	
     if ( intersects.length > 0 ) {
     	var i = 0;
@@ -4366,11 +4366,11 @@ SB.Grid.prototype.realize = function()
 
 	for ( var i = 0; i <= size / step * 2; i ++ )
 	{
-		geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - size, floor, i * step - size ) ) );
-		geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(   size, floor, i * step - size ) ) );
+		geometry.vertices.push( new THREE.Vector3( - size, floor, i * step - size ) );
+		geometry.vertices.push( new THREE.Vector3(   size, floor, i * step - size ) );
 
-		geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor, -size ) ) );
-		geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor,  size ) ) );
+		geometry.vertices.push( new THREE.Vector3( i * step - size, floor, -size ) );
+		geometry.vertices.push( new THREE.Vector3( i * step - size, floor,  size ) );
 	}
 
 	this.object = new THREE.Line( geometry, line_material, THREE.LinePieces );
@@ -5102,11 +5102,11 @@ SB.Pane.prototype.realize = function()
     var segmentsHeight = 8; // N.B.: do these ever need to be a soft setting?
     
     var material = this.param.material || new THREE.MeshBasicMaterial( { color: 0x80aaaa, opacity: 1, transparent: false, wireframe: false } );
+    material.side = THREE.DoubleSide;
 	
 	var geometry = new THREE.PlaneGeometry( width, height, segmentsWidth, segmentsHeight );
 	
     this.object = new THREE.Mesh(geometry, material);
-    this.object.doubleSided = true;
 
     this.addToScene();
 }
@@ -5912,6 +5912,85 @@ SB.PlaneDragger.prototype.getPlaneIntersection = function(x, y)
 	return ray.intersectObject( this.dragPlane );
 }
 
+goog.provide('SB.SceneUtils');
+
+SB.SceneUtils.computeBoundingBox = function(scene)
+{
+	function compute(obj, boundingBox)
+	{
+		if (obj instanceof THREE.Mesh)
+		{
+			var geometry = obj.geometry;
+			if (geometry)
+			{
+				if (!geometry.boundingBox)
+				{
+					geometry.computeBoundingBox();
+				}
+				
+				var geometryBBox = geometry.boundingBox;
+				var bboxMin = geometryBBox.min.clone();
+				var bboxMax = geometryBBox.max.clone();
+				var matrix = obj.matrixWorld;
+				
+				matrix.multiplyVector3(bboxMin);
+				matrix.multiplyVector3(bboxMax);
+				
+				if ( bboxMin.x < boundingBox.min.x ) {
+
+					boundingBox.min.x = bboxMin.x;
+
+				}
+				
+				if ( bboxMax.x > boundingBox.max.x ) {
+
+					boundingBox.max.x = bboxMax.x;
+
+				}
+
+				if ( bboxMin.y < boundingBox.min.y ) {
+
+					boundingBox.min.y = bboxMin.y;
+
+				}
+				
+				if ( bboxMax.y > boundingBox.max.y ) {
+
+					boundingBox.max.y = bboxMax.y;
+
+				}
+
+				if ( bboxMin.z < boundingBox.min.z ) {
+
+					boundingBox.min.z = bboxMin.z;
+
+				}
+				
+				if ( bboxMax.z > boundingBox.max.z ) {
+
+					boundingBox.max.z = bboxMax.z;
+
+				}
+				
+			}
+		}
+		else
+		{
+			var i, len = obj.children.length;
+			for (i = 0; i < len; i++)
+			{
+				compute(obj.children[i], boundingBox);
+			}
+		}
+	}
+	
+	var boundingBox = { min: new THREE.Vector3(), max: new THREE.Vector3() };
+	
+	compute(scene, boundingBox);
+	
+	return boundingBox;
+}
+
 /**
  * @fileoverview NetworkClient - Broadcast/listen on network
  * 
@@ -6132,13 +6211,14 @@ goog.require('SB.RigidBodyBox2D');
 goog.require('SB.Prefabs');
 goog.require('SB.SceneComponent');
 goog.require('SB.Transform');
-goog.require('SB.ScreenTracker');
-goog.require('SB.Tracker');
 goog.require('SB.Time');
 goog.require('SB.Timer');
 goog.require('SB.Annotation');
 goog.require('SB.Popup');
 goog.require('SB.View');
+goog.require('SB.SceneUtils');
+goog.require('SB.ScreenTracker');
+goog.require('SB.Tracker');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
 goog.require('SB.JsonModel');

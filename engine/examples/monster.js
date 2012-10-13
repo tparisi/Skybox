@@ -245,7 +245,7 @@ SB.Examples.Monster.prototype.move = function(direction)
 	var delta = direction * .1666;
 	var dir = new THREE.Vector3(0, 0, delta);
 	var matrix = new THREE.Matrix4();
-	matrix.setRotationY(this.transform.rotation.y - Math.PI / 2);
+	matrix.setRotationFromEuler(new THREE.Vector3(0, this.transform.rotation.y - Math.PI / 2, 0));
 	dir = matrix.multiplyVector3(dir);
 	this.transform.position.addSelf(dir);
 }

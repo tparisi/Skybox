@@ -25,11 +25,11 @@ SB.Pane.prototype.realize = function()
     var segmentsHeight = 8; // N.B.: do these ever need to be a soft setting?
     
     var material = this.param.material || new THREE.MeshBasicMaterial( { color: 0x80aaaa, opacity: 1, transparent: false, wireframe: false } );
+    material.side = THREE.DoubleSide;
 	
 	var geometry = new THREE.PlaneGeometry( width, height, segmentsWidth, segmentsHeight );
 	
     this.object = new THREE.Mesh(geometry, material);
-    this.object.doubleSided = true;
 
     this.addToScene();
 }

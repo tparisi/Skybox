@@ -43,7 +43,7 @@ SB.Examples.Monsters.prototype.initEntities = function()
 	this.monsters = [m1, m2, m3];
 	this.activeMonster = null;
 	
-	var viewer = SB.Prefabs.WalkthroughController({ headlight : true });
+	var viewer = SB.Prefabs.WalkthroughController({ headlight : false });
 	
 	var controllerScript = viewer.getComponent(SB.WalkthroughControllerScript);
 	controllerScript.setCameraPos(new THREE.Vector3(0, 2.5, 3.67));
