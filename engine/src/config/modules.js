@@ -55,6 +55,7 @@ goog.require('SB.Tracker');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
 goog.require('SB.JsonModel');
+goog.require('SB.JsonScene');
 goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');

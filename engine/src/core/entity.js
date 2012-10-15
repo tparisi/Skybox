@@ -169,6 +169,11 @@ SB.Entity.prototype.removeComponent = function(component) {
 
     if (i != -1)
     {
+    	if (component.removeFromScene);
+    	{
+    		component.removeFromScene();
+    	}
+    	
         this._components.splice(i, 1);
         component.setEntity(null);
     }

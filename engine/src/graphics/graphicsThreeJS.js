@@ -62,7 +62,7 @@ SB.GraphicsThreeJS.prototype.initScene = function()
 {
     var scene = new THREE.Scene();
 
-    scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 
+//    scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 
 	
     var camera = new THREE.PerspectiveCamera( 45, 
     		this.container.offsetWidth / this.container.offsetHeight, 1, 4000 );

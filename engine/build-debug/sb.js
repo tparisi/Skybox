@@ -1920,7 +1920,7 @@ SB.GraphicsThreeJS.prototype.initScene = function()
 {
     var scene = new THREE.Scene();
 
-    scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 
+//    scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 
 	
     var camera = new THREE.PerspectiveCamera( 45, 
     		this.container.offsetWidth / this.container.offsetHeight, 1, 4000 );
@@ -2762,6 +2762,122 @@ SB.Loader = function()
 
 goog.inherits(SB.Loader, SB.PubSub);
         
+goog.provide('SB.Shaders');
+
+SB.Shaders = {} ;
+
+SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
+{
+	diffuse = diffuse || new THREE.Color( 0xFFFFFF );
+	ambient = ambient || new THREE.Color( 0x050505 );
+
+	var params = {	
+		uniforms: 
+			{
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
+			"specular": { type: "c", value: new THREE.Color( 0x333333 ) },
+			"diffuse" : { type: "c", value: diffuse },
+			"ambient" : { type: "c", value: ambient },
+			"shininess"    : { type: "f", value: 30 },
+			"ambientLightColor": { type: "c", value: new THREE.Color( 0x888888 ) }
+			},
+
+		fragmentShader: [
+			"uniform vec3 diffuse;",
+			"uniform vec3 ambient;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
+			"varying vec2 vUv;",
+			"uniform sampler2D uDiffuseTexture;",
+			"uniform sampler2D uToonTexture;",
+			"uniform vec3 ambientLightColor;",
+			"#if MAX_DIR_LIGHTS > 0",
+			"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
+			"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+			"#endif",
+			"varying vec3 vViewPosition;",
+			"varying vec3 vNormal;",
+
+			"void main() {",
+
+			"	vec3 normal = normalize( vNormal );",
+			"	vec3 viewPosition = normalize( vViewPosition );",
+
+			"	vec3 lightDir = normalize(vec3(1.0, 10.0, 0.0));",
+			"	vec3 lightColor = vec3(1.0, 0.4, 0.4);",
+				
+			"	vec4 lDirection = viewMatrix * vec4( lightDir, 0.0 );",
+			"	vec3 dirVector = normalize( lDirection.xyz );",
+			"	vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
+			"	float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
+			"	float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+			"	float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
+				
+			"	vec4 toonDiffuseWeight = texture2D(uToonTexture, vec2(dirDiffuseWeight, 0));",
+			"	vec4 toonSpecularWeight = texture2D(uToonTexture, vec2(dirSpecularWeight, 0));",
+			"	dirDiffuseWeight = toonDiffuseWeight.x;",
+			"	dirSpecularWeight = toonSpecularWeight.x;",
+			"	vec3 dirSpecular = specular * lightColor * dirSpecularWeight * dirDiffuseWeight;",
+			"	vec3 dirDiffuse = diffuse * lightColor * dirDiffuseWeight;",
+
+			"	gl_FragColor = vec4(( dirDiffuse + ambientLightColor * ambient ) + dirSpecular, 1.0);",
+			"}"
+		].join("\n"),
+		
+		vertexShader: [
+			"varying vec3 vViewPosition;",
+			"varying vec3 vNormal;",
+			"varying vec2 vUv;",
+			"uniform vec4 offsetRepeat;",
+
+			"void main() {",
+			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+			"	vUv = uv;",
+
+			"	vViewPosition = -mvPosition.xyz;",
+			"	vNormal = normalMatrix * normal;",
+
+			"	gl_Position = projectionMatrix * mvPosition;",
+			"}"
+		].join("\n")
+
+	} ;
+	
+	return params;
+} ;
+
+
+SB.Shaders.ToonShader.applyShader = function(object)
+{
+	var geometry = object.geometry;
+	var material = object.material;
+	
+	if (material instanceof THREE.MeshFaceMaterial)
+	{
+		// HACK FOR TOON SHADING REMOVE
+		var diffuseTexture = './images/diffuse-tree.png';
+		var toonTexture = './images/toon-lookup.png';
+		
+		for (var i = 0; i < geometry.materials.length; i++)
+		{
+			var oldMaterial = geometry.materials[i];
+			
+			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+			
+			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		}
+	}
+	else
+	{
+		var oldMaterial = material;
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		object.material = new THREE.ShaderMaterial(newMaterialParams);
+	}
+}
+
 /**
  * @fileoverview Base class for visual elements.
  * @author Tony Parisi
@@ -2783,6 +2899,16 @@ SB.SceneComponent = function(param)
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
+
+SB.SceneComponent.prototype.realize = function()
+{
+	if (this.object && !this.object.data)
+	{
+		this.addToScene();
+	}
+	
+	SB.Component.prototype.realize.call(this);
+}
 
 SB.SceneComponent.prototype.update = function()
 {	
@@ -2841,52 +2967,7 @@ SB.SceneComponent.prototype.removeFromScene = function() {
 		// N.B.: throw something?
 	}
 }
-goog.provide('SB.Camera');
-goog.require('SB.SceneComponent');
-
-SB.Camera = function(param)
-{
-	param = param || {};
-	
-	SB.SceneComponent.call(this, param);
-	this._active = param.active || false;
-}
-
-goog.inherits(SB.Camera, SB.SceneComponent);
-
-SB.Camera.prototype.realize = function() 
-{
-	SB.SceneComponent.prototype.realize.call(this);
-	
-	var container = SB.Graphics.instance.container;
-	this.object = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 4000 );
-
-	this.addToScene();
-	
-	if (this._active)
-	{
-		SB.Graphics.instance.camera = this.object;
-	}
-}
-
-SB.Camera.prototype.setActive = function(active) 
-{
-	this._active = active;
-	if (this._realized && this._active)
-	{
-		SB.Graphics.instance.camera = this.object;
-	}
-}
-
-SB.Camera.prototype.lookAt = function(v) 
-{
-	this.object.lookAt(v);
-}
 /**
- * @fileoverview Contains prefab assemblies for core Skybox package
- * @author Tony Parisi
- */
-goog.provide('SB.Prefabs');/**
  * @fileoverview Base class for visual elements.
  * @author Tony Parisi
  */
@@ -3001,6 +3082,93 @@ SB.Model.loadModel = function(url, param, callback)
 	}
 }
 /**
+ * @fileoverview A visual containing a model in JSON format
+ * @author Tony Parisi
+ */
+goog.provide('SB.JsonScene');
+goog.require('SB.Model');
+goog.require('SB.Shaders');
+ 
+/**
+ * @constructor
+ * @extends {SB.Model}
+ */
+SB.JsonScene = function(param)
+{
+	SB.Model.call(this, param);
+}
+
+goog.inherits(SB.JsonScene, SB.Model);
+	       
+SB.JsonScene.prototype.handleLoaded = function(data)
+{
+	this.object = new THREE.Object3D();
+	this.object.add(data.scene);
+	
+	this.addToScene();
+}
+
+SB.JsonScene.loadScene = function(url, param, callback)
+{
+	var scene = new SB.JsonScene(param);
+	
+	var loader = new THREE.SceneLoader;
+	loader.load(url, function (data) {
+		scene.handleLoaded(data);
+		if (callback)
+		{
+			callback(scene);
+		}
+	});
+	
+	return scene;
+}
+goog.provide('SB.Camera');
+goog.require('SB.SceneComponent');
+
+SB.Camera = function(param)
+{
+	param = param || {};
+	
+	SB.SceneComponent.call(this, param);
+	this._active = param.active || false;
+}
+
+goog.inherits(SB.Camera, SB.SceneComponent);
+
+SB.Camera.prototype.realize = function() 
+{
+	SB.SceneComponent.prototype.realize.call(this);
+	
+	var container = SB.Graphics.instance.container;
+	this.object = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 4000 );
+
+	this.addToScene();
+	
+	if (this._active)
+	{
+		SB.Graphics.instance.camera = this.object;
+	}
+}
+
+SB.Camera.prototype.setActive = function(active) 
+{
+	this._active = active;
+	if (this._realized && this._active)
+	{
+		SB.Graphics.instance.camera = this.object;
+	}
+}
+
+SB.Camera.prototype.lookAt = function(v) 
+{
+	this.object.lookAt(v);
+}
+/**
+ * @fileoverview Contains prefab assemblies for core Skybox package
+ * @author Tony Parisi
+ */
+goog.provide('SB.Prefabs');/**
  *
  */
 goog.provide('SB.PhysicsSystem');
@@ -3410,6 +3578,11 @@ SB.Entity.prototype.removeComponent = function(component) {
 
     if (i != -1)
     {
+    	if (component.removeFromScene);
+    	{
+    		component.removeFromScene();
+    	}
+    	
         this._components.splice(i, 1);
         component.setEntity(null);
     }
@@ -4352,6 +4525,8 @@ SB.Grid = function(param)
 	SB.Visual.call(this, param);
 	param = param || {};
 	this.size = param.size || 10;
+	this.stepSize = param.stepSize || 1;
+	this.color = (param.color === undefined) ? 0xcccccc : param.color;
 }
 
 goog.inherits(SB.Grid, SB.Visual);
@@ -4360,9 +4535,9 @@ SB.Grid.prototype.realize = function()
 {
 	SB.Visual.prototype.realize.call(this);
 	
-	var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
+	var line_material = new THREE.LineBasicMaterial( { color: this.color, opacity: 0.2 } ),
 		geometry = new THREE.Geometry(),
-		floor = -0.04, step = 1, size = this.size;
+		floor = -0.04, step = this.stepSize, size = this.size;
 
 	for ( var i = 0; i <= size / step * 2; i ++ )
 	{
@@ -4473,122 +4648,6 @@ SB.PhysicsBodyBox2D.prototype.setShape = function(shape)
 {
     this._body.addShape(shape);
 } ;
-goog.provide('SB.Shaders');
-
-SB.Shaders = {} ;
-
-SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
-{
-	diffuse = diffuse || new THREE.Color( 0xFFFFFF );
-	ambient = ambient || new THREE.Color( 0x050505 );
-
-	var params = {	
-		uniforms: 
-			{
-			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
-			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
-			"specular": { type: "c", value: new THREE.Color( 0x333333 ) },
-			"diffuse" : { type: "c", value: diffuse },
-			"ambient" : { type: "c", value: ambient },
-			"shininess"    : { type: "f", value: 30 },
-			"ambientLightColor": { type: "c", value: new THREE.Color( 0x888888 ) }
-			},
-
-		fragmentShader: [
-			"uniform vec3 diffuse;",
-			"uniform vec3 ambient;",
-			"uniform vec3 specular;",
-			"uniform float shininess;",
-			"varying vec2 vUv;",
-			"uniform sampler2D uDiffuseTexture;",
-			"uniform sampler2D uToonTexture;",
-			"uniform vec3 ambientLightColor;",
-			"#if MAX_DIR_LIGHTS > 0",
-			"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
-			"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
-			"#endif",
-			"varying vec3 vViewPosition;",
-			"varying vec3 vNormal;",
-
-			"void main() {",
-
-			"	vec3 normal = normalize( vNormal );",
-			"	vec3 viewPosition = normalize( vViewPosition );",
-
-			"	vec3 lightDir = normalize(vec3(1.0, 10.0, 0.0));",
-			"	vec3 lightColor = vec3(1.0, 0.4, 0.4);",
-				
-			"	vec4 lDirection = viewMatrix * vec4( lightDir, 0.0 );",
-			"	vec3 dirVector = normalize( lDirection.xyz );",
-			"	vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
-			"	float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-			"	float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
-			"	float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
-				
-			"	vec4 toonDiffuseWeight = texture2D(uToonTexture, vec2(dirDiffuseWeight, 0));",
-			"	vec4 toonSpecularWeight = texture2D(uToonTexture, vec2(dirSpecularWeight, 0));",
-			"	dirDiffuseWeight = toonDiffuseWeight.x;",
-			"	dirSpecularWeight = toonSpecularWeight.x;",
-			"	vec3 dirSpecular = specular * lightColor * dirSpecularWeight * dirDiffuseWeight;",
-			"	vec3 dirDiffuse = diffuse * lightColor * dirDiffuseWeight;",
-
-			"	gl_FragColor = vec4(( dirDiffuse + ambientLightColor * ambient ) + dirSpecular, 1.0);",
-			"}"
-		].join("\n"),
-		
-		vertexShader: [
-			"varying vec3 vViewPosition;",
-			"varying vec3 vNormal;",
-			"varying vec2 vUv;",
-			"uniform vec4 offsetRepeat;",
-
-			"void main() {",
-			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-			"	vUv = uv;",
-
-			"	vViewPosition = -mvPosition.xyz;",
-			"	vNormal = normalMatrix * normal;",
-
-			"	gl_Position = projectionMatrix * mvPosition;",
-			"}"
-		].join("\n")
-
-	} ;
-	
-	return params;
-} ;
-
-
-SB.Shaders.ToonShader.applyShader = function(object)
-{
-	var geometry = object.geometry;
-	var material = object.material;
-	
-	if (material instanceof THREE.MeshFaceMaterial)
-	{
-		// HACK FOR TOON SHADING REMOVE
-		var diffuseTexture = './images/diffuse-tree.png';
-		var toonTexture = './images/toon-lookup.png';
-		
-		for (var i = 0; i < geometry.materials.length; i++)
-		{
-			var oldMaterial = geometry.materials[i];
-			
-			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
-			
-			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
-		}
-	}
-	else
-	{
-		var oldMaterial = material;
-		
-		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
-		
-		object.material = new THREE.ShaderMaterial(newMaterialParams);
-	}
-}
-
 /**
  * @fileoverview A visual containing a model in JSON format
  * @author Tony Parisi
@@ -6222,6 +6281,7 @@ goog.require('SB.Tracker');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
 goog.require('SB.JsonModel');
+goog.require('SB.JsonScene');
 goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');

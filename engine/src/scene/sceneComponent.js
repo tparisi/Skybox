@@ -20,6 +20,16 @@ SB.SceneComponent = function(param)
 
 goog.inherits(SB.SceneComponent, SB.Component);
 
+SB.SceneComponent.prototype.realize = function()
+{
+	if (this.object && !this.object.data)
+	{
+		this.addToScene();
+	}
+	
+	SB.Component.prototype.realize.call(this);
+}
+
 SB.SceneComponent.prototype.update = function()
 {	
 	SB.Component.prototype.update.call(this);
