@@ -20,6 +20,8 @@ SB.Examples.Monsters.prototype.initialize = function(param)
 	
 	SB.Game.prototype.initialize.call(this, param);
 	
+	SB.Graphics.instance.scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 
+	
 	this.initEntities();
 }
 
