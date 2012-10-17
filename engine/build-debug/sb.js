@@ -3132,6 +3132,7 @@ SB.Camera = function(param)
 	
 	SB.SceneComponent.call(this, param);
 	this._active = param.active || false;
+	this.fov = param.fov || 45;
 }
 
 goog.inherits(SB.Camera, SB.SceneComponent);
@@ -3141,7 +3142,7 @@ SB.Camera.prototype.realize = function()
 	SB.SceneComponent.prototype.realize.call(this);
 	
 	var container = SB.Graphics.instance.container;
-	this.object = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 4000 );
+	this.object = new THREE.PerspectiveCamera( this.fov, container.offsetWidth / container.offsetHeight, 1, 4000 );
 
 	this.addToScene();
 	
@@ -4866,6 +4867,8 @@ goog.require('SB.Prefabs');
 
 SB.Prefabs.FPSController = function(param)
 {
+	param = param || {};
+	
 	var controller = new SB.Entity(param);
 	var transform = new SB.Transform;
 	controller.addComponent(transform);
@@ -4888,7 +4891,7 @@ SB.Prefabs.FPSController = function(param)
 	
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
-	var camera = new SB.Camera({active:true});
+	var camera = new SB.Camera({active:true, fov: param.fov});
 	viewpoint.addComponent(transform);
 	viewpoint.addComponent(camera);
 	viewpoint.transform = transform;

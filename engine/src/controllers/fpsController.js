@@ -3,6 +3,8 @@ goog.require('SB.Prefabs');
 
 SB.Prefabs.FPSController = function(param)
 {
+	param = param || {};
+	
 	var controller = new SB.Entity(param);
 	var transform = new SB.Transform;
 	controller.addComponent(transform);
@@ -25,7 +27,7 @@ SB.Prefabs.FPSController = function(param)
 	
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
-	var camera = new SB.Camera({active:true});
+	var camera = new SB.Camera({active:true, fov: param.fov});
 	viewpoint.addComponent(transform);
 	viewpoint.addComponent(camera);
 	viewpoint.transform = transform;
