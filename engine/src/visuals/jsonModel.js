@@ -26,3 +26,14 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	this.addToScene();
 }
 
+SB.JsonModel.prototype.initialize = function(param)
+{
+	param = param || {};
+	
+	var material = param.material || new THREE.MeshBasicMaterial();
+	var geometry = param.geometry || new THREE.Geometry();
+	
+	this.object = new THREE.Mesh(geometry, material);
+
+	this.addToScene();
+}
