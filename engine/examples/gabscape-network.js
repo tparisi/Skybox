@@ -79,7 +79,7 @@ Gabscape.prototype.initEntities = function()
 
 Gabscape.prototype.createViewer = function()
 {
-	this.viewer = SB.Prefabs.FPSController({ headlight : true });
+	this.viewer = SB.Prefabs.FPSController({ active : true, headlight : true });
 	this.gabatar = new Gabatar({ info : this.twitterInfo });
 	this.gabatar.transform.position.set(0, -2.5, -3.67);
 
