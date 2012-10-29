@@ -198,6 +198,27 @@ SB.Entity.prototype.getComponent = function(type) {
 	return null;
 }
 
+/**
+ * Retrieves a Component of a given type in the Entity.
+ * @param {Object} type.
+ */
+SB.Entity.prototype.getComponents = function(type) {
+	var i, len = this._components.length;
+	
+	var components = [];
+	
+	for (i = 0; i < len; i++)
+	{
+		var component = this._components[i];
+		if (component instanceof type)
+		{
+			components.push(component);
+		}
+	}
+	
+	return components;
+}
+
 //---------------------------------------------------------------------
 //Initialize methods
 //---------------------------------------------------------------------

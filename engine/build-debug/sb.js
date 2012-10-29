@@ -3608,6 +3608,27 @@ SB.Entity.prototype.getComponent = function(type) {
 	return null;
 }
 
+/**
+ * Retrieves a Component of a given type in the Entity.
+ * @param {Object} type.
+ */
+SB.Entity.prototype.getComponents = function(type) {
+	var i, len = this._components.length;
+	
+	var components = [];
+	
+	for (i = 0; i < len; i++)
+	{
+		var component = this._components[i];
+		if (component instanceof type)
+		{
+			components.push(component);
+		}
+	}
+	
+	return components;
+}
+
 //---------------------------------------------------------------------
 //Initialize methods
 //---------------------------------------------------------------------
@@ -3794,9 +3815,9 @@ goog.require('SB.Component');
 
 SB.Tracker = function(param)
 {
-	this.param = param || {};
+	param = param || {};
 	
-    SB.Component.call(this);
+    SB.Component.call(this, param);
     this.running = false;
 }
 
@@ -3807,15 +3828,24 @@ SB.Tracker.prototype.realize = function()
     // Track our position based on the transform component and passed-in reference object
     this.object = this._entity.transform.object;
     this.reference = this.param.reference;
-    	
+
 	SB.Component.prototype.realize.call(this);
+
+	if (this.running)
+    {
+    	this.position = this.calcPosition();
+    }
+    
 }
 
 SB.Tracker.prototype.start = function()
 {
-	this.position = this.calcPosition();
-
     this.running = true;
+
+    if (this._realized)
+    {
+    	this.position = this.calcPosition();
+    }
 }
 
 SB.Tracker.prototype.stop = function(x, y)
@@ -3845,13 +3875,13 @@ SB.Tracker.prototype.update = function()
 SB.Tracker.prototype.calcPosition = function()
 {
 	// Get reference object position world space
-	var refpos = this.reference.position.clone();
-	var refmat = this.reference.matrixWorld;
+	var refpos = new THREE.Vector3;
+	var refmat = this.reference.object.matrixWorld;
 	refpos = refmat.multiplyVector3(refpos);
 	
 	// Transform reference world space position into my model space
 	var mymat = this.object.matrixWorld;
-	var myinv = THREE.Matrix4.makeInvert(mymat);
+	var myinv = new THREE.Matrix4().getInverse(mymat);
 	refpos = myinv.multiplyVector3(refpos);
 
 	return refpos;
@@ -4698,9 +4728,13 @@ goog.require('SB.Component');
 SB.Timer = function(param)
 {
     SB.Component.call(this);
+    param = param || {};
+    
     this.currentTime = SB.Time.instance.currentTime;
     this.running = false;
-    this.duration = (param && param.duration) ? param.duration : 0;
+    this.duration = param.duration ? param.duration : 0;
+    this.loop = param.loop;
+    this.lastFraction = 0;
 }
 
 goog.inherits(SB.Timer, SB.Component);
@@ -4724,6 +4758,18 @@ SB.Timer.prototype.update = function()
 		var fract = mod / this.duration;
 		
 		this.publish("fraction", fract);
+		
+		if (fract < this.lastFraction)
+		{
+			this.publish("cycleTime");
+			
+			if (!this.loop)
+			{
+				this.stop();
+			}
+		}
+		
+		this.lastFraction = fract;
 	}
 	
 	this.currentTime = now;
