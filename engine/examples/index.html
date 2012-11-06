@@ -48,6 +48,8 @@
 	<script src="keyFrameBall.js"></script>
     <!-- PLANE DRAGGER GAME -->
 	<script src="planeDraggerGame.js"></script>
+    <!-- TRACKER GAME -->
+	<script src="trackerGame.js"></script>
 
 </head>
 <body>
@@ -78,6 +80,8 @@
 			options[6].text="Key Frame Demo";
 			options[7]=document.createElement("option");
 			options[7].text="Plane Dragger Demo";
+			options[8]=document.createElement("option");
+			options[8].text="Tracker Demo";
 			select.add(options[0]);
 			select.add(options[1]);
 			select.add(options[2]);
@@ -86,6 +90,7 @@
 			select.add(options[5]);
 			select.add(options[6]);
 			select.add(options[7]);
+			select.add(options[8]);
 		}
 	);
 
@@ -96,7 +101,9 @@
 	          		SB.Examples.DuckRiders,
 	          		SB.Examples.Monsters,
 	          		SB.Examples.KeyFrameGame,
-	          		SB.Examples.PlaneDraggerGame] ;
+	          		SB.Examples.PlaneDraggerGame,
+	          		SB.Examples.TrackerGame
+	          		] ;
 	
 	function selectGame()
 	{

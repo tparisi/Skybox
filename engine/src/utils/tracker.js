@@ -21,6 +21,7 @@ SB.Tracker.prototype.realize = function()
     // Track our position based on the transform component and passed-in reference object
     this.object = this._entity.transform.object;
     this.reference = this.param.reference;
+	this.referencePosition = this.param.referencePosition ? this.param.referencePosition : new THREE.Vector3();
 
 	SB.Component.prototype.realize.call(this);
 
@@ -67,9 +68,9 @@ SB.Tracker.prototype.update = function()
 
 SB.Tracker.prototype.calcPosition = function()
 {
-	// Get reference object position world space
-	var refpos = new THREE.Vector3;
+	// Get reference object position in world space
 	var refmat = this.reference.object.matrixWorld;
+	var refpos = this.referencePosition.clone();
 	refpos = refmat.multiplyVector3(refpos);
 	
 	// Transform reference world space position into my model space

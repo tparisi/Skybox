@@ -8,6 +8,8 @@ SB.Camera = function(param)
 	SB.SceneComponent.call(this, param);
 	this._active = param.active || false;
 	this._fov = param.fov || 45;
+	var position = param.position || SB.Camera.DEFAULT_POSITION;
+    this.position.copy(position);	
 }
 
 goog.inherits(SB.Camera, SB.SceneComponent);
@@ -40,3 +42,5 @@ SB.Camera.prototype.lookAt = function(v)
 {
 	this.object.lookAt(v);
 }
+
+SB.Camera.DEFAULT_POSITION = new THREE.Vector3(0, 0, 10);
