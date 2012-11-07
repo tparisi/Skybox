@@ -3831,27 +3831,21 @@ SB.Tracker.prototype.realize = function()
     // Track our position based on the transform component and passed-in reference object
     this.object = this._entity.transform.object;
     this.reference = this.param.reference;
-	this.referencePosition = this.param.referencePosition ? this.param.referencePosition : new THREE.Vector3();
-
+	this.referencePosition = this.param.referencePosition ? this.param.referencePosition.clone() : new THREE.Vector3();
+	this.refpos = new THREE.Vector3;
+	this.position = new THREE.Vector3;
+	this.orientation = new THREE.Quaternion;
+	this.savedPosition = new THREE.Vector3;
+	this.savedOrientation = new THREE.Quaternion;
+	this.reference2me = new THREE.Matrix4;
+	this.world2me = new THREE.Matrix4;
+	
 	SB.Component.prototype.realize.call(this);
-
-	if (this.running)
-    {
-    	this.position = this.calcPosition();
-    	this.orientation = this.calcOrientation();
-    }
-    
 }
 
 SB.Tracker.prototype.start = function()
 {
     this.running = true;
-
-    if (this._realized)
-    {
-    	this.position = this.calcPosition();
-    	this.orientation = this.calcOrientation();
-    }
 }
 
 SB.Tracker.prototype.stop = function(x, y)
@@ -3866,27 +3860,25 @@ SB.Tracker.prototype.update = function()
         return;
     }
 
-    var pos = this.calcPosition();
-	if (this.position.x != pos.x ||
-			this.position.y != pos.y ||
-			this.position.z != pos.z)
+    this.calcPosition();
+	if (this.position.x != this.savedPosition.x ||
+			this.position.y != this.savedPosition.y ||
+			this.position.z != this.savedPosition.z)
 	{
 		//console.log("Object position: " + pos.x + ", " + pos.y + ", " + pos.z);
 
-	    this.publish("position", pos);
-	    this.position = pos;
+	    this.publish("position", this.position);
 	}
 	
-	var orient = this.calcOrientation();
-	if (this.orientation.x != orient.x ||
-			this.orientation.y != orient.y ||
-			this.orientation.z != orient.z ||
-			this.orientation.w != orient.w )
+	this.calcOrientation();
+	if (this.orientation.x != this.savedOrientation.x ||
+			this.orientation.y != this.savedOrientation.y ||
+			this.orientation.z != this.savedOrientation.z ||
+			this.orientation.w != this.savedOrientation.w )
 	{
 		//console.log("Object position: " + pos.x + ", " + pos.y + ", " + pos.z);
 
-	    this.publish("orientation", orient);
-	    this.orientation = orient;
+	    this.publish("orientation", this.orientation);
 	}
 }
 
@@ -3894,15 +3886,13 @@ SB.Tracker.prototype.calcPosition = function()
 {
 	// Get reference object position in world space
 	var refmat = this.reference.object.matrixWorld;
-	var refpos = this.referencePosition.clone();
-	refpos = refmat.multiplyVector3(refpos);
+	this.refpos.copy(this.referencePosition);
+	this.refpos = refmat.multiplyVector3(this.refpos);
 	
 	// Transform reference world space position into my model space
 	var mymat = this.object.matrixWorld;
-	var myinv = new THREE.Matrix4().getInverse(mymat);
-	refpos = myinv.multiplyVector3(refpos);
-
-	return refpos;
+	this.world2me.getInverse(mymat);
+	this.position = this.world2me.multiplyVector3(this.refpos);
 }
 
 SB.Tracker.prototype.calcOrientation = function()
@@ -3910,10 +3900,9 @@ SB.Tracker.prototype.calcOrientation = function()
 	// Get reference object orientation in world space
 	var refmat = this.reference.object.matrixWorld;
 	var mymat = this.object.matrixWorld;
-	var myinv = new THREE.Matrix4().getInverse(mymat);
-	var ref2me = new THREE.Matrix4().multiply(refmat, myinv);
-	var orientation = ref2me.decompose()[1];
-	return orientation; // .inverse();
+	this.world2me.getInverse(mymat);
+	this.reference2me.multiply(refmat, this.world2me);
+	this.orientation = this.reference2me.decompose()[1];
 }/**
  *
  */

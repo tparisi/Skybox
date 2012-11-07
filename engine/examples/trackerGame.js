@@ -210,7 +210,7 @@ SB.Examples.TrackerGame.prototype.onTrackerPosition = function(pos)
 
 SB.Examples.TrackerGame.prototype.onTrackerOrientation = function(orient)
 {
-	console.log("New tracker orientation: ", orient.x, ", ", orient.y, ", ", orient.z, ", ", orient.w);
+	// console.log("New tracker orientation: ", orient.x, ", ", orient.y, ", ", orient.z, ", ", orient.w);
 	this.trackerOrientation = orient;
 	this.panel.transform.orientation.copy(orient);
 	this.panel.transform.useQuaternion = true;
