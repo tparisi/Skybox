@@ -12,6 +12,7 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 	this.turnDir = new THREE.Vector3;
 	this.moveDir = new THREE.Vector3;
 	this.trackerPos = new THREE.Vector3;
+	this.trackerOrientation = new THREE.Quaternion;
 	
 	this.lastdx = 0;
 	this.dragging = false;
@@ -87,18 +88,18 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 	carousel.addChild(cylinder);
 
 	// Something to show tracker
-	var cube = new SB.Entity;
+	var panel = new SB.Entity;
 	
 	transform = new SB.Transform();
 	transform.position.z = 3;
-    visual = new SB.CubeVisual({width:.5, height:.25, depth:.25, color : 0x00ff00 });
+    visual = new SB.Pane({width:.5, height:.25, material : new THREE.MeshLambertMaterial({color:0x00ff00}) });
     
-    cube.addComponent(transform);
-    cube.addComponent(visual);		
+    panel.addComponent(transform);
+    panel.addComponent(visual);		
     
-	cylinder.addChild(cube);
+	cylinder.addChild(panel);
 	
-	this.cube = cube;
+	this.panel = panel;
 	
  
     this.cylinder = cylinder;
@@ -116,6 +117,7 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 	var tracker = new SB.Tracker({reference : camera, referencePosition:new THREE.Vector3(0, 0, -3)});
 	cylinder.addComponent(tracker);
 	tracker.subscribe("position", this, this.onTrackerPosition);
+	tracker.subscribe("orientation", this, this.onTrackerOrientation);
 	tracker.start();    
 	
 	this.root = root;
@@ -134,7 +136,7 @@ SB.Examples.TrackerGame.prototype.move = function(dir)
 
 SB.Examples.TrackerGame.prototype.onMouseDown = function(x, y)
 {
-//	this.dragger.start(x, y);
+	this.dragger.start(x, y);
 	this.dragging = true;
 	
 	SB.Game.prototype.onMouseDown.call(this, x, y);
@@ -142,21 +144,21 @@ SB.Examples.TrackerGame.prototype.onMouseDown = function(x, y)
 
 SB.Examples.TrackerGame.prototype.onMouseUp = function(x, y)
 {
-//	this.dragger.stop(x, y);
+	this.dragger.stop(x, y);
 	this.dragging = false;
 	/*
-	if (this.cube.transform.position.z > 3)
+	if (this.panel.transform.position.z > 3)
 	{
-		this.cube.transform.position.set(0, 0, 3);
-		this.cube.transform.rotation.y = 0;
+		this.panel.transform.position.set(0, 0, 3);
+		this.panel.transform.rotation.y = 0;
 	}
 	else
 	{
-		this.cube.transform.position.copy(this.trackerPos);
-		this.cube.transform.rotation.y = -this.carousel.transform.rotation.y;
+		this.panel.transform.position.copy(this.trackerPos);
+		this.panel.transform.rotation.y = -this.carousel.transform.rotation.y;
 	}
 	*/
-	this.animating = !this.animating;
+//	this.animating = !this.animating;
 	
 	this.lastdx = 0;
 
@@ -165,7 +167,7 @@ SB.Examples.TrackerGame.prototype.onMouseUp = function(x, y)
 
 SB.Examples.TrackerGame.prototype.onMouseMove = function(x, y)
 {
-//	this.dragger.set(x, y);
+	this.dragger.set(x, y);
 
 	SB.Game.prototype.onMouseMove.call(this, x, y);
 }
@@ -200,10 +202,18 @@ SB.Examples.TrackerGame.prototype.onDraggerMove = function(dx, dy)
 
 SB.Examples.TrackerGame.prototype.onTrackerPosition = function(pos)
 {
-	console.log("New tracker position: ", pos.x, ", ", pos.y, ", ", pos.z);
+	// console.log("New tracker position: ", pos.x, ", ", pos.y, ", ", pos.z);
 	this.trackerPos = pos;
-	this.cube.transform.position.copy(this.trackerPos);
-	this.cube.transform.rotation.y = -this.carousel.transform.rotation.y;
+	this.panel.transform.position.copy(this.trackerPos);
+//	this.panel.transform.rotation.y = -this.carousel.transform.rotation.y;
+}
+
+SB.Examples.TrackerGame.prototype.onTrackerOrientation = function(orient)
+{
+	console.log("New tracker orientation: ", orient.x, ", ", orient.y, ", ", orient.z, ", ", orient.w);
+	this.trackerOrientation = orient;
+	this.panel.transform.orientation.copy(orient);
+	this.panel.transform.useQuaternion = true;
 }
 
 SB.Examples.TrackerGame.prototype.onTimeChanged = function(t)

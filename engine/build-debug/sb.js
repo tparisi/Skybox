@@ -3838,6 +3838,7 @@ SB.Tracker.prototype.realize = function()
 	if (this.running)
     {
     	this.position = this.calcPosition();
+    	this.orientation = this.calcOrientation();
     }
     
 }
@@ -3849,6 +3850,7 @@ SB.Tracker.prototype.start = function()
     if (this._realized)
     {
     	this.position = this.calcPosition();
+    	this.orientation = this.calcOrientation();
     }
 }
 
@@ -3874,6 +3876,18 @@ SB.Tracker.prototype.update = function()
 	    this.publish("position", pos);
 	    this.position = pos;
 	}
+	
+	var orient = this.calcOrientation();
+	if (this.orientation.x != orient.x ||
+			this.orientation.y != orient.y ||
+			this.orientation.z != orient.z ||
+			this.orientation.w != orient.w )
+	{
+		//console.log("Object position: " + pos.x + ", " + pos.y + ", " + pos.z);
+
+	    this.publish("orientation", orient);
+	    this.orientation = orient;
+	}
 }
 
 SB.Tracker.prototype.calcPosition = function()
@@ -3889,6 +3903,17 @@ SB.Tracker.prototype.calcPosition = function()
 	refpos = myinv.multiplyVector3(refpos);
 
 	return refpos;
+}
+
+SB.Tracker.prototype.calcOrientation = function()
+{
+	// Get reference object orientation in world space
+	var refmat = this.reference.object.matrixWorld;
+	var mymat = this.object.matrixWorld;
+	var myinv = new THREE.Matrix4().getInverse(mymat);
+	var ref2me = new THREE.Matrix4().multiply(refmat, myinv);
+	var orientation = ref2me.decompose()[1];
+	return orientation; // .inverse();
 }/**
  *
  */
@@ -4096,6 +4121,8 @@ SB.Transform = function(param)
     this.position = new THREE.Vector3();
     this.rotation = new THREE.Vector3();
     this.scale = new THREE.Vector3(1, 1, 1);
+    this.orientation = new THREE.Quaternion;
+    this.useQuaternion = false;
 } ;
 
 goog.inherits(SB.Transform, SB.Component);
@@ -4119,6 +4146,11 @@ SB.Transform.prototype.update = function()
     this.object.scale.x = this.scale.x;
     this.object.scale.y = this.scale.y;
     this.object.scale.z = this.scale.z;
+    if (this.useQuaternion)
+    {
+    	this.object.quaternion.copy(this.orientation);
+    	this.object.useQuaternion = true;
+    }
 }
 
 SB.Transform.prototype.addToScene = function() {

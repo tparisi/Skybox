@@ -11,6 +11,8 @@ SB.Transform = function(param)
     this.position = new THREE.Vector3();
     this.rotation = new THREE.Vector3();
     this.scale = new THREE.Vector3(1, 1, 1);
+    this.orientation = new THREE.Quaternion;
+    this.useQuaternion = false;
 } ;
 
 goog.inherits(SB.Transform, SB.Component);
@@ -34,6 +36,11 @@ SB.Transform.prototype.update = function()
     this.object.scale.x = this.scale.x;
     this.object.scale.y = this.scale.y;
     this.object.scale.z = this.scale.z;
+    if (this.useQuaternion)
+    {
+    	this.object.quaternion.copy(this.orientation);
+    	this.object.useQuaternion = true;
+    }
 }
 
 SB.Transform.prototype.addToScene = function() {
