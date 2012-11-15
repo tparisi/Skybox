@@ -76,7 +76,10 @@ SB.GraphicsThreeJS.prototype.initScene = function()
 
 SB.GraphicsThreeJS.prototype.initRenderer = function(param)
 {
-    var renderer = new THREE.WebGLRenderer( { antialias: true } );
+    var renderer = SB.Config.USE_WEBGL ?
+    	new THREE.WebGLRenderer( { antialias: true } ) :
+    	new THREE.CanvasRenderer;
+    	
     renderer.sortObjects = false;
     renderer.setSize( this.container.offsetWidth, this.container.offsetHeight );
 

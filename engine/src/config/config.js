@@ -5,6 +5,11 @@
 goog.provide('SB.Config');
 
 /**
+ * @define {boolean} Whether the library should be compiled for Three.js usage.
+ */
+SB.Config.USE_THREEJS = true;
+
+/**
  * @define {boolean} Whether the library should be compiled for WebGL usage.
  */
 SB.Config.USE_WEBGL = true;

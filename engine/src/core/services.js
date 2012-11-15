@@ -16,7 +16,7 @@ SB.Services._serviceMap =
 		"time" : { object : SB.Time },
 		"input" : { object : SB.Input },
 		"events" : { object : SB.EventService },
-		"graphics" : { object : SB.Config.USE_WEBGL ? SB.GraphicsThreeJS : null },
+		"graphics" : { object : SB.Config.USE_THREEJS ? SB.GraphicsThreeJS : null },
 };
 
 SB.Services.create = function(serviceName)

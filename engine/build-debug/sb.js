@@ -1834,6 +1834,11 @@ SB.Time.instance = null;
 goog.provide('SB.Config');
 
 /**
+ * @define {boolean} Whether the library should be compiled for Three.js usage.
+ */
+SB.Config.USE_THREEJS = true;
+
+/**
  * @define {boolean} Whether the library should be compiled for WebGL usage.
  */
 SB.Config.USE_WEBGL = true;
@@ -1934,7 +1939,10 @@ SB.GraphicsThreeJS.prototype.initScene = function()
 
 SB.GraphicsThreeJS.prototype.initRenderer = function(param)
 {
-    var renderer = new THREE.WebGLRenderer( { antialias: true } );
+    var renderer = SB.Config.USE_WEBGL ?
+    	new THREE.WebGLRenderer( { antialias: true } ) :
+    	new THREE.CanvasRenderer;
+    	
     renderer.sortObjects = false;
     renderer.setSize( this.container.offsetWidth, this.container.offsetHeight );
 
@@ -2228,7 +2236,7 @@ SB.Services._serviceMap =
 		"time" : { object : SB.Time },
 		"input" : { object : SB.Input },
 		"events" : { object : SB.EventService },
-		"graphics" : { object : SB.Config.USE_WEBGL ? SB.GraphicsThreeJS : null },
+		"graphics" : { object : SB.Config.USE_THREEJS ? SB.GraphicsThreeJS : null },
 };
 
 SB.Services.create = function(serviceName)

@@ -107,7 +107,9 @@
 	
 	function selectGame()
 	{
-	    var select = document.getElementById("select");
+		SB.Config.USE_WEBGL = false;
+		
+		var select = document.getElementById("select");
 	    var index = select.selectedIndex - 1;
 		if (index >= 0)
 		{
