@@ -66,7 +66,7 @@ SB.Game.prototype.addOptionalServices = function()
 SB.Game.prototype.focus = function()
 {
 	// Hack hack hack should be the input system
-	SB.services.graphics.focus();
+	SB.Graphics.instance.focus();
 }
 
 SB.Game.prototype.run = function()
