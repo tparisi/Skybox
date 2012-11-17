@@ -25,6 +25,10 @@ goog.inherits(SB.Game, SB.PubSub);
 
 SB.Game.prototype.initialize = function(param)
 {
+	param = param || {};
+
+	this.tabstop = param.tabstop;
+	
 	this._services = [];
 	this._entities = [];
 
@@ -200,6 +204,12 @@ SB.Game.handleMouseMove = function(x, y)
 
 SB.Game.handleMouseDown = function(x, y)
 {
+    // N.B.: ahh, the bullshit continues...
+    if (SB.Game.instance.tabstop)
+    	SB.Game.instance.focus();
+    
+    // console.log("Mouse down " + event.pageX + ", " + event.pageY);
+    
     if (SB.Picker.clickedObject)
     	return;
     

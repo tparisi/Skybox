@@ -18,6 +18,8 @@ SB.Examples.Monsters.prototype.initialize = function(param)
 	if (!param.displayStats)
 		param.displayStats = SB.Examples.Monsters.default_display_stats;
 	
+	param.tabstop = true;
+	
 	SB.Game.prototype.initialize.call(this, param);
 	
 	SB.Graphics.instance.scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 

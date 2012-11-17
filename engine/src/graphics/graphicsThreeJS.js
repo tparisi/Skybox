@@ -219,11 +219,6 @@ SB.GraphicsThreeJS.prototype.onDocumentMouseDown = function(event)
 {
     event.preventDefault();
     
-    // N.B.: ahh, the bullshit continues...
-    this.focus();
-    
-    // console.log("Mouse down " + event.pageX + ", " + event.pageY);
-    
     SB.Mouse.instance.onMouseDown(event.pageX, event.pageY);
     
     if (SB.Picker)

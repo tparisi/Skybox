@@ -7,6 +7,8 @@ goog.inherits(SB.Examples.TrackerGame, SB.Game);
 
 SB.Examples.TrackerGame.prototype.initialize = function(param)
 {
+	param.tabstop = true;
+	
 	SB.Game.prototype.initialize.call(this, param);
 
 	this.turnDir = new THREE.Vector3;
