@@ -4317,18 +4317,6 @@ SB.WalkthroughControllerScript.prototype.update = function()
 	}
 }
 
-SB.WalkthroughControllerScript.prototype.setCameraPos = function(pos)
-{
-	if (this.cameraPos)
-	{
-		this.cameraPos.copy(pos);
-	}
-	else
-	{
-		this.cameraPos = pos.clone();
-	}
-}
-
 SB.WalkthroughControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();
@@ -5043,18 +5031,6 @@ SB.FPSControllerScript.prototype.update = function()
 	}
 }
 
-SB.FPSControllerScript.prototype.setCameraPos = function(pos)
-{
-	if (this.cameraPos)
-	{
-		this.cameraPos.copy(pos);
-	}
-	else
-	{
-		this.cameraPos = pos.clone();
-	}
-}
-
 SB.FPSControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();
@@ -5332,18 +5308,6 @@ SB.ModelControllerScript.prototype.update = function()
 	{
 		this._entity.transform.position.copy(this.cameraPos);
 		this.cameraPos = null;
-	}
-}
-
-SB.ModelControllerScript.prototype.setCameraPos = function(pos)
-{
-	if (this.cameraPos)
-	{
-		this.cameraPos.copy(pos);
-	}
-	else
-	{
-		this.cameraPos = pos.clone();
 	}
 }
 

@@ -51,6 +51,7 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 */
 	// Controller
 	var controller = SB.Prefabs.FPSController({ active : true, headlight : true });
+	controller.transform.position.set(0, 2.5, 3.67);
 	root.addChild(controller);
 	
     // Dragger thing
@@ -113,7 +114,6 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 	
     // This tracks cylinder movement relative to carousel
 	var controllerScript = controller.getComponent(SB.FPSControllerScript);
-	controllerScript.setCameraPos(new THREE.Vector3(0, 1, 10));
 	var camera = controllerScript.viewpoint.getComponent(SB.Camera);
 	
 	var tracker = new SB.Tracker({reference : camera, referencePosition:new THREE.Vector3(0, 0, -3)});

@@ -85,18 +85,6 @@ SB.ModelControllerScript.prototype.update = function()
 	}
 }
 
-SB.ModelControllerScript.prototype.setCameraPos = function(pos)
-{
-	if (this.cameraPos)
-	{
-		this.cameraPos.copy(pos);
-	}
-	else
-	{
-		this.cameraPos = pos.clone();
-	}
-}
-
 SB.ModelControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();

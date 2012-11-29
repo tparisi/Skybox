@@ -25,8 +25,8 @@ Gabscape.prototype.initEntities = function()
 {
 	this.root = new SB.Entity;
 	
-	var grid = new SB.Grid({size:64});
-	this.root.addComponent(grid);
+//	var grid = new SB.Grid({size:64});
+//	this.root.addComponent(grid);
 	
 	var g1 = new Gabber({name: "Gabber1" });
 	g1.transform.position.set(15, 0, -20);
@@ -44,8 +44,7 @@ Gabscape.prototype.initEntities = function()
 	this.gabatar.transform.position.set(0, -2.5, -3.67);
 	viewer.addChild(this.gabatar);
 	
-	var controllerScript = viewer.getComponent(SB.FPSControllerScript);
-	controllerScript.setCameraPos(new THREE.Vector3(0, 2.5, 3.67));
+	viewer.transform.position.set(0, 2.5, 3.67);
 	
 	this.gabbers = [g1]; // , g2, g3];
 	this.activeGabber = null;

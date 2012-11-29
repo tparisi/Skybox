@@ -87,8 +87,7 @@ Gabscape.prototype.createViewer = function()
 
 	this.root.addChild(this.viewer);
 	
-	var controllerScript = this.viewer.getComponent(SB.FPSControllerScript);
-	controllerScript.setCameraPos(new THREE.Vector3(0, 2.5, 3.67));
+	this.viewer.transform.position.set(0, 2.5, 3.67);
 }
 
 Gabscape.prototype.createNetwork = function()

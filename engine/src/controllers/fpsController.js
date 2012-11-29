@@ -85,18 +85,6 @@ SB.FPSControllerScript.prototype.update = function()
 	}
 }
 
-SB.FPSControllerScript.prototype.setCameraPos = function(pos)
-{
-	if (this.cameraPos)
-	{
-		this.cameraPos.copy(pos);
-	}
-	else
-	{
-		this.cameraPos = pos.clone();
-	}
-}
-
 SB.FPSControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();

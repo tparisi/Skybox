@@ -80,18 +80,6 @@ SB.WalkthroughControllerScript.prototype.update = function()
 	}
 }
 
-SB.WalkthroughControllerScript.prototype.setCameraPos = function(pos)
-{
-	if (this.cameraPos)
-	{
-		this.cameraPos.copy(pos);
-	}
-	else
-	{
-		this.cameraPos = pos.clone();
-	}
-}
-
 SB.WalkthroughControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();
