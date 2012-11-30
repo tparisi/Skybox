@@ -41,10 +41,10 @@ Gabscape.prototype.initEntities = function()
 	
 	var viewer = SB.Prefabs.FPSController({ active : true, headlight : true });
 	this.gabatar = new Gabatar({ info : this.twitterInfo });
-	this.gabatar.transform.position.set(0, -2.5, -3.67);
+	this.gabatar.transform.position.set(0, -2.5, 0);
 	viewer.addChild(this.gabatar);
 	
-	viewer.transform.position.set(0, 2.5, 3.67);
+	viewer.transform.position.set(0, 2.5, 0);
 	
 	this.gabbers = [g1]; // , g2, g3];
 	this.activeGabber = null;
@@ -198,57 +198,6 @@ Gabscape.prototype.onKeyUp = function(keyCode, charCode)
 Gabscape.prototype.onKeyPress = function(keyCode, charCode)
 {
 	SB.Game.prototype.onKeyPress.call(this, keyCode, charCode)
-}
-
-Gabscape.prototype.onRotatorRotate = function(axis, delta)
-{
-	return;
-	
-	delta *= .1667;
-	
-	if (delta != 0)
-	{
-		// this.viewer.transform.rotation.y -= delta;
-		//var dir = new THREE.Vector3(0, -delta, 0);
-		//this.viewer.turn(dir);
-		this.viewer.viewpoint.camera.rotation.y -= delta;
-
-		var ry = this.viewer.viewpoint.camera.rotation.y;
-		if (ry > Math.PI / 8)
-			this.viewer.viewpoint.camera.rotation.y = Math.PI / 8;
-		if (ry < - Math.PI / 8)
-			this.viewer.viewpoint.camera.rotation.y = -Math.PI / 8;
-	
-	}
-}
-
-Gabscape.prototype.onDraggerMove = function(dx, dy)
-{
-	return;
-	
-	if (Math.abs(dy) <= 2)
-		dy = 0;
-	
-	dy *= .002;
-	
-	if (dy)
-	{
-		this.lastdy = dy;
-	}
-	else if (this.lastdy && this.dragging)
-	{
-		dy = this.lastdy;
-	}
-
-	if (dy != 0)
-	{
-		this.viewer.viewpoint.camera.rotation.x += dy;
-		var rx = this.viewer.viewpoint.camera.rotation.x;
-		if (rx > Math.PI / 8)
-			this.viewer.viewpoint.camera.rotation.x = Math.PI / 8;
-		if (rx < - Math.PI / 8)
-			this.viewer.viewpoint.camera.rotation.x = -Math.PI / 8;
-	}
 }
 
 Gabscape.prototype.onTimeChanged = function(t)
