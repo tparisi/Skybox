@@ -4973,7 +4973,7 @@ SB.Prefabs.FPSController = function(param)
 	
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
-	var camera = new SB.Camera({active:param.active, fov: param.fov});
+	var camera = new SB.Camera({active:param.active, fov: param.fov, position:param.cameraPosition});
 	viewpoint.addComponent(transform);
 	viewpoint.addComponent(camera);
 	viewpoint.transform = transform;

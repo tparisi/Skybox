@@ -39,7 +39,8 @@ Gabscape.prototype.initEntities = function()
 	g3.transform.position.set(0, 0, -15);
 	*/
 	
-	var viewer = SB.Prefabs.FPSController({ active : true, headlight : true });
+	var viewer = SB.Prefabs.FPSController({ active : true, headlight : true,
+		cameraPosition : new THREE.Vector3(0, 0, 5) });
 	this.gabatar = new Gabatar({ info : this.twitterInfo });
 	this.gabatar.transform.position.set(0, -2.5, 0);
 	viewer.addChild(this.gabatar);
