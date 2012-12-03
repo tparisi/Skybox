@@ -26,10 +26,6 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 	var root = new SB.Entity;
 	this.root = root;
 
-	// Headlight
-    var headlight = new SB.DirectionalLight({ color : 0xFFFFFF, intensity : 1});
-    root.addComponent(headlight);
-
     // A timer
 	var timer = new SB.Timer( { loop : true } );
 	timer.subscribe("time", this, this.onTimeChanged);
