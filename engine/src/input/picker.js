@@ -77,7 +77,7 @@ SB.Picker.handleMouseMove = function(x, y)
         {
     		if (oldObj)
     		{
-    			SB.Graphics.instance.setCursor('auto');
+    			SB.Graphics.instance.setCursor(null);
     			
     			if (oldObj.onMouseOut)
                 {
