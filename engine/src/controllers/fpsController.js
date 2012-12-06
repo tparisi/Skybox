@@ -55,7 +55,6 @@ SB.FPSControllerScript = function(param)
 	this.moveDir = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
 	this.lookDir = new THREE.Vector3;
-	this.cameraPos = null;
 	
 	this.lastdy = 0;
 	this.dragging = false;
@@ -74,15 +73,6 @@ SB.FPSControllerScript.prototype.realize = function()
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
-}
-
-SB.FPSControllerScript.prototype.update = function()
-{
-	if (this.cameraPos)
-	{
-		this._entity.transform.position.copy(this.cameraPos);
-		this.cameraPos = null;
-	}
 }
 
 SB.FPSControllerScript.prototype.move = function(dir)

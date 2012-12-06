@@ -55,7 +55,6 @@ SB.ModelControllerScript = function(param)
 	this.moveDir = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
 	this.lookDir = new THREE.Vector3;
-	this.cameraPos = null;
 	
 	this.lastdx = 0;
 	this.dragging = false;
@@ -74,15 +73,6 @@ SB.ModelControllerScript.prototype.realize = function()
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
-}
-
-SB.ModelControllerScript.prototype.update = function()
-{
-	if (this.cameraPos)
-	{
-		this._entity.transform.position.copy(this.cameraPos);
-		this.cameraPos = null;
-	}
 }
 
 SB.ModelControllerScript.prototype.move = function(dir)

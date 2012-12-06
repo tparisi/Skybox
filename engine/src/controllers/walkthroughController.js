@@ -52,7 +52,6 @@ SB.WalkthroughControllerScript = function(param)
 	this.directionMatrix = new THREE.Matrix4;
 	this.moveDir = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
-	this.cameraPos = null;
 	
 	this.lastdy = 0;
 	this.dragging = false;
@@ -69,15 +68,6 @@ SB.WalkthroughControllerScript.prototype.realize = function()
 	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
-}
-
-SB.WalkthroughControllerScript.prototype.update = function()
-{
-	if (this.cameraPos)
-	{
-		this._entity.transform.position.copy(this.cameraPos);
-		this.cameraPos = null;
-	}
 }
 
 SB.WalkthroughControllerScript.prototype.move = function(dir)
