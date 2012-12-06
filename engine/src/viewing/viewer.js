@@ -13,7 +13,7 @@ SB.Viewer = function(param)
 	
 	this.viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
-	var camera = new SB.Camera({active:true});
+	var camera = new SB.PerspectiveCamera({active:true});
 	this.viewpoint.addComponent(transform);
 	this.viewpoint.addComponent(camera);
 	this.viewpoint.transform = transform;

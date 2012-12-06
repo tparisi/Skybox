@@ -32,19 +32,6 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 	timer.start();
 	root.addComponent(timer);
 	
-/*    // Camera
-	var mainCamera = new SB.Entity;
-	
-	var transform = new SB.Transform;
-	mainCamera.addComponent(transform);
-
-	var camera = new SB.Camera({fov: 50, active : true, position:new THREE.Vector3(0, 1, 5)} );
-	mainCamera.addComponent(camera);
-
-	root.addChild(mainCamera);
-	
-	this.mainCamera = mainCamera;
-*/
 	// Controller
 	var controller = SB.Prefabs.FPSController({ active : true, headlight : true });
 	controller.transform.position.set(0, 2.5, 3.67);

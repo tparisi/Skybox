@@ -27,7 +27,7 @@ SB.Prefabs.ModelController = function(param)
 	
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
-	var camera = new SB.Camera({active:param.active, fov: param.fov});
+	var camera = new SB.PerspectiveCamera({active:param.active, fov: param.fov});
 	viewpoint.addComponent(transform);
 	viewpoint.addComponent(camera);
 	viewpoint.transform = transform;

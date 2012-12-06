@@ -10,6 +10,7 @@ goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
 goog.require('SB.KeyFrameAnimator');
 goog.require('SB.Camera');
+goog.require('SB.PerspectiveCamera');
 goog.require('SB.WalkthroughControllerScript');
 goog.require('SB.FPSControllerScript');
 goog.require('SB.ModelControllerScript');
