@@ -324,5 +324,12 @@ SB.GraphicsThreeJS.prototype.update = function()
     	this.stats.update();
     }
 }
-	        
+
+SB.GraphicsThreeJS.prototype.enableShadows = function(enable)
+{
+	this.renderer.shadowMapEnabled = enable;
+	this.renderer.shadowMapSoft = enable;
+	this.renderer.shadowMapCullFrontFaces = false;
+}
+
 SB.GraphicsThreeJS.default_display_stats = false,

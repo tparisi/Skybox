@@ -2187,7 +2187,14 @@ SB.GraphicsThreeJS.prototype.update = function()
     	this.stats.update();
     }
 }
-	        
+
+SB.GraphicsThreeJS.prototype.enableShadows = function(enable)
+{
+	this.renderer.shadowMapEnabled = enable;
+	this.renderer.shadowMapSoft = enable;
+	this.renderer.shadowMapCullFrontFaces = false;
+}
+
 SB.GraphicsThreeJS.default_display_stats = false,
 /**
  *
@@ -4616,6 +4623,7 @@ SB.SpotLight = function(param)
 	this.angle = ( param.angle !== undefined ) ? param.angle : SB.SpotLight.DEFAULT_ANGLE;
 	this.exponent = ( param.exponent !== undefined ) ? param.exponent : SB.SpotLight.DEFAULT_EXPONENT;
 	this.castShadows = ( param.castShadows !== undefined ) ? param.castShadows : SB.SpotLight.DEFAULT_CAST_SHADOWS;
+	this.shadowDarkness = ( param.shadowDarkness !== undefined ) ? param.shadowDarkness : SB.SpotLight.DEFAULT_SHADOW_DARKNESS;
 	
 	SB.Light.call(this, param);
 }
@@ -4628,11 +4636,8 @@ SB.SpotLight.prototype.realize = function()
 	this.targetPos = this.position.clone();
 	this.targetPos.addSelf(this.direction.multiplyScalar(SB.Light.DEFAULT_RANGE));	
 	this.object.target.position.copy(this.targetPos);
+	this.updateShadows();
 
-	if (this.castShadows)
-	{
-	}
-	
 	SB.Light.prototype.realize.call(this);
 }
 
@@ -4654,16 +4659,39 @@ SB.SpotLight.prototype.update = function()
 		this.object.distance = this.distance;
 		this.object.angle = this.angle;
 		this.object.exponent = this.exponent;
+
+		this.updateShadows();
 	}
 	
 	// Update the rest
 	SB.Light.prototype.update.call(this);
 }
 
+SB.SpotLight.prototype.updateShadows = function()
+{
+	if (this.castShadows)
+	{
+		this.object.shadowCameraNear = 1;
+		this.object.shadowCameraFar = SB.Light.DEFAULT_RANGE;
+		this.object.shadowCameraFov = 90;
+
+		// light.shadowCameraVisible = true;
+
+		this.object.shadowBias = 0.0001;
+		this.object.shadowDarkness = this.shadowDarkness;
+
+		this.object.shadowMapWidth = 2048;
+		this.object.shadowMapHeight = 2048;
+		
+		SB.Graphics.instance.enableShadows(true);
+	}	
+}
+
 SB.SpotLight.DEFAULT_DISTANCE = 0;
 SB.SpotLight.DEFAULT_ANGLE = Math.PI / 2;
 SB.SpotLight.DEFAULT_EXPONENT = 10;
 SB.SpotLight.DEFAULT_CAST_SHADOWS = false;
+SB.SpotLight.DEFAULT_SHADOW_DARKNESS = 0.3;
 /**
  * @fileoverview A wire grid floor plane
  * @author Tony Parisi
