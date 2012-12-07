@@ -35,6 +35,7 @@ goog.require('SB.Mouse');
 goog.require('SB.Picker');
 goog.require('SB.Light');
 goog.require('SB.DirectionalLight');
+goog.require('SB.SpotLight');
 goog.require('SB.Loader');
 goog.require('SB.NetworkClient');
 goog.require('SB.PhysicsBody');

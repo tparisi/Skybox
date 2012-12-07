@@ -29,6 +29,6 @@ SB.DirectionalLight.prototype.update = function()
 	var worldmat = this.object.parent.matrixWorld;
 	worldmat.multiplyVector3(this.position);
 	worldmat.multiplyVector3(this.object.target.position);
-	SB.SceneComponent.prototype.update.call(this);
+	SB.Light.prototype.update.call(this);
 }
 

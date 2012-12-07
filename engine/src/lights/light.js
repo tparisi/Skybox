@@ -25,7 +25,7 @@ SB.Light.prototype.update = function()
 {
 	if (this.object)
 	{
-		this.object.color = this.color;
+		this.object.color.setHex(this.color);
 		this.object.intensity = this.intensity;
 	}
 	
