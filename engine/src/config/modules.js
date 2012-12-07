@@ -33,6 +33,7 @@ goog.require('SB.Input');
 goog.require('SB.Keyboard');
 goog.require('SB.Mouse');
 goog.require('SB.Picker');
+goog.require('SB.Light');
 goog.require('SB.DirectionalLight');
 goog.require('SB.Loader');
 goog.require('SB.NetworkClient');
