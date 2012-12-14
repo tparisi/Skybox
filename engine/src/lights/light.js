@@ -4,8 +4,8 @@ goog.require('SB.SceneComponent');
 SB.Light = function(param)
 {
 	param = param || {};
-	this.color = param.color;
-	this.intensity = param.intensity;
+	this.color = ( param.color !== undefined ) ? param.color : SB.Light.DEFAULT_COLOR;
+	this.intensity = ( param.intensity !== undefined ) ? param.intensity : SB.Light.DEFAULT_INTENSITY;
 	SB.SceneComponent.call(this, param);
 }
 
@@ -32,4 +32,6 @@ SB.Light.prototype.update = function()
 	SB.SceneComponent.prototype.update.call(this);
 }
 
+SB.Light.DEFAULT_COLOR = 0xFFFFFF;
+SB.Light.DEFAULT_INTENSITY = 1;
 SB.Light.DEFAULT_RANGE = 10000;

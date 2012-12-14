@@ -2869,8 +2869,8 @@ goog.require('SB.SceneComponent');
 SB.Light = function(param)
 {
 	param = param || {};
-	this.color = param.color;
-	this.intensity = param.intensity;
+	this.color = ( param.color !== undefined ) ? param.color : SB.Light.DEFAULT_COLOR;
+	this.intensity = ( param.intensity !== undefined ) ? param.intensity : SB.Light.DEFAULT_INTENSITY;
 	SB.SceneComponent.call(this, param);
 }
 
@@ -2897,6 +2897,8 @@ SB.Light.prototype.update = function()
 	SB.SceneComponent.prototype.update.call(this);
 }
 
+SB.Light.DEFAULT_COLOR = 0xFFFFFF;
+SB.Light.DEFAULT_INTENSITY = 1;
 SB.Light.DEFAULT_RANGE = 10000;/**
  * @fileoverview Loader - loads level files
  * 
@@ -4624,6 +4626,8 @@ SB.SpotLight = function(param)
 	this.exponent = ( param.exponent !== undefined ) ? param.exponent : SB.SpotLight.DEFAULT_EXPONENT;
 	this.castShadows = ( param.castShadows !== undefined ) ? param.castShadows : SB.SpotLight.DEFAULT_CAST_SHADOWS;
 	this.shadowDarkness = ( param.shadowDarkness !== undefined ) ? param.shadowDarkness : SB.SpotLight.DEFAULT_SHADOW_DARKNESS;
+	this.targetPos = new THREE.Vector3;
+	this.scaledDir = new THREE.Vector3;
 	
 	SB.Light.call(this, param);
 }
@@ -4633,9 +4637,13 @@ goog.inherits(SB.SpotLight, SB.Light);
 SB.SpotLight.prototype.realize = function() 
 {
 	this.object = new THREE.SpotLight(this.color, this.intensity, this.distance, this.angle, this.exponent);
-	this.targetPos = this.position.clone();
-	this.targetPos.addSelf(this.direction.multiplyScalar(SB.Light.DEFAULT_RANGE));	
+
+	this.scaledDir.copy(this.direction);
+	this.scaledDir.multiplyScalar(SB.Light.DEFAULT_RANGE);
+	this.targetPos.copy(this.position);
+	this.targetPos.addSelf(this.scaledDir);	
 	this.object.target.position.copy(this.targetPos);
+
 	this.updateShadows();
 
 	SB.Light.prototype.realize.call(this);
@@ -4645,10 +4653,10 @@ SB.SpotLight.prototype.update = function()
 {
 	if (this.object)
 	{
-		// D'oh Three.js doesn't seem to transform light directions automatically
-		// Really bizarre semantics
+		this.scaledDir.copy(this.direction);
+		this.scaledDir.multiplyScalar(SB.Light.DEFAULT_RANGE);
 		this.targetPos.copy(this.position);
-		this.targetPos.addSelf(this.direction.multiplyScalar(SB.Light.DEFAULT_RANGE));	
+		this.targetPos.addSelf(this.scaledDir);	
 		this.object.target.position.copy(this.targetPos);
 		
 		var worldmat = this.object.parent.matrixWorld;
@@ -4671,6 +4679,7 @@ SB.SpotLight.prototype.updateShadows = function()
 {
 	if (this.castShadows)
 	{
+		this.object.castShadow = true;
 		this.object.shadowCameraNear = 1;
 		this.object.shadowCameraFar = SB.Light.DEFAULT_RANGE;
 		this.object.shadowCameraFov = 90;
