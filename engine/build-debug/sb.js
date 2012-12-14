@@ -3237,7 +3237,25 @@ SB.Camera.DEFAULT_POSITION = new THREE.Vector3(0, 0, 10);/**
  * @fileoverview Contains prefab assemblies for core Skybox package
  * @author Tony Parisi
  */
-goog.provide('SB.Prefabs');/**
+goog.provide('SB.Prefabs');goog.provide('SB.AmbientLight');
+goog.require('SB.Light');
+
+SB.AmbientLight = function(param)
+{
+	param = param || {};
+	
+	SB.Light.call(this, param);
+}
+
+goog.inherits(SB.AmbientLight, SB.Light);
+
+SB.AmbientLight.prototype.realize = function() 
+{
+	this.object = new THREE.AmbientLight(this.color);
+
+	SB.Light.prototype.realize.call(this);
+}
+/**
  *
  */
 goog.provide('SB.PhysicsSystem');
@@ -6718,6 +6736,42 @@ SB.RigidBodyCircleBox2D = function(radius)
 } ;
 
 goog.inherits(SB.RigidBodyCircleBox2D, SB.RigidBodyBox2D);
+goog.provide('SB.PointLight');
+goog.require('SB.Light');
+
+SB.PointLight = function(param)
+{
+	param = param || {};
+	this.distance = ( param.distance !== undefined ) ? param.distance : SB.PointLight.DEFAULT_DISTANCE;
+	
+	SB.Light.call(this, param);
+}
+
+goog.inherits(SB.PointLight, SB.Light);
+
+SB.PointLight.prototype.realize = function() 
+{
+	this.object = new THREE.PointLight(this.color, this.intensity, this.distance);
+
+	SB.Light.prototype.realize.call(this);
+}
+
+SB.PointLight.prototype.update = function() 
+{
+	if (this.object)
+	{
+		var worldmat = this.object.parent.matrixWorld;
+		worldmat.multiplyVector3(this.position);
+		
+		// Copy other values
+		this.object.distance = this.distance;
+	}
+	
+	// Update the rest
+	SB.Light.prototype.update.call(this);
+}
+
+SB.PointLight.DEFAULT_DISTANCE = 0;
 /**
  * @fileoverview File Manager - load game assets using Ajax
  * 
@@ -6754,7 +6808,9 @@ goog.require('SB.Keyboard');
 goog.require('SB.Mouse');
 goog.require('SB.Picker');
 goog.require('SB.Light');
+goog.require('SB.AmbientLight');
 goog.require('SB.DirectionalLight');
+goog.require('SB.PointLight');
 goog.require('SB.SpotLight');
 goog.require('SB.Loader');
 goog.require('SB.NetworkClient');
