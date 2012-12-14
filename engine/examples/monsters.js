@@ -22,8 +22,6 @@ SB.Examples.Monsters.prototype.initialize = function(param)
 	
 	SB.Game.prototype.initialize.call(this, param);
 	
-	SB.Graphics.instance.scene.add( new THREE.AmbientLight(0xffffff) ); //  0x505050 ) ); // 
-	
 	this.initEntities();
 }
 
@@ -32,6 +30,12 @@ SB.Examples.Monsters.prototype.initEntities = function()
 {
 	this.root = new SB.Entity;
 	
+	var ambientLight = new SB.Entity;
+	var light = new SB.AmbientLight({color:0xFFFFFF});
+	ambientLight.addComponent(light);
+	
+	this.root.addChild(ambientLight);
+
 	var grid = new SB.Grid({size: 14});
 	this.root.addComponent(grid);
 	
