@@ -72,7 +72,6 @@ goog.require('SB.PointSet');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');
-goog.require('SB.LightComponent');
 
 /**
  * @constructor
