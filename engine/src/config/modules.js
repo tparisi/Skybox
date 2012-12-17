@@ -58,7 +58,6 @@ goog.require('SB.View');
 goog.require('SB.SceneUtils');
 goog.require('SB.ScreenTracker');
 goog.require('SB.Tracker');
-goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
 goog.require('SB.JsonModel');
 goog.require('SB.JsonScene');
