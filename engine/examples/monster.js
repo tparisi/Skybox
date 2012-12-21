@@ -2,10 +2,8 @@ SB.Examples.Monster = function(param)
 {
 	SB.Entity.call(this, param);
 	
+	// Set up the widget
 	this.transform = new SB.Transform();
-	this.model = new SB.Model.loadModel('./monster.dae');
-	this.model.scale.x = this.model.scale.y = this.model.scale.z = 0.002;
-	this.model.rotation.x = -Math.PI/2;
 	this.picker = new SB.Picker({ overCursor: 'pointer' });
 	this.rotator = new SB.Rotator();
 	this.dragger = new SB.Dragger();
@@ -15,7 +13,6 @@ SB.Examples.Monster = function(param)
 	this.timer = new SB.Timer( { duration : 3333 } );
 	
 	this.addComponent(this.transform);
-	this.addComponent(this.model);
 	this.addComponent(this.picker);
 	this.addComponent(this.rotator);
 	this.addComponent(this.dragger);
@@ -24,6 +21,12 @@ SB.Examples.Monster = function(param)
 	this.addComponent(this.mover);
 	this.addComponent(this.timer);
 
+	// Load the model
+	var loader = new SB.Loader;
+	loader.subscribe("loaded", this, this.onSceneLoaded);
+	loader.loadScene('./monster.dae');
+
+	// Wire up the notifications	
 	this.dragger.subscribe("move", this, this.onDraggerMove);
 	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
 	this.zoomer.subscribe("scale", this, this.onZoomerScale);
@@ -51,6 +54,23 @@ SB.Examples.Monster = function(param)
 }
 
 goog.inherits(SB.Examples.Monster, SB.Entity);
+
+SB.Examples.Monster.prototype.onSceneLoaded = function(data)
+{
+	if (data.scene)
+	{
+		var scene = data.scene;
+		scene.scale.x = scene.scale.y = scene.scale.z = 0.002;
+		scene.rotation.x = -Math.PI/2;
+		this.addComponent(scene);
+	}
+	
+	if (data.animator)
+	{
+		this.animator = data.animator;
+		this.addComponent(this.animator);
+	}
+}
 
 SB.Examples.Monster.prototype.realize = function() 
 {
@@ -141,7 +161,14 @@ SB.Examples.Monster.prototype.onMouseUp = function(x, y)
 
 	if (!this.lastdx && !this.lastdy)
 	{
-		this.model.animate(!this.model.animating);
+		if (this.animator.running)
+		{
+			this.animator.stop();
+		}
+		else
+		{
+			this.animator.start();
+		}
 	}
 }
 
