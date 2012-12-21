@@ -1,6 +1,8 @@
 SB.Examples.DuckRider = function()
 {
 	SB.Entity.call(this);
+
+	// Set up the widget
 	this.transform = new SB.Transform();
 	this.pane = new SB.Pane();
 	this.picker = new SB.Picker();
@@ -9,7 +11,7 @@ SB.Examples.DuckRider = function()
 	this.zoomer = new SB.Zoomer();
 	this.mover = new SB.KeyFrame({ loop : false, easeOut : true });
 	this.spinner = new SB.KeyFrame({ loop : true, easeOut : false });
-	
+
 	this.addComponent(this.transform);
 	this.addComponent(this.pane);
 	this.addComponent(this.picker);
@@ -19,6 +21,12 @@ SB.Examples.DuckRider = function()
 	this.addComponent(this.spinner);
 	this.addComponent(this.mover);
 
+	// Load the model
+	var loader = new SB.Loader;
+	loader.subscribe("loaded", this, this.onSceneLoaded);
+	loader.loadScene('./duck.dae');
+
+	// Wire up the notifications
 	this.dragger.subscribe("move", this, this.onDraggerMove);
 	this.rotator.subscribe("rotate", this, this.onRotatorRotate);
 	this.zoomer.subscribe("scale", this, this.onZoomerScale);
@@ -37,9 +45,6 @@ SB.Examples.DuckRider = function()
 	
 	this.savedColor = null;
 
-	var loader = new SB.Loader;
-	loader.subscribe("loaded", this, this.onSceneLoaded);
-	loader.loadScene('./duck.dae');
 }
 
 goog.inherits(SB.Examples.DuckRider, SB.Entity);
