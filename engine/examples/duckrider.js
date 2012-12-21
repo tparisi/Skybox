@@ -3,8 +3,6 @@ SB.Examples.DuckRider = function()
 	SB.Entity.call(this);
 	this.transform = new SB.Transform();
 	this.pane = new SB.Pane();
-	this.model = new SB.Model.loadModel('./duck.dae');
-	this.model.scale.x = this.model.scale.y = this.model.scale.z = 0.01;
 	this.picker = new SB.Picker();
 	this.rotator = new SB.Rotator();
 	this.dragger = new SB.Dragger();
@@ -14,7 +12,6 @@ SB.Examples.DuckRider = function()
 	
 	this.addComponent(this.transform);
 	this.addComponent(this.pane);
-	this.addComponent(this.model);
 	this.addComponent(this.picker);
 	this.addComponent(this.rotator);
 	this.addComponent(this.dragger);
@@ -39,9 +36,23 @@ SB.Examples.DuckRider = function()
 	this.rotating = true;
 	
 	this.savedColor = null;
+
+	var loader = new SB.Loader;
+	loader.subscribe("loaded", this, this.onSceneLoaded);
+	loader.loadScene('./duck.dae');
 }
 
 goog.inherits(SB.Examples.DuckRider, SB.Entity);
+
+SB.Examples.DuckRider.prototype.onSceneLoaded = function(data)
+{
+	if (data.scene)
+	{
+		var scene = data.scene;
+		scene.scale.x = scene.scale.y = scene.scale.z = 0.01;
+		this.addComponent(scene);
+	}
+}
 
 SB.Examples.DuckRider.prototype.onMouseOver = function(x, y)
 {

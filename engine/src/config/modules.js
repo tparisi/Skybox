@@ -9,6 +9,7 @@ goog.require('SB.Config');
 goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
 goog.require('SB.KeyFrameAnimator');
+goog.require('SB.MeshAnimator');
 goog.require('SB.Camera');
 goog.require('SB.PerspectiveCamera');
 goog.require('SB.WalkthroughControllerScript');
@@ -68,6 +69,7 @@ goog.require('SB.Mesh');
 goog.require('SB.Model');
 goog.require('SB.Pane');
 goog.require('SB.PointSet');
+goog.require('SB.SceneVisual');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');

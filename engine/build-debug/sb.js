@@ -2919,6 +2919,68 @@ SB.Loader = function()
 
 goog.inherits(SB.Loader, SB.PubSub);
         
+SB.Loader.prototype.loadScene = function(url)
+{
+	var spliturl = url.split('.');
+	var len = spliturl.length;
+	var ext = '';
+	if (len)
+	{
+		ext = spliturl[len - 1];
+	}
+	
+	if (ext && ext.length)
+	{
+	}
+	else
+	{
+		return;
+	}
+	
+	var loaderClass;
+	
+	switch (ext.toUpperCase())
+	{
+		case 'DAE' :
+			loaderClass = THREE.ColladaLoader;
+			break;
+		case 'JS' :
+			loaderClass = THREE.SceneLoader;
+			break;
+		default :
+			break;
+	}
+	
+	if (loaderClass)
+	{
+		var loader = new loaderClass;
+		var that = this;
+		
+		loader.load(url, function (data) {
+			that.handleSceneLoaded(url, data);
+		});		
+	}
+}
+
+SB.Loader.prototype.handleSceneLoaded = function(url, data)
+{
+	var result = {};
+	var success = false;
+	
+	if (data.scene)
+	{
+		result.scene = new SB.SceneVisual({scene:data.scene});
+		success = true;
+	}
+	
+	if (data.skins)
+	{
+		result.animator = new SB.MeshAnimator({skins:data.skins});
+	}
+	
+	if (success)
+		this.publish("loaded", result);
+}
 goog.provide('SB.Shaders');
 
 SB.Shaders = {} ;
@@ -3190,6 +3252,66 @@ SB.JsonScene.loadScene = function(url, param, callback)
 	});
 	
 	return scene;
+}
+/**
+ * @fileoverview Rotator - converts x,y mouse motion into rotation about an axis (event-driven)
+ * 
+ * @author Tony Parisi
+ */
+goog.provide('SB.Rotator');
+goog.require('SB.Component');
+
+SB.Rotator = function(param)
+{
+    SB.Component.call(this);
+    this.target = (param && param.target) ? param.target : null;
+    this.axis = (param && param.axis) ? param.axis : 'y';
+    this.lastx = SB.Mouse.NO_POSITION;
+    this.lasty = SB.Mouse.NO_POSITION;
+    this.x = SB.Mouse.NO_POSITION;
+    this.y = SB.Mouse.NO_POSITION;
+    this.running = false;
+}
+
+goog.inherits(SB.Rotator, SB.Component);
+	        
+SB.Rotator.prototype.start = function(x, y)
+{
+    this.lastx = x;
+    this.lasty = y;
+    this.x = this.lastx;
+    this.y = this.lasty;
+    this.running = true;
+}
+
+SB.Rotator.prototype.set = function(x, y)
+{
+    this.x = x;
+    this.y = y;
+}
+
+SB.Rotator.prototype.stop = function(x, y)
+{
+    this.x = x;
+    this.y = y;
+
+    this.running = false;
+}
+
+SB.Rotator.prototype.update = function()
+{
+    if (!this.running)
+    {
+        return;
+    }
+
+    var dx = this.x - this.lastx;
+    var dy = this.y - this.lasty;
+
+    this.publish("rotate", this.axis, dx * 0.01);
+
+    this.lastx = this.x;
+    this.lasty = this.y;
 }
 goog.provide('SB.Camera');
 goog.require('SB.SceneComponent');
@@ -3786,6 +3908,30 @@ SB.Popup.pop = function(popup)
         	return SB.Popup.stack.pop();
 		}
 	}
+}
+/**
+ * @fileoverview A visual containing a model in Collada format
+ * @author Tony Parisi
+ */
+goog.provide('SB.SceneVisual');
+goog.require('SB.Visual');
+
+SB.SceneVisual = function(param) 
+{
+	param = param || {};
+	
+    SB.Visual.call(this, param);
+
+    this.object = param.scene;
+}
+
+goog.inherits(SB.SceneVisual, SB.Visual);
+
+SB.SceneVisual.prototype.realize = function()
+{
+	SB.Visual.prototype.realize.call(this);
+	
+    this.addToScene();
 }
 /**
  * @fileoverview PollingRotator - converts x,y mouse motion into rotation about an axis (polling)
@@ -6197,65 +6343,72 @@ SB.Interpolator.prototype.tween = function(from, to, fract)
 	return value;
 }
 /**
- * @fileoverview Rotator - converts x,y mouse motion into rotation about an axis (event-driven)
- * 
+ * @fileoverview General-purpose key frame animation
  * @author Tony Parisi
  */
-goog.provide('SB.Rotator');
+goog.provide('SB.MeshAnimator');
 goog.require('SB.Component');
 
-SB.Rotator = function(param)
+// MeshAnimator class
+// Construction/initialization
+SB.MeshAnimator = function(param) 
 {
-    SB.Component.call(this);
-    this.target = (param && param.target) ? param.target : null;
-    this.axis = (param && param.axis) ? param.axis : 'y';
-    this.lastx = SB.Mouse.NO_POSITION;
-    this.lasty = SB.Mouse.NO_POSITION;
-    this.x = SB.Mouse.NO_POSITION;
-    this.y = SB.Mouse.NO_POSITION;
-    this.running = false;
+    SB.Component.call(this, param);
+	    		
+	param = param || {};
+	
+	this.skins = param.skins || [];
+	this.running = false;
+	this.frame = 0;
+	this.duration = param.duration ? param.duration : SB.MeshAnimator.default_duration;
+	this.frameRate = SB.MeshAnimator.default_frame_rate;
+	this.loop = param.loop ? param.loop : false;
 }
 
-goog.inherits(SB.Rotator, SB.Component);
-	        
-SB.Rotator.prototype.start = function(x, y)
+goog.inherits(SB.MeshAnimator, SB.Component);
+
+// Start/stop
+SB.MeshAnimator.prototype.start = function()
 {
-    this.lastx = x;
-    this.lasty = y;
-    this.x = this.lastx;
-    this.y = this.lasty;
-    this.running = true;
+	if (this.running)
+		return;
+	
+	this.startTime = Date.now();
+	this.running = true;
 }
 
-SB.Rotator.prototype.set = function(x, y)
+SB.MeshAnimator.prototype.stop = function()
 {
-    this.x = x;
-    this.y = y;
+	this.running = false;
+	this.publish("complete");
 }
 
-SB.Rotator.prototype.stop = function(x, y)
+// Update - drive key frame evaluation
+SB.MeshAnimator.prototype.update = function()
 {
-    this.x = x;
-    this.y = y;
+	if (!this.running)
+		return;
+		
+	var skin = this.skins[0];
+	
+	if ( skin )
+	{
+    	var now = Date.now();
+    	var deltat = (now - this.startTime) / 1000;
+    	var fract = deltat - Math.floor(deltat);
+    	this.frame = fract * this.frameRate;
+		
+		for ( var i = 0; i < skin.morphTargetInfluences.length; i++ )
+		{
+			skin.morphTargetInfluences[ i ] = 0;
+		}
 
-    this.running = false;
+		skin.morphTargetInfluences[ Math.floor( this.frame ) ] = 1;
+	}	
 }
-
-SB.Rotator.prototype.update = function()
-{
-    if (!this.running)
-    {
-        return;
-    }
-
-    var dx = this.x - this.lastx;
-    var dy = this.y - this.lasty;
-
-    this.publish("rotate", this.axis, dx * 0.01);
-
-    this.lastx = this.x;
-    this.lasty = this.y;
-}
+// Statics
+SB.MeshAnimator.default_duration = 1000;
+SB.MeshAnimator.default_frame_rate = 30;
 /**
  * @fileoverview ScreenTracker - converts x,y mouse motion into rotation about an axis (event-driven)
  * 
@@ -6708,6 +6861,7 @@ goog.require('SB.Config');
 goog.require('SB.Interpolator');
 goog.require('SB.KeyFrame');
 goog.require('SB.KeyFrameAnimator');
+goog.require('SB.MeshAnimator');
 goog.require('SB.Camera');
 goog.require('SB.PerspectiveCamera');
 goog.require('SB.WalkthroughControllerScript');
@@ -6767,6 +6921,7 @@ goog.require('SB.Mesh');
 goog.require('SB.Model');
 goog.require('SB.Pane');
 goog.require('SB.PointSet');
+goog.require('SB.SceneVisual');
 goog.require('SB.Visual');
 
 goog.require('SB.Shaders');
