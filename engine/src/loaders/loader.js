@@ -18,6 +18,56 @@ SB.Loader = function()
 
 goog.inherits(SB.Loader, SB.PubSub);
         
+SB.Loader.prototype.loadModel = function(url)
+{
+	var spliturl = url.split('.');
+	var len = spliturl.length;
+	var ext = '';
+	if (len)
+	{
+		ext = spliturl[len - 1];
+	}
+	
+	if (ext && ext.length)
+	{
+	}
+	else
+	{
+		return;
+	}
+	
+	var loaderClass;
+	
+	switch (ext.toUpperCase())
+	{
+		case 'JS' :
+			loaderClass = THREE.JSONLoader;
+			break;
+		default :
+			break;
+	}
+	
+	if (loaderClass)
+	{
+		var loader = new loaderClass;
+		var that = this;
+		
+		loader.load(url, function (data) {
+			that.handleModelLoaded(url, data);
+		});		
+	}
+}
+
+SB.Loader.prototype.handleModelLoaded = function(url, data)
+{
+	if (data.scene)
+	{
+		var material = new THREE.MeshFaceMaterial();
+		var mesh = new SB.Mesh({geometry:data, material:material});
+		this.publish("loaded", mesh);
+	}
+}
+
 SB.Loader.prototype.loadScene = function(url)
 {
 	var spliturl = url.split('.');
@@ -80,3 +130,4 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	if (success)
 		this.publish("loaded", result);
 }
+

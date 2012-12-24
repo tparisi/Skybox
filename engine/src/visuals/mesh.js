@@ -13,9 +13,12 @@ goog.require('SB.Visual');
 SB.Mesh = function(param) {
     SB.Visual.call(this, param);
 
-    this.param = param || {};
-    this.param.color = this.param.color || 0;
-    this.param.wireframe = this.param.wireframe || false;
+    param = param || {};
+    
+    this.color = (param.color !== undefined) ? param.color : 0;
+    this.wireframe = (param.wireframe !== undefined) ? param.wireframe : false;
+    this.geometry = param.geometry;
+    this.material = param.material;
 }
 
 goog.inherits(SB.Mesh, SB.Visual);
@@ -24,9 +27,16 @@ SB.Mesh.prototype.realize = function()
 {
 	SB.Visual.prototype.realize.call(this);
 	
-	this.geometry = new THREE.Geometry();
-	this.geometry.dynamic = true;
-	this.material = new THREE.MeshPhongMaterial({wireframe:this.param.wireframe, color: this.param.color});
+	if (!this.geometry)
+	{
+		this.geometry = new THREE.Geometry();
+		this.geometry.dynamic = true;
+	}
+	
+	if (this.material)
+	{
+		this.material = new THREE.MeshPhongMaterial({wireframe:this.param.wireframe, color: this.param.color});
+	}
 	
 	this.object = new THREE.Mesh(this.geometry, this.material);
 	
