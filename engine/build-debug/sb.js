@@ -4875,7 +4875,7 @@ SB.Entity.prototype.removeComponent = function(component) {
 
     if (i != -1)
     {
-    	if (component.removeFromScene);
+    	if (component.removeFromScene)
     	{
     		component.removeFromScene();
     	}
@@ -6127,6 +6127,7 @@ SB.KeyFrameAnimator = function(param)
 	param = param || {};
 	
 	this.interpdata = param.interps || [];
+	this.animationData = param.animations;
 	this.running = false;
 	this.duration = param.duration ? param.duration : SB.KeyFrameAnimator.default_duration;
 	this.loop = param.loop ? param.loop : false;
@@ -6141,7 +6142,21 @@ SB.KeyFrameAnimator.prototype.realize = function()
 	if (this.interpdata)
 	{
 		this.createInterpolators(this.interpdata);
-	}	    		
+	}
+	
+	if (this.animationData)
+	{
+		this.animations = [];
+		var i, len = this.animationData.length;
+		for (i = 0; i < len; i++)
+		{
+			var animdata = this.animationData[i];
+			THREE.AnimationHandler.add(animdata);
+			var animation = new THREE.KeyFrameAnimation(animdata.node, animdata.name);
+//			animation.timeScale = .01; // why?
+			this.animations.push(animation);
+		}
+	}
 }
 
 SB.KeyFrameAnimator.prototype.createInterpolators = function(interpdata)
@@ -6165,13 +6180,33 @@ SB.KeyFrameAnimator.prototype.start = function()
 		return;
 	
 	this.startTime = Date.now();
+	this.lastTime = this.startTime;
 	this.running = true;
+	
+	if (this.animations)
+	{
+		var i, len = this.animations.length;
+		for (i = 0; i < len; i++)
+		{
+			this.animations[i].play(this.loop, 0);
+		}
+	}
 }
 
 SB.KeyFrameAnimator.prototype.stop = function()
 {
 	this.running = false;
 	this.publish("complete");
+
+	if (this.animations)
+	{
+		var i, len = this.animations.length;
+		for (i = 0; i < len; i++)
+		{
+			this.animations[i].stop();
+		}
+	}
+
 }
 
 // Update - drive key frame evaluation
@@ -6179,6 +6214,12 @@ SB.KeyFrameAnimator.prototype.update = function()
 {
 	if (!this.running)
 		return;
+	
+	if (this.animations)
+	{
+		this.updateAnimations();
+		return;
+	}
 	
 	var now = Date.now();
 	var deltat = (now - this.startTime) % this.duration;
@@ -6205,6 +6246,19 @@ SB.KeyFrameAnimator.prototype.update = function()
 		}
 	}
 }
+
+SB.KeyFrameAnimator.prototype.updateAnimations = function()
+{
+	var now = Date.now();
+	var deltat = now - this.lastTime;
+	var i, len = this.animations.length;
+	for (i = 0; i < len; i++)
+	{
+		this.animations[i].update(deltat);
+	}
+	this.lastTime = now;	
+}
+
 // Statics
 SB.KeyFrameAnimator.default_duration = 1000;
 goog.provide('SB.PerspectiveCamera');
