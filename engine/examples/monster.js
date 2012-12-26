@@ -65,9 +65,9 @@ SB.Examples.Monster.prototype.onSceneLoaded = function(data)
 		this.addComponent(scene);
 	}
 	
-	if (data.animator)
+	if (data.meshAnimator)
 	{
-		this.animator = data.animator;
+		this.animator = data.meshAnimator;
 		this.addComponent(this.animator);
 	}
 }
@@ -255,14 +255,15 @@ SB.Examples.Monster.prototype.onKeyUp = function(keyCode, charCode)
 
 SB.Examples.Monster.prototype.setActive = function(active)
 {
-	this.model.animate(active);
 	this.active = active;
 	if (this.active)
 	{
+		this.animator.start();
 		this.timer.start();
 	}
 	else
 	{
+		this.animator.stop();
 		this.timer.stop();
 	}
 }

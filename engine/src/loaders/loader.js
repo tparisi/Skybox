@@ -122,11 +122,16 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 		success = true;
 	}
 	
-	if (data.skins)
+	if (data.animations)
 	{
-		result.animator = new SB.MeshAnimator({skins:data.skins});
+		result.keyFrameAnimator = new SB.KeyFrameAnimator({animations:data.animations});
 	}
 	
+	if (data.skins)
+	{
+		result.meshAnimator = new SB.MeshAnimator({skins:data.skins});
+	}
+
 	if (success)
 		this.publish("loaded", result);
 }
