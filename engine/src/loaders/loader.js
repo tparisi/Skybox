@@ -111,6 +111,18 @@ SB.Loader.prototype.loadScene = function(url)
 	}
 }
 
+SB.Loader.prototype.traverseCallback = function(n, result)
+{
+	// Look for cameras
+	if (n instanceof THREE.Camera)
+	{
+		if (!result.cameras)
+			result.cameras = [];
+		
+		result.cameras.push(n);
+	}
+}
+
 SB.Loader.prototype.handleSceneLoaded = function(url, data)
 {
 	var result = {};
@@ -119,6 +131,8 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	if (data.scene)
 	{
 		result.scene = new SB.SceneVisual({scene:data.scene});
+		var that = this;
+		THREE.SceneUtils.traverseHierarchy(data.scene, function (n) { that.traverseCallback(n, result); });
 		success = true;
 	}
 	
@@ -132,6 +146,7 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 		result.meshAnimator = new SB.MeshAnimator({skins:data.skins});
 	}
 
+	
 	if (success)
 		this.publish("loaded", result);
 }

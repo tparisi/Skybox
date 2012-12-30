@@ -2792,6 +2792,7 @@ SB.SceneComponent = function(param)
     this.position = this.param.position || new THREE.Vector3();
     this.rotation = this.param.rotation || new THREE.Vector3();
     this.scale = this.param.scale || new THREE.Vector3(1, 1, 1);
+    this.autoUpdateTransform = true;
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
@@ -2810,7 +2811,7 @@ SB.SceneComponent.prototype.update = function()
 {	
 	SB.Component.prototype.update.call(this);
 	
-	if (this.object)
+	if (this.object && this.autoUpdateTransform)
 	{
 		this.object.position.x = this.position.x;
 		this.object.position.y = this.position.y;
@@ -2821,6 +2822,10 @@ SB.SceneComponent.prototype.update = function()
 		this.object.scale.x = this.scale.x;
 		this.object.scale.y = this.scale.y;
 		this.object.scale.z = this.scale.z;
+	}
+	else
+	{
+		var debug = 1;
 	}
 }
 
@@ -3012,6 +3017,18 @@ SB.Loader.prototype.loadScene = function(url)
 	}
 }
 
+SB.Loader.prototype.traverseCallback = function(n, result)
+{
+	// Look for cameras
+	if (n instanceof THREE.Camera)
+	{
+		if (!result.cameras)
+			result.cameras = [];
+		
+		result.cameras.push(n);
+	}
+}
+
 SB.Loader.prototype.handleSceneLoaded = function(url, data)
 {
 	var result = {};
@@ -3020,6 +3037,8 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	if (data.scene)
 	{
 		result.scene = new SB.SceneVisual({scene:data.scene});
+		var that = this;
+		THREE.SceneUtils.traverseHierarchy(data.scene, function (n) { that.traverseCallback(n, result); });
 		success = true;
 	}
 	
@@ -3033,6 +3052,7 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 		result.meshAnimator = new SB.MeshAnimator({skins:data.skins});
 	}
 
+	
 	if (success)
 		this.publish("loaded", result);
 }

@@ -16,6 +16,7 @@ SB.SceneComponent = function(param)
     this.position = this.param.position || new THREE.Vector3();
     this.rotation = this.param.rotation || new THREE.Vector3();
     this.scale = this.param.scale || new THREE.Vector3(1, 1, 1);
+    this.autoUpdateTransform = true;
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
@@ -34,7 +35,7 @@ SB.SceneComponent.prototype.update = function()
 {	
 	SB.Component.prototype.update.call(this);
 	
-	if (this.object)
+	if (this.object && this.autoUpdateTransform)
 	{
 		this.object.position.x = this.position.x;
 		this.object.position.y = this.position.y;
@@ -45,6 +46,10 @@ SB.SceneComponent.prototype.update = function()
 		this.object.scale.x = this.scale.x;
 		this.object.scale.y = this.scale.y;
 		this.object.scale.z = this.scale.z;
+	}
+	else
+	{
+		var debug = 1;
 	}
 }
 
