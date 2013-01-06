@@ -8,8 +8,7 @@ SB.Prefabs.ModelController = function(param)
 	var controller = new SB.Entity(param);
 	var transform = new SB.Transform;
 	controller.addComponent(transform);
-	controller.transform.position.set(0, 0, 5);
-	var controllerScript = new SB.ModelControllerScript;
+	var controllerScript = new SB.ModelControllerScript(param);
 	controller.addComponent(controllerScript);
 
 	var dragger = new SB.Dragger();
@@ -28,6 +27,7 @@ SB.Prefabs.ModelController = function(param)
 	var viewpoint = new SB.Entity;
 	var transform = new SB.Transform;
 	var camera = new SB.PerspectiveCamera({active:param.active, fov: param.fov});
+	camera.position.set(0, 0, 0);
 	viewpoint.addComponent(transform);
 	viewpoint.addComponent(camera);
 	viewpoint.transform = transform;
@@ -52,7 +52,7 @@ SB.ModelControllerScript = function(param)
 	SB.Component.call(this, param);
 
 	this.directionMatrix = new THREE.Matrix4;
-	this.moveDir = new THREE.Vector3;
+	this.cameraPos = new THREE.Vector3;
 	this.turnDir = new THREE.Vector3;
 	this.lookDir = new THREE.Vector3;
 	
@@ -60,6 +60,8 @@ SB.ModelControllerScript = function(param)
 	this.dragging = false;
 	this.walkSpeed = 1;
 	this.turnSpeed = 1;
+
+	this.radius = param.radius || SB.ModelControllerScript.default_radius;
 }
 
 goog.inherits(SB.ModelControllerScript, SB.Component);
@@ -71,16 +73,22 @@ SB.ModelControllerScript.prototype.realize = function()
 	this.timer = this._entity.getComponent(SB.Timer);
 	this.viewpoint = this._entity.getChild(0);
 	
+	this.viewpoint.transform.position.set(0, 0, this.radius);
+	
 	SB.Game.instance.mouseDelegate = this;
 	SB.Game.instance.keyboardDelegate = this;
 }
 
-SB.ModelControllerScript.prototype.move = function(dir)
+SB.ModelControllerScript.prototype.zoom = function(delta)
 {
-	this.directionMatrix.identity();
-	this.directionMatrix.setRotationFromEuler(this._entity.transform.rotation);
-	dir = this.directionMatrix.multiplyVector3(dir);
-	this._entity.transform.position.addSelf(dir);
+	this.radius += delta;
+	
+	this.cameraPos.set(0, 0, this.radius);
+
+//	this.directionMatrix.identity();
+//	this.directionMatrix.setRotationFromEuler(this.viewpoint.transform.rotation);
+//	dir = this.directionMatrix.multiplyVector3(this.moveDir);
+	this.viewpoint.transform.position.copy(this.cameraPos);
 }
 
 SB.ModelControllerScript.prototype.turn = function(dir)
@@ -127,8 +135,7 @@ SB.ModelControllerScript.prototype.onMouseUp = function(x, y)
 
 SB.ModelControllerScript.prototype.onMouseScroll = function(delta)
 {
-	this.moveDir.set(0, 0, -delta);
-	this.move(this.moveDir);
+	this.zoom(-delta);
 }
 
 SB.ModelControllerScript.prototype.onKeyDown = function(keyCode, charCode)
@@ -260,3 +267,4 @@ SB.ModelControllerScript.prototype.onTimeFractionChanged = function(fraction)
 	this.turnFraction = fraction;
 }
 
+SB.ModelControllerScript.default_radius = 5;

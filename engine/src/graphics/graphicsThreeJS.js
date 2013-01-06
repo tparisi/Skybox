@@ -104,7 +104,8 @@ SB.GraphicsThreeJS.prototype.initRenderer = function(param)
 
     this.renderer = renderer;
     this.projector = projector;
-    
+
+    this.lastFrameTime = 0;
 }
 
 SB.GraphicsThreeJS.prototype.initMouse = function()
@@ -319,6 +320,12 @@ SB.GraphicsThreeJS.prototype.update = function()
 {
     this.renderer.render( this.scene, this.camera );
 
+    var frameTime = Date.now();
+    var deltat = (frameTime - this.lastFrameTime) / 1000;
+    this.frameRate = 1 / deltat;
+
+    this.lastFrameTime = frameTime;
+    	
     if (this.stats)
     {
     	this.stats.update();
