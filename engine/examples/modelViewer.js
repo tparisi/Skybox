@@ -38,7 +38,6 @@ SB.Examples.ModelViewer.prototype.initialize = function(param)
 	var cube = new SB.Entity;
 	
 	transform = new SB.Transform();
-	transform.position.z = -10;
     visual = new SB.CubeVisual({width : 1, depth : 1, height : 1.667, color : 0x0000ff });
     
     cube.addComponent(transform);

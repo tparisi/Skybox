@@ -11,16 +11,16 @@ SB.Prefabs.ModelController = function(param)
 	var controllerScript = new SB.ModelControllerScript(param);
 	controller.addComponent(controllerScript);
 
-	var dragger = new SB.Dragger();
-	var rotator = new SB.Rotator();
+	var xRotator = new SB.Rotator( { axis : 'x' } );
+	var yRotator = new SB.Rotator( { axis : 'y' } );
 	var timer = new SB.Timer( { duration : 3333 } );
 	
-	controller.addComponent(dragger);
-	controller.addComponent(rotator);
+	controller.addComponent(xRotator);
+	controller.addComponent(yRotator);
 	controller.addComponent(timer);
 
-	dragger.subscribe("move", controllerScript, controllerScript.onDraggerMove);
-	rotator.subscribe("rotate", controllerScript, controllerScript.onRotatorRotate);
+	xRotator.subscribe("rotate", controllerScript, controllerScript.onXRotatorRotate);
+	yRotator.subscribe("rotate", controllerScript, controllerScript.onYRotatorRotate);
 	timer.subscribe("time", controllerScript, controllerScript.onTimeChanged);
 	timer.subscribe("fraction", controllerScript, controllerScript.onTimeFractionChanged);	
 	
@@ -51,17 +51,19 @@ SB.ModelControllerScript = function(param)
 {
 	SB.Component.call(this, param);
 
-	this.directionMatrix = new THREE.Matrix4;
+	this.rotationMatrix = new THREE.Matrix4;
 	this.cameraPos = new THREE.Vector3;
-	this.turnDir = new THREE.Vector3;
-	this.lookDir = new THREE.Vector3;
+	this.object2camera = new THREE.Vector3(0, 0, 1);
+	this.combinedRotation = new THREE.Vector3;
 	
 	this.lastdx = 0;
+	this.lastdy = 0;
 	this.dragging = false;
-	this.walkSpeed = 1;
-	this.turnSpeed = 1;
+	this.rotateSpeed = 1;
 
 	this.radius = param.radius || SB.ModelControllerScript.default_radius;
+	this.xRotation = 0;
+	this.yRotation = 0;
 }
 
 goog.inherits(SB.ModelControllerScript, SB.Component);
@@ -69,7 +71,8 @@ goog.inherits(SB.ModelControllerScript, SB.Component);
 SB.ModelControllerScript.prototype.realize = function()
 {
 	this.dragger = this._entity.getComponent(SB.Dragger);
-	this.rotator = this._entity.getComponent(SB.Rotator);
+	this.xRotator = this._entity.getComponents(SB.Rotator)[0];
+	this.yRotator = this._entity.getComponents(SB.Rotator)[1];
 	this.timer = this._entity.getComponent(SB.Timer);
 	this.viewpoint = this._entity.getChild(0);
 	
@@ -82,55 +85,55 @@ SB.ModelControllerScript.prototype.realize = function()
 SB.ModelControllerScript.prototype.zoom = function(delta)
 {
 	this.radius += delta;
+	this.updateCamera();
+}
+
+SB.ModelControllerScript.prototype.rotateX = function(delta)
+{
+	this.xRotation -= delta;
+	this.updateCamera();
+}
+
+SB.ModelControllerScript.prototype.rotateY = function(delta)
+{
+	this.yRotation -= delta;
+	this.updateCamera();
+}
+
+SB.ModelControllerScript.prototype.updateCamera = function()
+{
+	this.object2camera.set(0, 0, 1);
+	this.combinedRotation.set(this.xRotation, this.yRotation, 0);
+	this.rotationMatrix.setRotationFromEuler(this.combinedRotation);
+	this.rotationMatrix.multiplyVector3(this.object2camera);
+	this.object2camera.multiplyScalar(this.radius);
 	
-	this.cameraPos.set(0, 0, this.radius);
+	this.cameraPos.copy(this.object2camera);
 
-//	this.directionMatrix.identity();
-//	this.directionMatrix.setRotationFromEuler(this.viewpoint.transform.rotation);
-//	dir = this.directionMatrix.multiplyVector3(this.moveDir);
 	this.viewpoint.transform.position.copy(this.cameraPos);
-}
-
-SB.ModelControllerScript.prototype.turn = function(dir)
-{
-	SB.Game.instance.sceneRoot.transform.rotation.addSelf(dir);
-}
-
-SB.ModelControllerScript.prototype.setCameraTilt = function(dir)
-{
-	if (this.viewpoint && this.viewpoint.transform)
-	{
-		this.viewpoint.transform.rotation.copy(dir);
-	}
-}
-
-SB.ModelControllerScript.prototype.setCameraTurn = function(dir)
-{
-	if (this._entity && this._entity.transform)
-	{
-		this._entity.transform.rotation.copy(dir);
-	}
+	this.viewpoint.transform.rotation.copy(this.combinedRotation);
 }
 
 SB.ModelControllerScript.prototype.onMouseMove = function(x, y)
 {
-	this.dragger.set(x, y);
-	this.rotator.set(x, y);
+	this.xRotator.set(x, y);
+	this.yRotator.set(x, y);
 }
 
 SB.ModelControllerScript.prototype.onMouseDown = function(x, y)
 {
-	this.dragger.start(x, y);
-	this.rotator.start(x, y);
+	this.xRotator.start(x, y);
+	this.yRotator.start(x, y);
 	this.dragging = true;
 }
 
 SB.ModelControllerScript.prototype.onMouseUp = function(x, y)
 {
-	this.dragger.stop(x, y);
-	this.rotator.stop(x, y);
+	this.xRotator.stop(x, y);
+	this.yRotator.stop(x, y);
 	this.dragging = false;
 	this.lastdx = 0;
+	this.lastdy = 0;
 }
 
 SB.ModelControllerScript.prototype.onMouseScroll = function(delta)
@@ -158,107 +161,76 @@ SB.ModelControllerScript.prototype.onKeyPress = function(keyCode, charCode)
 {
 }
 
-SB.ModelControllerScript.prototype.onRotatorRotate = function(axis, delta)
+SB.ModelControllerScript.prototype.onXRotatorRotate = function(axis, delta)
 {
-	delta *= .666;
+//	console.log("Rotator delta = ", delta);
+
+	delta *= .222;
 	
 	if (delta != 0)
 	{
-		// this.controllerScript.transform.rotation.y -= delta;
-		this.turnDir.set(0, -delta, 0);
-		this.turn(this.lookDir);
+		this.rotateX(delta);
+		this.lastdy = delta;
+	}
+	else if (this.lastdy)
+	{
+		this.rotateX(this.lastdy);
 	}
 }
 
-SB.ModelControllerScript.prototype.onDraggerMove = function(dx, dy)
+SB.ModelControllerScript.prototype.onYRotatorRotate = function(axis, delta)
 {
-	if (Math.abs(dx) <= 2)
-		dx = 0;
-	
-	dx *= .002;
-	
-	if (dx)
-	{
-		this.lastdx = dx;
-	}
-	else if (this.lastdx && this.dragging)
-	{
-		dx = this.lastdx;
-	}
+//	console.log("Rotator delta = ", delta);
 
-	if (dx != 0)
+	delta *= .222;
+	
+	if (delta != 0)
 	{
-		// this.controllerScript.transform.position.z -= dx;
-		this.turnDir.set(0, dx, 0);
-		this.turn(this.turnDir);
-	}	
+		this.rotateY(delta);
+		this.lastdy = delta;
+	}
+	else if (this.lastdy)
+	{
+		this.rotateY(this.lastdy);
+	}
 }
 
 SB.ModelControllerScript.prototype.onTimeChanged = function(t)
 {
-	var turnfraction = .0416;
-	var movefraction = .1666;
-	var turnamount = 0;
-	var moveamount = 0;
+	var yFraction = .0333;
+	var xFraction = .0333;
+	var yRotateAmount = 0;
+	var xRotateAmount = 0;
 	var handled = false;
 	
 	switch (this.whichKeyDown)
 	{
     	case SB.Keyboard.KEY_LEFT : 
-    		turnamount = +1 * turnfraction * this.turnSpeed;
+    		yRotateAmount = -1 * yFraction * this.rotateSpeed;
 			handled = true;
     		break;
     	case SB.Keyboard.KEY_UP : 
-    		moveamount = -1 * movefraction * this.walkSpeed;
+    		xRotateAmount = -1 * xFraction * this.rotateSpeed;
 			handled = true;
     		break;
     	case SB.Keyboard.KEY_RIGHT : 
-    		turnamount = -1 * turnfraction * this.turnSpeed;
+    		yRotateAmount = +1 * yFraction * this.rotateSpeed;
 			handled = true;
     		break;
     	case SB.Keyboard.KEY_DOWN : 
-    		moveamount = +1 * movefraction * this.walkSpeed;
+    		xRotateAmount = +1 * xFraction * this.rotateSpeed;
 			handled = true;
     		break;
 	}
 
-	if (!handled)
+	if (yRotateAmount)
 	{
-		switch (String.fromCharCode(this.whichKeyDown))
-		{
-	    	case 'A' :
-	    		turnamount = +1 * turnfraction * this.turnSpeed;
-	    		handled = true;
-	    		break;
-	    		
-	    	case 'W' :
-	    		moveamount = -1 * movefraction * this.walkSpeed;
-	    		handled = true;
-	    		break;
-	    	case 'D' :
-	    		turnamount = -1 * turnfraction * this.turnSpeed;
-				handled = true;
-	    		break;
-	    	case 'S' :
-	    		moveamount = +1 * movefraction * this.walkSpeed;
-				handled = true;
-	    		break;
-	    		
-	    	default : 
-	    		break;
-		}
-	}
-
-	if (moveamount)
-	{
-		this.moveDir.set(0, 0, moveamount);
-		this.move(this.moveDir);
+		this.rotateY(yRotateAmount);
 	}
 	
-	if (turnamount)
+	if (xRotateAmount)
 	{
-		this.turnDir.set(0, turnamount, 0);
-		this.turn(this.turnDir);
+		this.rotateX(xRotateAmount);
 	}
 }
 

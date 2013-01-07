@@ -53,7 +53,15 @@ SB.Rotator.prototype.update = function()
     var dx = this.x - this.lastx;
     var dy = this.y - this.lasty;
 
-    this.publish("rotate", this.axis, dx * 0.01);
+    if (this.axis == 'y')
+    {
+    	this.publish("rotate", this.axis, dx * 0.01);
+    }
+
+    if (this.axis == 'x')
+    {
+    	this.publish("rotate", this.axis, dy * 0.01);
+    }    
 
     this.lastx = this.x;
     this.lasty = this.y;
