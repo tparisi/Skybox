@@ -64,6 +64,11 @@ SB.ModelControllerScript = function(param)
 	this.radius = param.radius || SB.ModelControllerScript.default_radius;
 	this.xRotation = 0;
 	this.yRotation = 0;
+	
+	this.maxXRotation = param.maxXRotation || SB.ModelControllerScript.MAX_X_ROTATION;
+	this.minXRotation = param.minXRotation || SB.ModelControllerScript.MIN_X_ROTATION;
+	this.maxYRotation = param.maxYRotation || SB.ModelControllerScript.MAX_Y_ROTATION;
+	this.minYRotation = param.minYRotation || SB.ModelControllerScript.MIN_Y_ROTATION;
 }
 
 goog.inherits(SB.ModelControllerScript, SB.Component);
@@ -91,11 +96,23 @@ SB.ModelControllerScript.prototype.rotateX = function(delta)
 {
 	var newXRotation = this.xRotation - delta;
 	
-	if (newXRotation > SB.ModelControllerScript.MAX_X_ROTATION)
-		newXRotation = SB.ModelControllerScript.MAX_X_ROTATION;
+	if (newXRotation > this.maxXRotation)
+		newXRotation =  this.maxXRotation;
 	
-	if (newXRotation < SB.ModelControllerScript.MIN_X_ROTATION)
-		newXRotation = SB.ModelControllerScript.MIN_X_ROTATION;
+	if (newXRotation < this.minXRotation)
+		newXRotation = this.minXRotation;
+			
+	if (newXRotation >= Math.PI * 2)
+	{
+		newXRotation = 0;
+		this.xRotation = 0;
+	}
+	
+	if (newXRotation <= -Math.PI * 2)
+	{
+		newXRotation = 0;
+		this.xRotation = 0;
+	}
 	
 	new TWEEN.Tween(this)
     .to( {
@@ -108,6 +125,24 @@ SB.ModelControllerScript.prototype.rotateX = function(delta)
 SB.ModelControllerScript.prototype.rotateY = function(delta)
 {
 	var newYRotation = this.yRotation - delta;
+	
+	if (newYRotation > this.maxYRotation)
+		newYRotation =  this.maxYRotation;
+	
+	if (newYRotation < this.minYRotation)
+		newYRotation = this.minYRotation;
+	
+	if (newYRotation >= Math.PI * 2)
+	{
+		newYRotation = 0;
+		this.yRotation = 0;
+	}
+	
+	if (newYRotation <= -Math.PI * 2)
+	{
+		newYRotation = 0;
+		this.yRotation = 0;
+	}
 	
 	new TWEEN.Tween(this)
     .to( {
@@ -261,3 +296,5 @@ SB.ModelControllerScript.prototype.onTimeFractionChanged = function(fraction)
 SB.ModelControllerScript.default_radius = 5;
 SB.ModelControllerScript.MAX_X_ROTATION = Math.PI / 12;
 SB.ModelControllerScript.MIN_X_ROTATION = -Math.PI / 4;
+SB.ModelControllerScript.MAX_Y_ROTATION = Math.PI * 2;
+SB.ModelControllerScript.MIN_Y_ROTATION = -Math.PI * 2;
