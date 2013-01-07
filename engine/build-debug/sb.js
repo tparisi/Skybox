@@ -3034,6 +3034,15 @@ SB.Loader.prototype.traverseCallback = function(n, result)
 		
 		result.cameras.push(n);
 	}
+
+	// Look for lights
+	if (n instanceof THREE.Light)
+	{
+		if (!result.lights)
+			result.lights = [];
+		
+		result.lights.push(n);
+	}
 }
 
 SB.Loader.prototype.handleSceneLoaded = function(url, data)
@@ -3391,6 +3400,12 @@ SB.Rotator.prototype.update = function()
     var dx = this.x - this.lastx;
     var dy = this.y - this.lasty;
 
+    if (Math.abs(dx) < 4)
+    	dx = 0;
+    
+    if (Math.abs(dy) < 4)
+    	dy = 0;
+    
     if (this.axis == 'y')
     {
     	this.publish("rotate", this.axis, dx * 0.01);
@@ -5642,23 +5657,42 @@ SB.ModelControllerScript.prototype.realize = function()
 SB.ModelControllerScript.prototype.zoom = function(delta)
 {
 	this.radius += delta;
-	this.updateCamera();
 }
 
 SB.ModelControllerScript.prototype.rotateX = function(delta)
 {
-	this.xRotation -= delta;
-	this.updateCamera();
+	var newXRotation = this.xRotation - delta;
+	
+	if (newXRotation > SB.ModelControllerScript.MAX_X_ROTATION)
+		newXRotation = SB.ModelControllerScript.MAX_X_ROTATION;
+	
+	if (newXRotation < SB.ModelControllerScript.MIN_X_ROTATION)
+		newXRotation = SB.ModelControllerScript.MIN_X_ROTATION;
+	
+	new TWEEN.Tween(this)
+    .to( {
+        xRotation : newXRotation
+    }, 500)
+    .easing(TWEEN.Easing.Quadratic.EaseIn)
+    .easing(TWEEN.Easing.Quadratic.EaseOut).start();	
 }
 
 SB.ModelControllerScript.prototype.rotateY = function(delta)
 {
-	this.yRotation -= delta;
-	this.updateCamera();
+	var newYRotation = this.yRotation - delta;
+	
+	new TWEEN.Tween(this)
+    .to( {
+        yRotation : newYRotation
+    }, 500)
+    .easing(TWEEN.Easing.Quadratic.EaseIn)
+    .easing(TWEEN.Easing.Quadratic.EaseOut).start();	
 }
 
-SB.ModelControllerScript.prototype.updateCamera = function()
+SB.ModelControllerScript.prototype.update = function()
 {
+	TWEEN.update();
+	
 	this.object2camera.set(0, 0, 1);
 	this.combinedRotation.set(this.xRotation, this.yRotation, 0);
 	this.rotationMatrix.setRotationFromEuler(this.combinedRotation);
@@ -5722,14 +5756,14 @@ SB.ModelControllerScript.prototype.onXRotatorRotate = function(axis, delta)
 {
 //	console.log("Rotator delta = ", delta);
 
-	delta *= .222;
+	delta *= 1;
 	
 	if (delta != 0)
 	{
 		this.rotateX(delta);
 		this.lastdy = delta;
 	}
-	else if (this.lastdy)
+	else if (false) // this.lastdy)
 	{
 		this.rotateX(this.lastdy);
 	}
@@ -5739,14 +5773,14 @@ SB.ModelControllerScript.prototype.onYRotatorRotate = function(axis, delta)
 {
 //	console.log("Rotator delta = ", delta);
 
-	delta *= .222;
+	delta *= 1;
 	
 	if (delta != 0)
 	{
 		this.rotateY(delta);
 		this.lastdy = delta;
 	}
-	else if (this.lastdy)
+	else if (false) // this.lastdy)
 	{
 		this.rotateY(this.lastdy);
 	}
@@ -5754,8 +5788,8 @@ SB.ModelControllerScript.prototype.onYRotatorRotate = function(axis, delta)
 
 SB.ModelControllerScript.prototype.onTimeChanged = function(t)
 {
-	var yFraction = .0333;
-	var xFraction = .0333;
+	var yFraction = .333;
+	var xFraction = .333;
 	var yRotateAmount = 0;
 	var xRotateAmount = 0;
 	var handled = false;
@@ -5797,6 +5831,8 @@ SB.ModelControllerScript.prototype.onTimeFractionChanged = function(fraction)
 }
 
 SB.ModelControllerScript.default_radius = 5;
+SB.ModelControllerScript.MAX_X_ROTATION = Math.PI / 12;
+SB.ModelControllerScript.MIN_X_ROTATION = -Math.PI / 4;
 /**
  * @fileoverview A rectangle visual
  * @author Tony Parisi

@@ -53,6 +53,12 @@ SB.Rotator.prototype.update = function()
     var dx = this.x - this.lastx;
     var dy = this.y - this.lasty;
 
+    if (Math.abs(dx) < 4)
+    	dx = 0;
+    
+    if (Math.abs(dy) < 4)
+    	dy = 0;
+    
     if (this.axis == 'y')
     {
     	this.publish("rotate", this.axis, dx * 0.01);

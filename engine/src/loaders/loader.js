@@ -121,6 +121,15 @@ SB.Loader.prototype.traverseCallback = function(n, result)
 		
 		result.cameras.push(n);
 	}
+
+	// Look for lights
+	if (n instanceof THREE.Light)
+	{
+		if (!result.lights)
+			result.lights = [];
+		
+		result.lights.push(n);
+	}
 }
 
 SB.Loader.prototype.handleSceneLoaded = function(url, data)
