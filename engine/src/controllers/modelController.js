@@ -92,6 +92,8 @@ SB.ModelControllerScript.prototype.zoom = function(delta)
 	this.radius += delta;
 }
 
+if (true)
+{
 SB.ModelControllerScript.prototype.rotateX = function(delta)
 {
 	var newXRotation = this.xRotation - delta;
@@ -117,7 +119,7 @@ SB.ModelControllerScript.prototype.rotateX = function(delta)
 	new TWEEN.Tween(this)
     .to( {
         xRotation : newXRotation
-    }, 500)
+    }, 667)
     .easing(TWEEN.Easing.Quadratic.EaseIn)
     .easing(TWEEN.Easing.Quadratic.EaseOut).start();	
 }
@@ -147,7 +149,7 @@ SB.ModelControllerScript.prototype.rotateY = function(delta)
 	new TWEEN.Tween(this)
     .to( {
         yRotation : newYRotation
-    }, 500)
+    }, 667)
     .easing(TWEEN.Easing.Quadratic.EaseIn)
     .easing(TWEEN.Easing.Quadratic.EaseOut).start();	
 }
@@ -166,6 +168,85 @@ SB.ModelControllerScript.prototype.update = function()
 
 	this.viewpoint.transform.position.copy(this.cameraPos);
 	this.viewpoint.transform.rotation.copy(this.combinedRotation);
+}
+}
+
+else {
+SB.ModelControllerScript.prototype.rotateX = function(delta)
+{
+	var newXRotation = this.xRotation - delta;
+	
+	if (newXRotation > this.maxXRotation)
+		newXRotation =  this.maxXRotation;
+	
+	if (newXRotation < this.minXRotation)
+		newXRotation = this.minXRotation;
+			
+	if (newXRotation >= Math.PI * 2)
+	{
+		newXRotation = 0;
+		this.xRotation = 0;
+	}
+	
+	if (newXRotation <= -Math.PI * 2)
+	{
+		newXRotation = 0;
+		this.xRotation = 0;
+	}
+	
+	new TWEEN.Tween(this)
+    .to( {
+        xRotation : newXRotation
+    }, 667)
+    .easing(TWEEN.Easing.Quadratic.EaseIn)
+    .easing(TWEEN.Easing.Quadratic.EaseOut).start();	
+}
+
+SB.ModelControllerScript.prototype.rotateY = function(delta)
+{
+	var newYRotation = this.yRotation - delta;
+	
+	if (newYRotation > this.maxYRotation)
+		newYRotation =  this.maxYRotation;
+	
+	if (newYRotation < this.minYRotation)
+		newYRotation = this.minYRotation;
+	
+	if (newYRotation >= Math.PI * 2)
+	{
+		newYRotation = 0;
+		this.yRotation = 0;
+	}
+	
+	if (newYRotation <= -Math.PI * 2)
+	{
+		newYRotation = 0;
+		this.yRotation = 0;
+	}
+	
+	new TWEEN.Tween(this)
+    .to( {
+        yRotation : newYRotation
+    }, 667)
+    .easing(TWEEN.Easing.Quadratic.EaseIn)
+    .easing(TWEEN.Easing.Quadratic.EaseOut).start();	
+}
+
+SB.ModelControllerScript.prototype.update = function()
+{
+	TWEEN.update();
+	
+	this.object2camera.set(0, 0, 1);
+	this.combinedRotation.set(this.xRotation, this.yRotation, 0);
+	this.rotationMatrix.setRotationFromEuler(this.combinedRotation);
+	this.rotationMatrix.multiplyVector3(this.object2camera);
+	this.object2camera.multiplyScalar(this.radius);
+	
+	this.cameraPos.copy(this.object2camera);
+
+	this.viewpoint.transform.position.copy(this.cameraPos);
+	this.viewpoint.transform.rotation.copy(this.combinedRotation);
+}
 }
 
 SB.ModelControllerScript.prototype.onMouseMove = function(x, y)
@@ -236,7 +317,7 @@ SB.ModelControllerScript.prototype.onYRotatorRotate = function(axis, delta)
 {
 //	console.log("Rotator delta = ", delta);
 
-	delta *= 1;
+	delta *= 2;
 	
 	if (delta != 0)
 	{
