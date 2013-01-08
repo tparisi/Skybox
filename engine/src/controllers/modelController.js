@@ -36,9 +36,8 @@ SB.Prefabs.ModelController = function(param)
 	controller.addChild(viewpoint);
 
 	var intensity = param.headlight ? 1 : 0;
-	var color = param.headlight ? 0xFFFFFF : 0;
 	
-	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	var headlight = new SB.DirectionalLight({ intensity : intensity });
 	controller.addComponent(headlight);
 	
 	return controller;
@@ -79,6 +78,7 @@ SB.ModelControllerScript.prototype.realize = function()
 	this.xRotator = this._entity.getComponents(SB.Rotator)[0];
 	this.yRotator = this._entity.getComponents(SB.Rotator)[1];
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.headlight = this._entity.getComponent(SB.DirectionalLight);
 	this.viewpoint = this._entity.getChild(0);
 	
 	this.viewpoint.transform.position.set(0, 0, this.radius);

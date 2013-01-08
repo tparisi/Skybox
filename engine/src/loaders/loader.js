@@ -147,7 +147,14 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	
 	if (data.animations)
 	{
-		result.keyFrameAnimator = new SB.KeyFrameAnimator({animations:data.animations});
+		result.keyFrameAnimators = [];
+		var i, len = data.animations.length;
+		for (i = 0; i < len; i++)
+		{
+			var animations = [];
+			animations.push(data.animations[i]);
+			result.keyFrameAnimators.push(new SB.KeyFrameAnimator({animations:animations}));
+		}
 	}
 	
 	if (data.skins)

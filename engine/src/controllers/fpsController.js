@@ -36,9 +36,8 @@ SB.Prefabs.FPSController = function(param)
 	controller.addChild(viewpoint);
 
 	var intensity = param.headlight ? 1 : 0;
-	var color = param.headlight ? 0xFFFFFF : 0;
 	
-	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	var headlight = new SB.DirectionalLight({ intensity : intensity });
 	controller.addComponent(headlight);
 	
 	return controller;
@@ -69,6 +68,7 @@ SB.FPSControllerScript.prototype.realize = function()
 	this.dragger = this._entity.getComponent(SB.Dragger);
 	this.rotator = this._entity.getComponent(SB.Rotator);
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.headlight = this._entity.getComponent(SB.DirectionalLight);
 	this.viewpoint = this._entity.getChild(0);
 	
 	SB.Game.instance.mouseDelegate = this;

@@ -3060,7 +3060,14 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	
 	if (data.animations)
 	{
-		result.keyFrameAnimator = new SB.KeyFrameAnimator({animations:data.animations});
+		result.keyFrameAnimators = [];
+		var i, len = data.animations.length;
+		for (i = 0; i < len; i++)
+		{
+			var animations = [];
+			animations.push(data.animations[i]);
+			result.keyFrameAnimators.push(new SB.KeyFrameAnimator({animations:animations}));
+		}
 	}
 	
 	if (data.skins)
@@ -4243,9 +4250,8 @@ SB.Prefabs.WalkthroughController = function(param)
 	controller.addChild(viewpoint);
 
 	var intensity = param.headlight ? 1 : 0;
-	var color = param.headlight ? 0xFFFFFF : 0;
 	
-	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	var headlight = new SB.DirectionalLight({ intensity : intensity });
 	controller.addComponent(headlight);
 	
 	return controller;
@@ -4273,6 +4279,7 @@ SB.WalkthroughControllerScript.prototype.realize = function()
 	this.dragger = this._entity.getComponent(SB.Dragger);
 	this.rotator = this._entity.getComponent(SB.Rotator);
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.headlight = this._entity.getComponent(SB.DirectionalLight);
 	this.viewpoint = this._entity.getChild(0);
 	
 	SB.Game.instance.mouseDelegate = this;
@@ -5338,9 +5345,8 @@ SB.Prefabs.FPSController = function(param)
 	controller.addChild(viewpoint);
 
 	var intensity = param.headlight ? 1 : 0;
-	var color = param.headlight ? 0xFFFFFF : 0;
 	
-	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	var headlight = new SB.DirectionalLight({ intensity : intensity });
 	controller.addComponent(headlight);
 	
 	return controller;
@@ -5371,6 +5377,7 @@ SB.FPSControllerScript.prototype.realize = function()
 	this.dragger = this._entity.getComponent(SB.Dragger);
 	this.rotator = this._entity.getComponent(SB.Rotator);
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.headlight = this._entity.getComponent(SB.DirectionalLight);
 	this.viewpoint = this._entity.getChild(0);
 	
 	SB.Game.instance.mouseDelegate = this;
@@ -5608,9 +5615,8 @@ SB.Prefabs.ModelController = function(param)
 	controller.addChild(viewpoint);
 
 	var intensity = param.headlight ? 1 : 0;
-	var color = param.headlight ? 0xFFFFFF : 0;
 	
-	var headlight = new SB.DirectionalLight({ color : color, intensity : intensity });
+	var headlight = new SB.DirectionalLight({ intensity : intensity });
 	controller.addComponent(headlight);
 	
 	return controller;
@@ -5651,6 +5657,7 @@ SB.ModelControllerScript.prototype.realize = function()
 	this.xRotator = this._entity.getComponents(SB.Rotator)[0];
 	this.yRotator = this._entity.getComponents(SB.Rotator)[1];
 	this.timer = this._entity.getComponent(SB.Timer);
+	this.headlight = this._entity.getComponent(SB.DirectionalLight);
 	this.viewpoint = this._entity.getChild(0);
 	
 	this.viewpoint.transform.position.set(0, 0, this.radius);
