@@ -61,6 +61,8 @@ SB.ModelControllerScript = function(param)
 	this.rotateSpeed = 1;
 
 	this.radius = param.radius || SB.ModelControllerScript.default_radius;
+	this.active = (param.active !== undefined) ? param.active : true;
+	
 	this.xRotation = 0;
 	this.yRotation = 0;
 	
@@ -174,14 +176,27 @@ SB.ModelControllerScript.prototype.update = function()
 else {
 SB.ModelControllerScript.prototype.rotateX = function(delta)
 {
-	var newXRotation = this.xRotation - delta;
+	// Get camera in my model space
+	var cameraPos = this.viewpoint.camera.object.matrixWorld.multiplyVector3(new THREE.Vector3);
 	
+	var mymat = this._entity.transform.object.matrixWorld;
+	var invmat = new THREE.Matrix4().getInverse(mymat);
+
+	cameraPos = invmat.multiplyVector3(cameraPos);
+	
+	this.object2camera.set(0, 0, 0).subSelf(cameraPos).normalize();
+	var orig2v = new THREE.Vector3(0, 0, -1);
+	var xrotation = Math.acos( orig2v.dot(this.object2camera) );
+	
+	var newXRotation = xrotation + delta;
+
+	/*
 	if (newXRotation > this.maxXRotation)
 		newXRotation =  this.maxXRotation;
 	
 	if (newXRotation < this.minXRotation)
 		newXRotation = this.minXRotation;
-			
+	
 	if (newXRotation >= Math.PI * 2)
 	{
 		newXRotation = 0;
@@ -193,6 +208,7 @@ SB.ModelControllerScript.prototype.rotateX = function(delta)
 		newXRotation = 0;
 		this.xRotation = 0;
 	}
+	*/
 	
 	new TWEEN.Tween(this)
     .to( {
@@ -251,24 +267,33 @@ SB.ModelControllerScript.prototype.update = function()
 
 SB.ModelControllerScript.prototype.onMouseMove = function(x, y)
 {
-	this.xRotator.set(x, y);
-	this.yRotator.set(x, y);
+	if (this.active)
+	{
+		this.xRotator.set(x, y);
+		this.yRotator.set(x, y);
+	}
 }
 
 SB.ModelControllerScript.prototype.onMouseDown = function(x, y)
 {
-	this.xRotator.start(x, y);
-	this.yRotator.start(x, y);
-	this.dragging = true;
+	if (this.active)
+	{
+		this.xRotator.start(x, y);
+		this.yRotator.start(x, y);
+		this.dragging = true;
+	}
 }
 
 SB.ModelControllerScript.prototype.onMouseUp = function(x, y)
 {
-	this.xRotator.stop(x, y);
-	this.yRotator.stop(x, y);
-	this.dragging = false;
-	this.lastdx = 0;
-	this.lastdy = 0;
+	if (this.active)
+	{
+		this.xRotator.stop(x, y);
+		this.yRotator.stop(x, y);
+		this.dragging = false;
+		this.lastdx = 0;
+		this.lastdy = 0;
+	}
 }
 
 SB.ModelControllerScript.prototype.onMouseScroll = function(delta)
@@ -375,7 +400,7 @@ SB.ModelControllerScript.prototype.onTimeFractionChanged = function(fraction)
 }
 
 SB.ModelControllerScript.default_radius = 5;
-SB.ModelControllerScript.MAX_X_ROTATION = Math.PI / 12;
-SB.ModelControllerScript.MIN_X_ROTATION = -Math.PI / 4;
+SB.ModelControllerScript.MAX_X_ROTATION = 0; // Math.PI / 12;
+SB.ModelControllerScript.MIN_X_ROTATION = -Math.PI / 2;
 SB.ModelControllerScript.MAX_Y_ROTATION = Math.PI * 2;
 SB.ModelControllerScript.MIN_Y_ROTATION = -Math.PI * 2;

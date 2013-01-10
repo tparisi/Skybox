@@ -151,13 +151,8 @@ SB.GraphicsThreeJS.prototype.addDomHandlers = function()
 	window.addEventListener( 'resize', function(event) { that.onWindowResize(event); }, false );
 }
 
-SB.GraphicsThreeJS.prototype.objectFromMouse = function(pagex, pagey)
+SB.GraphicsThreeJS.prototype.objectFromMouse = function(eltx, elty)
 {
-	var offset = $(this.renderer.domElement).offset();
-	
-	var eltx = pagex - offset.left;
-	var elty = pagey - offset.top;
-	
 	// translate client coords into vp x,y
     var vpx = ( eltx / this.container.offsetWidth ) * 2 - 1;
     var vpy = - ( elty / this.container.offsetHeight ) * 2 + 1;
@@ -213,51 +208,64 @@ SB.GraphicsThreeJS.prototype.findObjectFromIntersected = function(object, point,
 SB.GraphicsThreeJS.prototype.onDocumentMouseMove = function(event)
 {
     event.preventDefault();
-    //console.log("MOUSE Mouse move " + event.pageX + ", " + event.pageY);
     
-    SB.Mouse.instance.onMouseMove(event.pageX, event.pageY);
+	var offset = $(this.renderer.domElement).offset();
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
+	
+    SB.Mouse.instance.onMouseMove(eltx, elty);
     
     if (SB.Picker)
     {
-    	SB.Picker.handleMouseMove(event.pageX, event.pageY);
+    	SB.Picker.handleMouseMove(eltx, elty);
     }
     
-    SB.Game.handleMouseMove(event.pageX, event.pageY);
+    SB.Game.handleMouseMove(event.pageX, event.pageY, eltx, elty);
 }
 
 SB.GraphicsThreeJS.prototype.onDocumentMouseDown = function(event)
 {
     event.preventDefault();
     
-    SB.Mouse.instance.onMouseDown(event.pageX, event.pageY);
+	var offset = $(this.renderer.domElement).offset();
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
+	
+    SB.Mouse.instance.onMouseDown(eltx, elty);
     
     if (SB.Picker)
     {
-    	SB.Picker.handleMouseDown(event.pageX, event.pageY);
+    	SB.Picker.handleMouseDown(eltx, elty);
     }
     
-    SB.Game.handleMouseDown(event.pageX, event.pageY);
+    SB.Game.handleMouseDown(event.pageX, event.pageY, eltx, elty);
 }
 
 SB.GraphicsThreeJS.prototype.onDocumentMouseUp = function(event)
 {
     event.preventDefault();
-    // console.log("Mouse up " + event.pageX + ", " + event.pageY);
+
+    var offset = $(this.renderer.domElement).offset();
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
+	
     
-    SB.Mouse.instance.onMouseUp(event.pageX, event.pageY);
+    SB.Mouse.instance.onMouseUp(eltx, elty);
     
     if (SB.Picker)
     {
-    	SB.Picker.handleMouseUp(event.pageX, event.pageY);
+    	SB.Picker.handleMouseUp(eltx, elty);
     }	            
 
-    SB.Game.handleMouseUp(event.pageX, event.pageY);
+    SB.Game.handleMouseUp(event.pageX, event.pageY, eltx, elty);
 }
 
 SB.GraphicsThreeJS.prototype.onDocumentMouseScroll = function(event, delta)
 {
     event.preventDefault();
-    // console.log("Mouse wheel " + delta);
     
     SB.Mouse.instance.onMouseScroll(delta);
 

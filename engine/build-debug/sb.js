@@ -2014,13 +2014,8 @@ SB.GraphicsThreeJS.prototype.addDomHandlers = function()
 	window.addEventListener( 'resize', function(event) { that.onWindowResize(event); }, false );
 }
 
-SB.GraphicsThreeJS.prototype.objectFromMouse = function(pagex, pagey)
+SB.GraphicsThreeJS.prototype.objectFromMouse = function(eltx, elty)
 {
-	var offset = $(this.renderer.domElement).offset();
-	
-	var eltx = pagex - offset.left;
-	var elty = pagey - offset.top;
-	
 	// translate client coords into vp x,y
     var vpx = ( eltx / this.container.offsetWidth ) * 2 - 1;
     var vpy = - ( elty / this.container.offsetHeight ) * 2 + 1;
@@ -2076,51 +2071,64 @@ SB.GraphicsThreeJS.prototype.findObjectFromIntersected = function(object, point,
 SB.GraphicsThreeJS.prototype.onDocumentMouseMove = function(event)
 {
     event.preventDefault();
-    //console.log("MOUSE Mouse move " + event.pageX + ", " + event.pageY);
     
-    SB.Mouse.instance.onMouseMove(event.pageX, event.pageY);
+	var offset = $(this.renderer.domElement).offset();
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
+	
+    SB.Mouse.instance.onMouseMove(eltx, elty);
     
     if (SB.Picker)
     {
-    	SB.Picker.handleMouseMove(event.pageX, event.pageY);
+    	SB.Picker.handleMouseMove(eltx, elty);
     }
     
-    SB.Game.handleMouseMove(event.pageX, event.pageY);
+    SB.Game.handleMouseMove(event.pageX, event.pageY, eltx, elty);
 }
 
 SB.GraphicsThreeJS.prototype.onDocumentMouseDown = function(event)
 {
     event.preventDefault();
     
-    SB.Mouse.instance.onMouseDown(event.pageX, event.pageY);
+	var offset = $(this.renderer.domElement).offset();
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
+	
+    SB.Mouse.instance.onMouseDown(eltx, elty);
     
     if (SB.Picker)
     {
-    	SB.Picker.handleMouseDown(event.pageX, event.pageY);
+    	SB.Picker.handleMouseDown(eltx, elty);
     }
     
-    SB.Game.handleMouseDown(event.pageX, event.pageY);
+    SB.Game.handleMouseDown(event.pageX, event.pageY, eltx, elty);
 }
 
 SB.GraphicsThreeJS.prototype.onDocumentMouseUp = function(event)
 {
     event.preventDefault();
-    // console.log("Mouse up " + event.pageX + ", " + event.pageY);
+
+    var offset = $(this.renderer.domElement).offset();
+	
+	var eltx = event.pageX - offset.left;
+	var elty = event.pageY - offset.top;
+	
     
-    SB.Mouse.instance.onMouseUp(event.pageX, event.pageY);
+    SB.Mouse.instance.onMouseUp(eltx, elty);
     
     if (SB.Picker)
     {
-    	SB.Picker.handleMouseUp(event.pageX, event.pageY);
+    	SB.Picker.handleMouseUp(eltx, elty);
     }	            
 
-    SB.Game.handleMouseUp(event.pageX, event.pageY);
+    SB.Game.handleMouseUp(event.pageX, event.pageY, eltx, elty);
 }
 
 SB.GraphicsThreeJS.prototype.onDocumentMouseScroll = function(event, delta)
 {
     event.preventDefault();
-    // console.log("Mouse wheel " + delta);
     
     SB.Mouse.instance.onMouseScroll(delta);
 
@@ -5640,6 +5648,8 @@ SB.ModelControllerScript = function(param)
 	this.rotateSpeed = 1;
 
 	this.radius = param.radius || SB.ModelControllerScript.default_radius;
+	this.active = (param.active !== undefined) ? param.active : true;
+	
 	this.xRotation = 0;
 	this.yRotation = 0;
 	
@@ -5753,14 +5763,27 @@ SB.ModelControllerScript.prototype.update = function()
 else {
 SB.ModelControllerScript.prototype.rotateX = function(delta)
 {
-	var newXRotation = this.xRotation - delta;
+	// Get camera in my model space
+	var cameraPos = this.viewpoint.camera.object.matrixWorld.multiplyVector3(new THREE.Vector3);
 	
+	var mymat = this._entity.transform.object.matrixWorld;
+	var invmat = new THREE.Matrix4().getInverse(mymat);
+
+	cameraPos = invmat.multiplyVector3(cameraPos);
+	
+	this.object2camera.set(0, 0, 0).subSelf(cameraPos).normalize();
+	var orig2v = new THREE.Vector3(0, 0, -1);
+	var xrotation = Math.acos( orig2v.dot(this.object2camera) );
+	
+	var newXRotation = xrotation + delta;
+
+	/*
 	if (newXRotation > this.maxXRotation)
 		newXRotation =  this.maxXRotation;
 	
 	if (newXRotation < this.minXRotation)
 		newXRotation = this.minXRotation;
-			
+	
 	if (newXRotation >= Math.PI * 2)
 	{
 		newXRotation = 0;
@@ -5772,6 +5795,7 @@ SB.ModelControllerScript.prototype.rotateX = function(delta)
 		newXRotation = 0;
 		this.xRotation = 0;
 	}
+	*/
 	
 	new TWEEN.Tween(this)
     .to( {
@@ -5830,24 +5854,33 @@ SB.ModelControllerScript.prototype.update = function()
 
 SB.ModelControllerScript.prototype.onMouseMove = function(x, y)
 {
-	this.xRotator.set(x, y);
-	this.yRotator.set(x, y);
+	if (this.active)
+	{
+		this.xRotator.set(x, y);
+		this.yRotator.set(x, y);
+	}
 }
 
 SB.ModelControllerScript.prototype.onMouseDown = function(x, y)
 {
-	this.xRotator.start(x, y);
-	this.yRotator.start(x, y);
-	this.dragging = true;
+	if (this.active)
+	{
+		this.xRotator.start(x, y);
+		this.yRotator.start(x, y);
+		this.dragging = true;
+	}
 }
 
 SB.ModelControllerScript.prototype.onMouseUp = function(x, y)
 {
-	this.xRotator.stop(x, y);
-	this.yRotator.stop(x, y);
-	this.dragging = false;
-	this.lastdx = 0;
-	this.lastdy = 0;
+	if (this.active)
+	{
+		this.xRotator.stop(x, y);
+		this.yRotator.stop(x, y);
+		this.dragging = false;
+		this.lastdx = 0;
+		this.lastdy = 0;
+	}
 }
 
 SB.ModelControllerScript.prototype.onMouseScroll = function(delta)
@@ -5954,8 +5987,8 @@ SB.ModelControllerScript.prototype.onTimeFractionChanged = function(fraction)
 }
 
 SB.ModelControllerScript.default_radius = 5;
-SB.ModelControllerScript.MAX_X_ROTATION = Math.PI / 12;
-SB.ModelControllerScript.MIN_X_ROTATION = -Math.PI / 4;
+SB.ModelControllerScript.MAX_X_ROTATION = 0; // Math.PI / 12;
+SB.ModelControllerScript.MIN_X_ROTATION = -Math.PI / 2;
 SB.ModelControllerScript.MAX_Y_ROTATION = Math.PI * 2;
 SB.ModelControllerScript.MIN_Y_ROTATION = -Math.PI * 2;
 /**
