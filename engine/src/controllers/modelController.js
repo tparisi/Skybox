@@ -88,14 +88,6 @@ SB.ModelControllerScript.prototype.createControls = function()
 	this.controls = new THREE.OrbitControls(this.camera.object, SB.Graphics.instance.container);
 }
 
-SB.ModelControllerScript.prototype.zoom = function(delta)
-{
-	this.radius += delta;
-	if (this.radius < this.minRadius)
-		this.radius = this.minRadius;
-	
-}
-
 SB.ModelControllerScript.prototype.update = function()
 {
 	if (!this.controls)
@@ -103,6 +95,9 @@ SB.ModelControllerScript.prototype.update = function()
 		this.createControls();
 		this.controls.enabled = this.enabled;
 	}
+	
+	this.camera.object.position = this.camera.position;
+	this.camera.object.rotation = this.camera.rotation;
 	
 	this.controls.update();
 	this.camera.position = this.camera.object.position;
