@@ -53,6 +53,7 @@ SB.Examples.ModelViewer.prototype.initialize = function(param)
     // This tracks cylinder movement relative to carousel
 	var controllerScript = controller.getComponent(SB.ModelControllerScript);
 	var camera = controllerScript.viewpoint.getComponent(SB.Camera);
+	controllerScript.minY = 0;
 	
 	this.root = root;
 }

@@ -15,6 +15,7 @@ goog.require('SB.PerspectiveCamera');
 goog.require('SB.WalkthroughControllerScript');
 goog.require('SB.FPSControllerScript');
 goog.require('SB.ModelControllerScript');
+goog.require('SB.OrbitControls');
 goog.require('SB.Component');
 goog.require('SB.Entity');
 goog.require('SB.FSM');

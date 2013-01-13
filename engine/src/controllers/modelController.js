@@ -85,7 +85,7 @@ SB.ModelControllerScript.prototype.createControls = function()
 	this.camera.object.position = this.camera.position;
 	this.camera.object.rotation = this.camera.rotation;
 	
-	this.controls = new THREE.OrbitControls(this.camera.object, SB.Graphics.instance.container);
+	this.controls = new SB.OrbitControls(this.camera.object, SB.Graphics.instance.container);
 }
 
 SB.ModelControllerScript.prototype.update = function()
@@ -94,6 +94,7 @@ SB.ModelControllerScript.prototype.update = function()
 	{
 		this.createControls();
 		this.controls.enabled = this.enabled;
+		this.controls.userMinY = this.minY;
 	}
 	
 	this.camera.object.position = this.camera.position;
@@ -131,7 +132,6 @@ SB.ModelControllerScript.prototype.onMouseUp = function(x, y)
 
 SB.ModelControllerScript.prototype.onMouseScroll = function(delta)
 {
-	this.zoom(-delta);
 }
 
 SB.ModelControllerScript.prototype.onKeyDown = function(keyCode, charCode)
