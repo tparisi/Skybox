@@ -5667,25 +5667,12 @@ SB.ModelControllerScript.prototype.realize = function()
 	SB.Game.instance.keyboardDelegate = this;
 }
 
-SB.ModelControllerScript.prototype.bindCamera = function(camera)
-{
-	this.camera.object = camera;
-	this.camera.position = camera.position;
-	this.camera.rotation = camera.rotation;
-	
-	SB.Graphics.instance.camera = camera;	
-
-	this.controls.object = camera;
-}
-
 SB.ModelControllerScript.prototype.createControls = function()
 {
 	this.camera.object.position = this.camera.position;
 	this.camera.object.rotation = this.camera.rotation;
 	
 	this.controls = new SB.OrbitControls(this.camera.object, SB.Graphics.instance.container);
-	this.controls.enabled = this.enabled;
-	this.controls.userMinY = this.minY;
 }
 
 SB.ModelControllerScript.prototype.update = function()
@@ -5693,6 +5680,8 @@ SB.ModelControllerScript.prototype.update = function()
 	if (!this.controls)
 	{
 		this.createControls();
+		this.controls.enabled = this.enabled;
+		this.controls.userMinY = this.minY;
 	}
 	
 	this.camera.object.position = this.camera.position;
@@ -7100,11 +7089,9 @@ SB.OrbitControls = function ( object, domElement ) {
 
 	this.update = function () {
 
-//		var position = this.object.position;
-		var worldPosition = this.object.position.clone();
-		this.object.matrixWorld.multiplyVector3(worldPosition);
-		var offset = worldPosition.clone().subSelf(this.center);
-		
+		var position = this.object.position;
+		var offset = position.clone().subSelf( this.center )
+
 		// angle from z-axis around y-axis
 
 		var theta = Math.atan2( offset.x, offset.z );
@@ -7137,15 +7124,9 @@ SB.OrbitControls = function ( object, domElement ) {
 		newposition.copy( this.center ).addSelf( offset );
 		if (this.userMinY === undefined || newposition.y >= this.userMinY)
 		{
-			var position = worldPosition.copy( this.center ).addSelf( offset ).clone();
-			
-			var invmat = new THREE.Matrix4();
-			invmat.getInverse(this.object.matrixWorld);
-			invmat.multiplyVector3(position);
-			
-			this.object.position.copy(position);
+			position.copy( this.center ).addSelf( offset );
 		}
-
+		
 		this.object.lookAt( this.center );
 
 		thetaDelta = 0;
