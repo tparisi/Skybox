@@ -76,6 +76,7 @@ SB.KeyFrameAnimator.prototype.start = function()
 		for (i = 0; i < len; i++)
 		{
 			this.animations[i].play(this.loop, 0);
+			this.endTime = this.startTime + this.animations[i].endTime / this.animations[i].timeScale;
 		}
 	}
 }
@@ -138,12 +139,21 @@ SB.KeyFrameAnimator.prototype.updateAnimations = function()
 {
 	var now = Date.now();
 	var deltat = now - this.lastTime;
+	var complete = false;
+	
 	var i, len = this.animations.length;
 	for (i = 0; i < len; i++)
 	{
 		this.animations[i].update(deltat);
+		if (now >= this.endTime)
+			complete = true;
 	}
 	this.lastTime = now;	
+	
+	if (complete)
+	{
+		this.stop();
+	}
 }
 
 // Statics
