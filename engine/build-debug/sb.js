@@ -2068,6 +2068,49 @@ SB.GraphicsThreeJS.prototype.findObjectFromIntersected = function(object, point,
 	}
 }
 
+SB.GraphicsThreeJS.prototype.nodeFromMouse = function(eltx, elty)
+{
+	// Blerg, this is to support code outside the SB components & picker framework
+	// Returns a raw Three.js node
+	
+	// translate client coords into vp x,y
+    var vpx = ( eltx / this.container.offsetWidth ) * 2 - 1;
+    var vpy = - ( elty / this.container.offsetHeight ) * 2 + 1;
+    
+    var vector = new THREE.Vector3( vpx, vpy, 0.5 );
+
+    this.projector.unprojectVector( vector, this.camera );
+	
+    var pos = new THREE.Vector3;
+    pos = this.camera.matrixWorld.multiplyVector3(pos);
+    var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
+
+    var intersects = ray.intersectObject( this.scene, true );
+	
+    if ( intersects.length > 0 ) {
+    	var i = 0;
+    	while(!intersects[i].object.visible)
+    	{
+    		i++;
+    	}
+    	
+    	var intersected = intersects[i];
+    	if (intersected)
+    	{
+    		return { node : intersected.object, 
+    				 point : intersected.point, 
+    				 normal : intersected.face.normal
+    				}
+    	}
+    	else
+    		return null;
+    }
+    else
+    {
+    	return null;
+    }
+}
+
 SB.GraphicsThreeJS.prototype.onDocumentMouseMove = function(event)
 {
     event.preventDefault();
@@ -2506,16 +2549,16 @@ SB.Game.instance = null;
 SB.Game.curEntityID = 0;
 SB.Game.minFrameTime = 16;
 	    	
-SB.Game.handleMouseMove = function(x, y)
+SB.Game.handleMouseMove = function(pageX, pageY, eltX, eltY)
 {
     if (SB.Picker.clickedObject)
     	return;
     
     if (SB.Game.instance.onMouseMove)
-    	SB.Game.instance.onMouseMove(x, y);	            	
+    	SB.Game.instance.onMouseMove(pageX, pageY, eltX, eltY);	            	
 }
 
-SB.Game.handleMouseDown = function(x, y)
+SB.Game.handleMouseDown = function(pageX, pageY, eltX, eltY)
 {
     // N.B.: ahh, the bullshit continues...
     if (SB.Game.instance.tabstop)
@@ -2527,16 +2570,16 @@ SB.Game.handleMouseDown = function(x, y)
     	return;
     
     if (SB.Game.instance.onMouseDown)
-    	SB.Game.instance.onMouseDown(x, y);	            	
+    	SB.Game.instance.onMouseDown(pageX, pageY, eltX, eltY);	            	
 }
 
-SB.Game.handleMouseUp = function(x, y)
+SB.Game.handleMouseUp = function(pageX, pageY, eltX, eltY)
 {
     if (SB.Picker.clickedObject)
     	return;
     
     if (SB.Game.instance.onMouseUp)
-    	SB.Game.instance.onMouseUp(x, y);	            	
+    	SB.Game.instance.onMouseUp(pageX, pageY, eltX, eltY);	            	
 }
 
 SB.Game.handleMouseScroll = function(delta)

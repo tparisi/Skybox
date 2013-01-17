@@ -193,16 +193,16 @@ SB.Game.instance = null;
 SB.Game.curEntityID = 0;
 SB.Game.minFrameTime = 16;
 	    	
-SB.Game.handleMouseMove = function(x, y)
+SB.Game.handleMouseMove = function(pageX, pageY, eltX, eltY)
 {
     if (SB.Picker.clickedObject)
     	return;
     
     if (SB.Game.instance.onMouseMove)
-    	SB.Game.instance.onMouseMove(x, y);	            	
+    	SB.Game.instance.onMouseMove(pageX, pageY, eltX, eltY);	            	
 }
 
-SB.Game.handleMouseDown = function(x, y)
+SB.Game.handleMouseDown = function(pageX, pageY, eltX, eltY)
 {
     // N.B.: ahh, the bullshit continues...
     if (SB.Game.instance.tabstop)
@@ -214,16 +214,16 @@ SB.Game.handleMouseDown = function(x, y)
     	return;
     
     if (SB.Game.instance.onMouseDown)
-    	SB.Game.instance.onMouseDown(x, y);	            	
+    	SB.Game.instance.onMouseDown(pageX, pageY, eltX, eltY);	            	
 }
 
-SB.Game.handleMouseUp = function(x, y)
+SB.Game.handleMouseUp = function(pageX, pageY, eltX, eltY)
 {
     if (SB.Picker.clickedObject)
     	return;
     
     if (SB.Game.instance.onMouseUp)
-    	SB.Game.instance.onMouseUp(x, y);	            	
+    	SB.Game.instance.onMouseUp(pageX, pageY, eltX, eltY);	            	
 }
 
 SB.Game.handleMouseScroll = function(delta)

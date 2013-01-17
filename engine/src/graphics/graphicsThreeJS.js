@@ -205,6 +205,49 @@ SB.GraphicsThreeJS.prototype.findObjectFromIntersected = function(object, point,
 	}
 }
 
+SB.GraphicsThreeJS.prototype.nodeFromMouse = function(eltx, elty)
+{
+	// Blerg, this is to support code outside the SB components & picker framework
+	// Returns a raw Three.js node
+	
+	// translate client coords into vp x,y
+    var vpx = ( eltx / this.container.offsetWidth ) * 2 - 1;
+    var vpy = - ( elty / this.container.offsetHeight ) * 2 + 1;
+    
+    var vector = new THREE.Vector3( vpx, vpy, 0.5 );
+
+    this.projector.unprojectVector( vector, this.camera );
+	
+    var pos = new THREE.Vector3;
+    pos = this.camera.matrixWorld.multiplyVector3(pos);
+    var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
+
+    var intersects = ray.intersectObject( this.scene, true );
+	
+    if ( intersects.length > 0 ) {
+    	var i = 0;
+    	while(!intersects[i].object.visible)
+    	{
+    		i++;
+    	}
+    	
+    	var intersected = intersects[i];
+    	if (intersected)
+    	{
+    		return { node : intersected.object, 
+    				 point : intersected.point, 
+    				 normal : intersected.face.normal
+    				}
+    	}
+    	else
+    		return null;
+    }
+    else
+    {
+    	return null;
+    }
+}
+
 SB.GraphicsThreeJS.prototype.onDocumentMouseMove = function(event)
 {
     event.preventDefault();
