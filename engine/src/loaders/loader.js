@@ -105,9 +105,14 @@ SB.Loader.prototype.loadScene = function(url)
 		var loader = new loaderClass;
 		var that = this;
 		
-		loader.load(url, function (data) {
-			that.handleSceneLoaded(url, data);
-		});		
+		loader.load(url, 
+				function (data) {
+					that.handleSceneLoaded(url, data);
+				},
+				function (data) {
+					that.handleSceneProgress(url, data);
+				}
+		);		
 	}
 }
 
@@ -165,5 +170,10 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	
 	if (success)
 		this.publish("loaded", result);
+}
+
+SB.Loader.prototype.handleSceneProgress = function(url, progress)
+{
+	this.publish("progress", progress);
 }
 
