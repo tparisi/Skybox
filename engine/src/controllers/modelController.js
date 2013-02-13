@@ -95,6 +95,8 @@ SB.ModelControllerScript.prototype.update = function()
 		this.createControls();
 		this.controls.enabled = this.enabled;
 		this.controls.userMinY = this.minY;
+		this.controls.userMinZoom = this.minZoom;
+		this.controls.userMaxZoom = this.maxZoom;
 	}
 	
 	this.camera.object.position = this.camera.position;

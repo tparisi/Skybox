@@ -5735,6 +5735,8 @@ SB.ModelControllerScript.prototype.update = function()
 		this.createControls();
 		this.controls.enabled = this.enabled;
 		this.controls.userMinY = this.minY;
+		this.controls.userMinZoom = this.minZoom;
+		this.controls.userMaxZoom = this.maxZoom;
 	}
 	
 	this.camera.object.position = this.camera.position;
@@ -7177,7 +7179,16 @@ SB.OrbitControls = function ( object, domElement ) {
 		newposition.copy( this.center ).addSelf( offset );
 		if (this.userMinY === undefined || newposition.y >= this.userMinY)
 		{
-			position.copy( this.center ).addSelf( offset );
+			var center2newpos = newposition.clone().subSelf(this.center);
+			var dist = center2newpos.length();
+			
+			if (this.userMinZoom === undefined || dist >= this.userMinZoom)
+			{
+				if (this.userMaxZoom === undefined || dist <= this.userMaxZoom)
+				{
+					position.copy( this.center ).addSelf( offset );
+				}
+			}
 		}
 		
 		this.object.lookAt( this.center );
