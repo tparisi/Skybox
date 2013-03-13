@@ -285,7 +285,15 @@ SB.OrbitControls = function ( object, domElement ) {
 
 		if ( ! scope.userZoom ) return;
 
-		if ( event.wheelDelta > 0 ) {
+		event.preventDefault();
+
+		// WebKit: wheelDeltaY; Moz: -deltaY
+		var wheelDelta = (event.wheelDeltaY !== undefined) ? event.wheelDeltaY : -event.deltaY;
+		
+		// Gecko - old, use event.detail
+		if ( event.detail ) { wheelDelta = -event.detail/3; }
+
+		if ( wheelDelta > 0 ) {
 
 			scope.zoomOut();
 
@@ -300,5 +308,7 @@ SB.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+	this.domElement.addEventListener( 'wheel', onMouseWheel, false );
+	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false );
 
 };
