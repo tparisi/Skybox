@@ -381,6 +381,11 @@ SB.GraphicsThreeJS.prototype.update = function()
     {
     	this.stats.update();
     }
+    
+    if (TWEEN !== undefined)
+    {
+    	TWEEN.update();
+    }
 }
 
 SB.GraphicsThreeJS.prototype.enableShadows = function(enable)
