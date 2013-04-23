@@ -191,7 +191,7 @@ SB.Game.prototype.onKeyPress = function(keyCode, charCode)
 
 SB.Game.instance = null;
 SB.Game.curEntityID = 0;
-SB.Game.minFrameTime = 16;
+SB.Game.minFrameTime = 1;
 	    	
 SB.Game.handleMouseMove = function(pageX, pageY, eltX, eltY)
 {

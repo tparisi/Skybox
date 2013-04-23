@@ -33,5 +33,10 @@ SB.EventService.prototype.terminate = function() {};
  */
 SB.EventService.prototype.update = function()
 {
-	SB.Game.instance.updateEntities();
+	do
+	{
+		SB.EventService.eventsPending = false;
+		SB.Game.instance.updateEntities();
+	}
+	while (SB.EventService.eventsPending);
 }

@@ -1663,17 +1663,92 @@ SB.Input = function()
 goog.inherits(SB.Input, SB.Service);
 
 SB.Input.instance = null;/**
+ *
+ */
+goog.require('SB.Service');
+goog.provide('SB.EventService');
+
+/**
+ * The EventService.
+ *
+ * @extends {SB.Service}
+ */
+SB.EventService = function() {};
+
+goog.inherits(SB.EventService, SB.Service);
+
+//---------------------------------------------------------------------
+// Initialization/Termination
+//---------------------------------------------------------------------
+
+/**
+ * Initializes the events system.
+ */
+SB.EventService.prototype.initialize = function(param) {};
+
+/**
+ * Terminates the events world.
+ */
+SB.EventService.prototype.terminate = function() {};
+
+
+/**
+ * Updates the EventService.
+ */
+SB.EventService.prototype.update = function()
+{
+	do
+	{
+		SB.EventService.eventsPending = false;
+		SB.Game.instance.updateEntities();
+	}
+	while (SB.EventService.eventsPending);
+}/**
+ * @fileoverview Main interface to the graphics and rendering subsystem
+ * 
+ * @author Tony Parisi
+ */
+goog.provide('SB.Time');
+
+SB.Time = function()
+{
+	// Freak out if somebody tries to make 2
+    if (SB.Time.instance)
+    {
+        throw new Error('Graphics singleton already exists')
+    }
+}
+
+
+SB.Time.prototype.initialize = function(param)
+{
+	this.currentTime = Date.now();
+
+	SB.Time.instance = this;
+}
+
+SB.Time.prototype.update = function()
+{
+	this.currentTime = Date.now();
+}
+
+SB.Time.instance = null;
+	        
+/**
  * @fileoverview PubSub is the base class for any object that sends/receives messages
  * 
  * @author Tony Parisi
  */
 goog.provide('SB.PubSub');
+goog.require('SB.EventService');
+goog.require('SB.Time');
 
 /**
  * @constructor
  */
 SB.PubSub = function() {
     this.messageTypes = {};
+    this.timestamps = {};
     this.messageQueue = [];
     this.post = SB.PubSub.postMessages;
 }
@@ -1691,6 +1766,7 @@ SB.PubSub.prototype.subscribe = function(message, subscriber, callback) {
     {
         subscribers = [];
         this.messageTypes[message] = subscribers;
+        this.timestamps[message] = 0;
     }
 
     subscribers.push({ subscriber : subscriber, callback : callback });
@@ -1721,27 +1797,35 @@ SB.PubSub.prototype.publish = function(message) {
 
     if (subscribers)
     {
-        for (var i = 0; i < subscribers.length; i++)
-        {
-            if (this.post)
-            {
-                var args = [subscribers[i].callback];
-                for (var j = 0; j < arguments.length - 1; j++)
-                {
-                    args.push(arguments[j + 1]);
-                }
-                subscribers[i].subscriber.postMessage.apply(subscribers[i].subscriber, args);
-            }
-            else
-            {
-                var args = [];
-                for (var j = 0; j < arguments.length - 1; j++)
-                {
-                    args.push(arguments[j + 1]);
-                }
-                subscribers[i].callback.apply(subscribers[i].subscriber, args);
-            }
-        }
+    	var now = SB.Time.instance.currentTime;
+    	
+    	if (this.timestamps[message] < now)
+    	{
+    		this.timestamps[message] = now;
+	    	SB.EventService.eventsPending = true;
+	    	
+	    	for (var i = 0; i < subscribers.length; i++)
+	        {
+	            if (this.post)
+	            {
+	                var args = [subscribers[i].callback];
+	                for (var j = 0; j < arguments.length - 1; j++)
+	                {
+	                    args.push(arguments[j + 1]);
+	                }
+	                subscribers[i].subscriber.postMessage.apply(subscribers[i].subscriber, args);
+	            }
+	            else
+	            {
+	                var args = [];
+	                for (var j = 0; j < arguments.length - 1; j++)
+	                {
+	                    args.push(arguments[j + 1]);
+	                }
+	                subscribers[i].callback.apply(subscribers[i].subscriber, args);
+	            }
+	        }
+    	}
     }
 }
 
@@ -1796,37 +1880,6 @@ SB.PubSub.prototype.peekMessage = function() {
 }
 
 SB.PubSub.postMessages = false;
-/**
- * @fileoverview Main interface to the graphics and rendering subsystem
- * 
- * @author Tony Parisi
- */
-goog.provide('SB.Time');
-
-SB.Time = function()
-{
-	// Freak out if somebody tries to make 2
-    if (SB.Time.instance)
-    {
-        throw new Error('Graphics singleton already exists')
-    }
-}
-
-
-SB.Time.prototype.initialize = function(param)
-{
-	this.currentTime = Date.now();
-
-	SB.Time.instance = this;
-}
-
-SB.Time.prototype.update = function()
-{
-	this.currentTime = Date.now();
-}
-
-SB.Time.instance = null;
-	        
 /**
  * @fileoverview Contains configuration options for the Skybox Engine.
  * @author Tony Parisi
@@ -2274,43 +2327,7 @@ SB.GraphicsThreeJS.prototype.enableShadows = function(enable)
 }
 
 SB.GraphicsThreeJS.default_display_stats = false,
-/**
- *
- */
-goog.require('SB.Service');
-goog.provide('SB.EventService');
 
-/**
- * The EventService.
- *
- * @extends {SB.Service}
- */
-SB.EventService = function() {};
-
-goog.inherits(SB.EventService, SB.Service);
-
-//---------------------------------------------------------------------
-// Initialization/Termination
-//---------------------------------------------------------------------
-
-/**
- * Initializes the events system.
- */
-SB.EventService.prototype.initialize = function(param) {};
-
-/**
- * Terminates the events world.
- */
-SB.EventService.prototype.terminate = function() {};
-
-
-/**
- * Updates the EventService.
- */
-SB.EventService.prototype.update = function()
-{
-	SB.Game.instance.updateEntities();
-}
 /**
  * @fileoverview Service locator for various game services.
  */
@@ -2567,7 +2584,7 @@ SB.Game.prototype.onKeyPress = function(keyCode, charCode)
 
 SB.Game.instance = null;
 SB.Game.curEntityID = 0;
-SB.Game.minFrameTime = 16;
+SB.Game.minFrameTime = 1;
 	    	
 SB.Game.handleMouseMove = function(pageX, pageY, eltX, eltY)
 {
