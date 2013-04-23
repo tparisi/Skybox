@@ -1944,6 +1944,16 @@ SB.GraphicsThreeJS.prototype.initScene = function()
     
     this.scene = scene;
 	this.camera = camera;
+	
+	this.backgroundLayer = {};
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera( 45, 
+    		this.container.offsetWidth / this.container.offsetHeight, 1, 4000 );
+    camera.position.set( 0, 0, 10 );	
+    scene.add(camera);
+    
+    this.backgroundLayer.scene = scene;
+    this.backgroundLayer.camera = camera;
 }
 
 SB.GraphicsThreeJS.prototype.initRenderer = function(param)
@@ -2232,6 +2242,11 @@ SB.GraphicsThreeJS.prototype.setCursor = function(cursor)
 
 SB.GraphicsThreeJS.prototype.update = function()
 {
+    this.renderer.setClearColor( 0, 0 );
+	this.renderer.autoClearColor = true;
+    this.renderer.render( this.backgroundLayer.scene, this.backgroundLayer.camera );
+    this.renderer.setClearColor( 0, 1 );
+	this.renderer.autoClearColor = false;
     this.renderer.render( this.scene, this.camera );
 
     var frameTime = Date.now();
@@ -2849,6 +2864,8 @@ goog.require('SB.Component');
  */
 SB.SceneComponent = function(param)
 {	
+	param = param || {};
+
 	SB.Component.call(this, param);
     
     this.object = null;
@@ -2856,6 +2873,7 @@ SB.SceneComponent = function(param)
     this.rotation = this.param.rotation || new THREE.Vector3();
     this.scale = this.param.scale || new THREE.Vector3(1, 1, 1);
     this.autoUpdateTransform = true;
+    this.layer = param.layer;
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
@@ -2893,9 +2911,10 @@ SB.SceneComponent.prototype.update = function()
 }
 
 SB.SceneComponent.prototype.addToScene = function() {
+	var scene = this.layer ? this.layer.scene : SB.Graphics.instance.scene;
 	if (this._entity)
 	{
-		var parent = this._entity.transform ? this._entity.transform.object : SB.Graphics.instance.scene;
+		var parent = this._entity.transform ? this._entity.transform.object : scene;
 		if (parent)
 		{
 		    parent.add(this.object);
@@ -2913,9 +2932,10 @@ SB.SceneComponent.prototype.addToScene = function() {
 }
 
 SB.SceneComponent.prototype.removeFromScene = function() {
+	var scene = this.layer ? this.layer.scene : SB.Graphics.instance.scene;
 	if (this._entity)
 	{
-		var parent = this._entity.transform ? this._entity.transform.object : SB.Graphics.instance.scene;
+		var parent = this._entity.transform ? this._entity.transform.object : scene;
 		if (parent)
 		{
 			this.object.data = null;
@@ -4163,6 +4183,8 @@ goog.require('SB.Component');
 
 SB.Transform = function(param)
 {
+	param = param || {};
+	
     SB.Component.call(this);
     
     this.position = new THREE.Vector3();
@@ -4170,6 +4192,7 @@ SB.Transform = function(param)
     this.scale = new THREE.Vector3(1, 1, 1);
     this.orientation = new THREE.Quaternion;
     this.useQuaternion = false;
+    this.layer = param.layer;
 } ;
 
 goog.inherits(SB.Transform, SB.Component);
@@ -4201,9 +4224,10 @@ SB.Transform.prototype.update = function()
 }
 
 SB.Transform.prototype.addToScene = function() {
+	var scene = this.layer ? this.layer.scene : SB.Graphics.instance.scene;
 	if (this._entity)
 	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : scene;
 		if (parent)
 		{
 		    parent.add(this.object);
@@ -4221,9 +4245,10 @@ SB.Transform.prototype.addToScene = function() {
 }
 
 SB.Transform.prototype.removeFromScene = function() {
+	var scene = this.layer ? this.layer.scene : SB.Graphics.instance.scene;
 	if (this._entity)
 	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : scene;
 		if (parent)
 		{
 			this.object.data = null;

@@ -6,6 +6,8 @@ goog.require('SB.Component');
 
 SB.Transform = function(param)
 {
+	param = param || {};
+	
     SB.Component.call(this);
     
     this.position = new THREE.Vector3();
@@ -13,6 +15,7 @@ SB.Transform = function(param)
     this.scale = new THREE.Vector3(1, 1, 1);
     this.orientation = new THREE.Quaternion;
     this.useQuaternion = false;
+    this.layer = param.layer;
 } ;
 
 goog.inherits(SB.Transform, SB.Component);
@@ -44,9 +47,10 @@ SB.Transform.prototype.update = function()
 }
 
 SB.Transform.prototype.addToScene = function() {
+	var scene = this.layer ? this.layer.scene : SB.Graphics.instance.scene;
 	if (this._entity)
 	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : scene;
 		if (parent)
 		{
 		    parent.add(this.object);
@@ -64,9 +68,10 @@ SB.Transform.prototype.addToScene = function() {
 }
 
 SB.Transform.prototype.removeFromScene = function() {
+	var scene = this.layer ? this.layer.scene : SB.Graphics.instance.scene;
 	if (this._entity)
 	{
-		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : SB.Graphics.instance.scene;
+		var parent = (this._entity._parent && this._entity._parent.transform) ? this._entity._parent.transform.object : scene;
 		if (parent)
 		{
 			this.object.data = null;

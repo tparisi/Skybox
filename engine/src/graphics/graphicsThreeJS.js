@@ -81,6 +81,16 @@ SB.GraphicsThreeJS.prototype.initScene = function()
     
     this.scene = scene;
 	this.camera = camera;
+	
+	this.backgroundLayer = {};
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera( 45, 
+    		this.container.offsetWidth / this.container.offsetHeight, 1, 4000 );
+    camera.position.set( 0, 0, 10 );	
+    scene.add(camera);
+    
+    this.backgroundLayer.scene = scene;
+    this.backgroundLayer.camera = camera;
 }
 
 SB.GraphicsThreeJS.prototype.initRenderer = function(param)
@@ -369,6 +379,11 @@ SB.GraphicsThreeJS.prototype.setCursor = function(cursor)
 
 SB.GraphicsThreeJS.prototype.update = function()
 {
+    this.renderer.setClearColor( 0, 0 );
+	this.renderer.autoClearColor = true;
+    this.renderer.render( this.backgroundLayer.scene, this.backgroundLayer.camera );
+    this.renderer.setClearColor( 0, 1 );
+	this.renderer.autoClearColor = false;
     this.renderer.render( this.scene, this.camera );
 
     var frameTime = Date.now();
