@@ -46,6 +46,9 @@
     <!-- KEYFRAME GAME -->
 	<script src="keyFrames.js"></script>
 	<script src="keyFrameBall.js"></script>
+    <!-- LAYER TEST -->
+	<script src="layerTest.js"></script>
+	<script src="layerObject.js"></script>
     <!-- PLANE DRAGGER GAME -->
 	<script src="planeDraggerGame.js"></script>
     <!-- TRACKER GAME -->
@@ -79,9 +82,11 @@
 			options[6]=document.createElement("option");
 			options[6].text="Key Frame Demo";
 			options[7]=document.createElement("option");
-			options[7].text="Plane Dragger Demo";
+			options[7].text="Layer Test";
 			options[8]=document.createElement("option");
-			options[8].text="Tracker Demo";
+			options[8].text="Plane Dragger Demo";
+			options[9]=document.createElement("option");
+			options[9].text="Tracker Demo";
 			select.add(options[0]);
 			select.add(options[1]);
 			select.add(options[2]);
@@ -91,6 +96,7 @@
 			select.add(options[6]);
 			select.add(options[7]);
 			select.add(options[8]);
+			select.add(options[9]);
 		}
 	);
 
@@ -101,6 +107,7 @@
 	          		SB.Examples.DuckRiders,
 	          		SB.Examples.Monsters,
 	          		SB.Examples.KeyFrameGame,
+	          		SB.Examples.LayerTest,
 	          		SB.Examples.PlaneDraggerGame,
 	          		SB.Examples.TrackerGame
 	          		] ;
