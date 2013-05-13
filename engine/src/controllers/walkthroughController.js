@@ -74,13 +74,13 @@ SB.WalkthroughControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();
 	this.directionMatrix.setRotationFromEuler(this._entity.transform.rotation);
-	dir = this.directionMatrix.multiplyVector3(dir);
-	this._entity.transform.position.addSelf(dir);
+	dir = dir.applyMatrix4(this.directionMatrix);
+	this._entity.transform.position.add(dir);
 }
 
 SB.WalkthroughControllerScript.prototype.turn = function(dir)
 {
-	this._entity.transform.rotation.addSelf(dir);
+	this._entity.transform.rotation.add(dir);
 }
 
 

@@ -146,7 +146,7 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	{
 		result.scene = new SB.SceneVisual({scene:data.scene});
 		var that = this;
-		THREE.SceneUtils.traverseHierarchy(data.scene, function (n) { that.traverseCallback(n, result); });
+		data.scene.traverse(function (n) { that.traverseCallback(n, result); });
 		success = true;
 	}
 	

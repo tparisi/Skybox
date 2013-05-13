@@ -38,7 +38,7 @@ SB.PlaneDragger.prototype.beginDrag = function(x, y)
 	
 	if (planeIntersects.length)
 	{
-		this.dragOffset.copy( planeIntersects[ 0 ].point.subSelf( this.dragPlane.position ));
+		this.dragOffset.copy( planeIntersects[ 0 ].point.sub( this.dragPlane.position ));
 		this.dragStartPoint = this.object.position.clone();
 	}
 }
@@ -49,8 +49,8 @@ SB.PlaneDragger.prototype.drag = function(x, y)
 	
 	if (planeIntersects.length)
 	{
-		this.dragHitPoint.copy(planeIntersects[ 0 ].point.subSelf( this.dragOffset ) );
-		this.dragHitPoint.addSelf(this.dragStartPoint);
+		this.dragHitPoint.copy(planeIntersects[ 0 ].point.sub( this.dragOffset ) );
+		this.dragHitPoint.add(this.dragStartPoint);
 		this.publish("drag", this.dragHitPoint);
 	}			
 }
@@ -78,10 +78,10 @@ SB.PlaneDragger.prototype.getPlaneIntersection = function(x, y)
 	this.projector.unprojectVector( vector, camera );
 	
     var cameraPos = new THREE.Vector3;
-    cameraPos = camera.matrixWorld.multiplyVector3(cameraPos);
-    
-	var ray = new THREE.Ray( cameraPos, vector.subSelf( cameraPos ).normalize() );
-	
-	return ray.intersectObject( this.dragPlane );
+    cameraPos = cameraPos.applyMatrix4(camera.matrixWorld);
+
+    var raycaster = new THREE.Raycaster( cameraPos, vector.sub( cameraPos ).normalize() );
+
+	return raycaster.intersectObject( this.dragPlane );
 }
 

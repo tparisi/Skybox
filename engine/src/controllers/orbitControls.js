@@ -13,7 +13,7 @@ goog.provide('SB.OrbitControls');
 
 SB.OrbitControls = function ( object, domElement ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -135,7 +135,7 @@ SB.OrbitControls = function ( object, domElement ) {
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().subSelf( this.center )
+		var offset = position.clone().sub( this.center )
 
 		// angle from z-axis around y-axis
 
@@ -166,17 +166,17 @@ SB.OrbitControls = function ( object, domElement ) {
 
 		// Keep y above userMinY if defined
 		var newposition = new THREE.Vector3;
-		newposition.copy( this.center ).addSelf( offset );
+		newposition.copy( this.center ).add( offset );
 		if (this.userMinY === undefined || newposition.y >= this.userMinY)
 		{
-			var center2newpos = newposition.clone().subSelf(this.center);
+			var center2newpos = newposition.clone().sub(this.center);
 			var dist = center2newpos.length();
 			
 			if (this.userMinZoom === undefined || dist >= this.userMinZoom)
 			{
 				if (this.userMaxZoom === undefined || dist <= this.userMaxZoom)
 				{
-					position.copy( this.center ).addSelf( offset );
+					position.copy( this.center ).add( offset );
 				}
 			}
 		}

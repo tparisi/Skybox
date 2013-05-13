@@ -172,10 +172,11 @@ SB.GraphicsThreeJS.prototype.objectFromMouse = function(eltx, elty)
     this.projector.unprojectVector( vector, this.camera );
 	
     var pos = new THREE.Vector3;
-    pos = this.camera.matrixWorld.multiplyVector3(pos);
-    var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
+    pos = pos.applyMatrix4(this.camera.matrixWorld);
+	
+    var raycaster = new THREE.Raycaster( pos, vector.sub( pos ).normalize() );
 
-    var intersects = ray.intersectObject( this.scene, true );
+	var intersects = raycaster.intersectObjects( this.scene.children, true );
 	
     if ( intersects.length > 0 ) {
     	var i = 0;
@@ -229,10 +230,11 @@ SB.GraphicsThreeJS.prototype.nodeFromMouse = function(eltx, elty)
     this.projector.unprojectVector( vector, this.camera );
 	
     var pos = new THREE.Vector3;
-    pos = this.camera.matrixWorld.multiplyVector3(pos);
-    var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
+    pos = pos.applyMatrix4(this.camera.matrixWorld);
 
-    var intersects = ray.intersectObject( this.scene, true );
+    var raycaster = new THREE.Raycaster( pos, vector.sub( pos ).normalize() );
+
+	var intersects = raycaster.intersectObjects( this.scene.children, true );
 	
     if ( intersects.length > 0 ) {
     	var i = 0;

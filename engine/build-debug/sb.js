@@ -2088,10 +2088,11 @@ SB.GraphicsThreeJS.prototype.objectFromMouse = function(eltx, elty)
     this.projector.unprojectVector( vector, this.camera );
 	
     var pos = new THREE.Vector3;
-    pos = this.camera.matrixWorld.multiplyVector3(pos);
-    var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
+    pos = pos.applyMatrix4(this.camera.matrixWorld);
+	
+    var raycaster = new THREE.Raycaster( pos, vector.sub( pos ).normalize() );
 
-    var intersects = ray.intersectObject( this.scene, true );
+	var intersects = raycaster.intersectObjects( this.scene.children, true );
 	
     if ( intersects.length > 0 ) {
     	var i = 0;
@@ -2145,10 +2146,11 @@ SB.GraphicsThreeJS.prototype.nodeFromMouse = function(eltx, elty)
     this.projector.unprojectVector( vector, this.camera );
 	
     var pos = new THREE.Vector3;
-    pos = this.camera.matrixWorld.multiplyVector3(pos);
-    var ray = new THREE.Ray( pos, vector.subSelf( pos ).normalize() );
+    pos = pos.applyMatrix4(this.camera.matrixWorld);
 
-    var intersects = ray.intersectObject( this.scene, true );
+    var raycaster = new THREE.Raycaster( pos, vector.sub( pos ).normalize() );
+
+	var intersects = raycaster.intersectObjects( this.scene.children, true );
 	
     if ( intersects.length > 0 ) {
     	var i = 0;
@@ -3152,7 +3154,7 @@ SB.Loader.prototype.handleSceneLoaded = function(url, data)
 	{
 		result.scene = new SB.SceneVisual({scene:data.scene});
 		var that = this;
-		THREE.SceneUtils.traverseHierarchy(data.scene, function (n) { that.traverseCallback(n, result); });
+		data.scene.traverse(function (n) { that.traverseCallback(n, result); });
 		success = true;
 	}
 	
@@ -3874,8 +3876,8 @@ SB.DirectionalLight.prototype.update = function()
 	this.position.copy(this.direction).negate();
 	this.object.target.position.copy(this.direction).multiplyScalar(SB.Light.DEFAULT_RANGE);
 	var worldmat = this.object.parent.matrixWorld;
-	worldmat.multiplyVector3(this.position);
-	worldmat.multiplyVector3(this.object.target.position);
+	this.position.applyMatrix4(worldmat);
+	this.object.target.position.applyMatrix4(worldmat);
 	SB.Light.prototype.update.call(this);
 }
 
@@ -3958,12 +3960,12 @@ SB.Tracker.prototype.calcPosition = function()
 	// Get reference object position in world space
 	var refmat = this.reference.object.matrixWorld;
 	this.refpos.copy(this.referencePosition);
-	this.refpos = refmat.multiplyVector3(this.refpos);
+	this.refpos.applyMatrix4(refmat);
 	
 	// Transform reference world space position into my model space
 	var mymat = this.object.matrixWorld;
 	this.world2me.getInverse(mymat);
-	this.position = this.world2me.multiplyVector3(this.refpos);
+	this.position = this.refpos.clone().applyMatrix4(this.world2me);
 }
 
 SB.Tracker.prototype.calcOrientation = function()
@@ -4398,13 +4400,13 @@ SB.WalkthroughControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();
 	this.directionMatrix.setRotationFromEuler(this._entity.transform.rotation);
-	dir = this.directionMatrix.multiplyVector3(dir);
-	this._entity.transform.position.addSelf(dir);
+	dir = dir.applyMatrix4(this.directionMatrix);
+	this._entity.transform.position.add(dir);
 }
 
 SB.WalkthroughControllerScript.prototype.turn = function(dir)
 {
-	this._entity.transform.rotation.addSelf(dir);
+	this._entity.transform.rotation.add(dir);
 }
 
 
@@ -4673,7 +4675,7 @@ SB.SpotLight.prototype.realize = function()
 	this.scaledDir.copy(this.direction);
 	this.scaledDir.multiplyScalar(SB.Light.DEFAULT_RANGE);
 	this.targetPos.copy(this.position);
-	this.targetPos.addSelf(this.scaledDir);	
+	this.targetPos.add(this.scaledDir);	
 	this.object.target.position.copy(this.targetPos);
 
 	this.updateShadows();
@@ -4688,12 +4690,12 @@ SB.SpotLight.prototype.update = function()
 		this.scaledDir.copy(this.direction);
 		this.scaledDir.multiplyScalar(SB.Light.DEFAULT_RANGE);
 		this.targetPos.copy(this.position);
-		this.targetPos.addSelf(this.scaledDir);	
+		this.targetPos.add(this.scaledDir);	
 		this.object.target.position.copy(this.targetPos);
 		
 		var worldmat = this.object.parent.matrixWorld;
-		worldmat.multiplyVector3(this.position);
-		worldmat.multiplyVector3(this.object.target.position);
+		this.position.applyMatrix4(worldmat);
+		this.object.target.position.applyMatrix4(worldmat);
 		
 		// Copy other values
 		this.object.distance = this.distance;
@@ -5496,18 +5498,18 @@ SB.FPSControllerScript.prototype.move = function(dir)
 {
 	this.directionMatrix.identity();
 	this.directionMatrix.setRotationFromEuler(this._entity.transform.rotation);
-	dir = this.directionMatrix.multiplyVector3(dir);
-	this._entity.transform.position.addSelf(dir);
+	dir = dir.applyMatrix4(this.directionMatrix);
+	this._entity.transform.position.add(dir);
 }
 
 SB.FPSControllerScript.prototype.turn = function(dir)
 {
-	this._entity.transform.rotation.addSelf(dir);
+	this._entity.transform.rotation.add(dir);
 }
 
 SB.FPSControllerScript.prototype.mouseLook = function(dir)
 {
-	this.viewpoint.transform.rotation.addSelf(dir);
+	this.viewpoint.transform.rotation.add(dir);
 }
 
 SB.FPSControllerScript.prototype.setCameraTilt = function(dir)
@@ -6717,8 +6719,8 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	// Get object position in screen space
 	var mat = this.object.matrixWorld;
 	var pos = this.referencePosition.clone();
-	pos = mat.multiplyVector3(pos);
-
+	pos.applyMatrix4(mat);
+	
 	var projected = pos.clone();
 	this.projector.projectVector(projected, this.camera);
 	
@@ -6730,7 +6732,7 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	elty += offset.top;
 
 	var cameramat = this.camera.matrixWorldInverse;
-	var cameraspacepos = cameramat.multiplyVector3(pos);
+	var cameraspacepos = pos.clone().applyMatrix4(cameramat);
 	
 	return new THREE.Vector3(eltx, elty, -cameraspacepos.z);
 }
@@ -6774,7 +6776,7 @@ SB.PlaneDragger.prototype.beginDrag = function(x, y)
 	
 	if (planeIntersects.length)
 	{
-		this.dragOffset.copy( planeIntersects[ 0 ].point.subSelf( this.dragPlane.position ));
+		this.dragOffset.copy( planeIntersects[ 0 ].point.sub( this.dragPlane.position ));
 		this.dragStartPoint = this.object.position.clone();
 	}
 }
@@ -6785,8 +6787,8 @@ SB.PlaneDragger.prototype.drag = function(x, y)
 	
 	if (planeIntersects.length)
 	{
-		this.dragHitPoint.copy(planeIntersects[ 0 ].point.subSelf( this.dragOffset ) );
-		this.dragHitPoint.addSelf(this.dragStartPoint);
+		this.dragHitPoint.copy(planeIntersects[ 0 ].point.sub( this.dragOffset ) );
+		this.dragHitPoint.add(this.dragStartPoint);
 		this.publish("drag", this.dragHitPoint);
 	}			
 }
@@ -6814,11 +6816,11 @@ SB.PlaneDragger.prototype.getPlaneIntersection = function(x, y)
 	this.projector.unprojectVector( vector, camera );
 	
     var cameraPos = new THREE.Vector3;
-    cameraPos = camera.matrixWorld.multiplyVector3(cameraPos);
-    
-	var ray = new THREE.Ray( cameraPos, vector.subSelf( cameraPos ).normalize() );
-	
-	return ray.intersectObject( this.dragPlane );
+    cameraPos = cameraPos.applyMatrix4(camera.matrixWorld);
+
+    var raycaster = new THREE.Raycaster( cameraPos, vector.sub( cameraPos ).normalize() );
+
+	return raycaster.intersectObject( this.dragPlane );
 }
 
 goog.provide('SB.SceneUtils');
@@ -6842,8 +6844,8 @@ SB.SceneUtils.computeBoundingBox = function(scene)
 				var bboxMax = geometryBBox.max.clone();
 				var matrix = obj.matrixWorld;
 				
-				matrix.multiplyVector3(bboxMin);
-				matrix.multiplyVector3(bboxMax);
+				bboxMin.applyMatrix4(matrix);
+				bboxMax.applyMatrix4(matrix);
 				
 				if ( bboxMin.x < boundingBox.min.x ) {
 
@@ -7070,7 +7072,7 @@ goog.provide('SB.OrbitControls');
 
 SB.OrbitControls = function ( object, domElement ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -7192,7 +7194,7 @@ SB.OrbitControls = function ( object, domElement ) {
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().subSelf( this.center )
+		var offset = position.clone().sub( this.center )
 
 		// angle from z-axis around y-axis
 
@@ -7223,17 +7225,17 @@ SB.OrbitControls = function ( object, domElement ) {
 
 		// Keep y above userMinY if defined
 		var newposition = new THREE.Vector3;
-		newposition.copy( this.center ).addSelf( offset );
+		newposition.copy( this.center ).add( offset );
 		if (this.userMinY === undefined || newposition.y >= this.userMinY)
 		{
-			var center2newpos = newposition.clone().subSelf(this.center);
+			var center2newpos = newposition.clone().sub(this.center);
 			var dist = center2newpos.length();
 			
 			if (this.userMinZoom === undefined || dist >= this.userMinZoom)
 			{
 				if (this.userMaxZoom === undefined || dist <= this.userMaxZoom)
 				{
-					position.copy( this.center ).addSelf( offset );
+					position.copy( this.center ).add( offset );
 				}
 			}
 		}
@@ -7394,7 +7396,7 @@ SB.PointLight.prototype.update = function()
 	if (this.object)
 	{
 		var worldmat = this.object.parent.matrixWorld;
-		worldmat.multiplyVector3(this.position);
+		this.position.applyMatrix4(worldmat);
 		
 		// Copy other values
 		this.object.distance = this.distance;

@@ -11,17 +11,11 @@ SB.Examples.LayerObject = function()
 	var transform = new SB.Transform();
 	child.addComponent(transform);
 	transform.position.x = 2;
-	//transform.rotation.z = Math.PI / 4;
-
-    var avParams = {};
-    avParams.radiusTop    = 1;
-    avParams.radiusBottom = 1;
-    avParams.height       = 1.667;
-    avParams.color = 0x0000ff;
-
-	var visual = new SB.CylinderVisual(avParams);
-	child.addComponent(visual);	
-
+	var map = THREE.ImageUtils.loadTexture('./images/duckCM.png');
+	var cube = new SB.CubeVisual({map:map});
+	child.addComponent(cube);
+    this.addChild(child);
+	
     var animator = new SB.KeyFrameAnimator({ 
     	interps:
     		[ 
@@ -32,9 +26,6 @@ SB.Examples.LayerObject = function()
     });
     
     child.addComponent(animator);	
-    //animator.start();
-    
-    this.addChild(child);
 }
 
 goog.inherits(SB.Examples.LayerObject, SB.Entity);

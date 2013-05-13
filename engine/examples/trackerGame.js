@@ -111,12 +111,12 @@ SB.Examples.TrackerGame.prototype.initialize = function(param)
 
 SB.Examples.TrackerGame.prototype.turn = function(dir)
 {
-	this.carousel.transform.rotation.addSelf(dir);
+	this.carousel.transform.rotation.add(dir);
 }
 
 SB.Examples.TrackerGame.prototype.move = function(dir)
 {
-	this.carousel.transform.position.addSelf(dir);
+	this.carousel.transform.position.add(dir);
 }
 
 SB.Examples.TrackerGame.prototype.onMouseDown = function(x, y)

@@ -27,8 +27,8 @@ SB.DirectionalLight.prototype.update = function()
 	this.position.copy(this.direction).negate();
 	this.object.target.position.copy(this.direction).multiplyScalar(SB.Light.DEFAULT_RANGE);
 	var worldmat = this.object.parent.matrixWorld;
-	worldmat.multiplyVector3(this.position);
-	worldmat.multiplyVector3(this.object.target.position);
+	this.position.applyMatrix4(worldmat);
+	this.object.target.position.applyMatrix4(worldmat);
 	SB.Light.prototype.update.call(this);
 }
 

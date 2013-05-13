@@ -276,8 +276,8 @@ Gabber.prototype.move = function(direction)
 	var dir = new THREE.Vector3(0, 0, delta);
 	var matrix = new THREE.Matrix4();
 	matrix.setRotationY(this.transform.rotation.y - Math.PI / 2);
-	dir = matrix.multiplyVector3(dir);
-	this.transform.position.addSelf(dir);
+	dir.applyMatrix4(matrix);
+	this.transform.position.add(dir);
 }
 
 Gabber.prototype.turn = function(direction)

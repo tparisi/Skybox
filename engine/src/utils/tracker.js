@@ -77,12 +77,12 @@ SB.Tracker.prototype.calcPosition = function()
 	// Get reference object position in world space
 	var refmat = this.reference.object.matrixWorld;
 	this.refpos.copy(this.referencePosition);
-	this.refpos = refmat.multiplyVector3(this.refpos);
+	this.refpos.applyMatrix4(refmat);
 	
 	// Transform reference world space position into my model space
 	var mymat = this.object.matrixWorld;
 	this.world2me.getInverse(mymat);
-	this.position = this.world2me.multiplyVector3(this.refpos);
+	this.position = this.refpos.clone().applyMatrix4(this.world2me);
 }
 
 SB.Tracker.prototype.calcOrientation = function()

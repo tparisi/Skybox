@@ -65,8 +65,8 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	// Get object position in screen space
 	var mat = this.object.matrixWorld;
 	var pos = this.referencePosition.clone();
-	pos = mat.multiplyVector3(pos);
-
+	pos.applyMatrix4(mat);
+	
 	var projected = pos.clone();
 	this.projector.projectVector(projected, this.camera);
 	
@@ -78,7 +78,7 @@ SB.ScreenTracker.prototype.calcPosition = function()
 	elty += offset.top;
 
 	var cameramat = this.camera.matrixWorldInverse;
-	var cameraspacepos = cameramat.multiplyVector3(pos);
+	var cameraspacepos = pos.clone().applyMatrix4(cameramat);
 	
 	return new THREE.Vector3(eltx, elty, -cameraspacepos.z);
 }

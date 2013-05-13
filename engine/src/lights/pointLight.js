@@ -23,7 +23,7 @@ SB.PointLight.prototype.update = function()
 	if (this.object)
 	{
 		var worldmat = this.object.parent.matrixWorld;
-		worldmat.multiplyVector3(this.position);
+		this.position.applyMatrix4(worldmat);
 		
 		// Copy other values
 		this.object.distance = this.distance;

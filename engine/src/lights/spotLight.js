@@ -25,7 +25,7 @@ SB.SpotLight.prototype.realize = function()
 	this.scaledDir.copy(this.direction);
 	this.scaledDir.multiplyScalar(SB.Light.DEFAULT_RANGE);
 	this.targetPos.copy(this.position);
-	this.targetPos.addSelf(this.scaledDir);	
+	this.targetPos.add(this.scaledDir);	
 	this.object.target.position.copy(this.targetPos);
 
 	this.updateShadows();
@@ -40,12 +40,12 @@ SB.SpotLight.prototype.update = function()
 		this.scaledDir.copy(this.direction);
 		this.scaledDir.multiplyScalar(SB.Light.DEFAULT_RANGE);
 		this.targetPos.copy(this.position);
-		this.targetPos.addSelf(this.scaledDir);	
+		this.targetPos.add(this.scaledDir);	
 		this.object.target.position.copy(this.targetPos);
 		
 		var worldmat = this.object.parent.matrixWorld;
-		worldmat.multiplyVector3(this.position);
-		worldmat.multiplyVector3(this.object.target.position);
+		this.position.applyMatrix4(worldmat);
+		this.object.target.position.applyMatrix4(worldmat);
 		
 		// Copy other values
 		this.object.distance = this.distance;

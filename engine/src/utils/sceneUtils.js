@@ -19,8 +19,8 @@ SB.SceneUtils.computeBoundingBox = function(scene)
 				var bboxMax = geometryBBox.max.clone();
 				var matrix = obj.matrixWorld;
 				
-				matrix.multiplyVector3(bboxMin);
-				matrix.multiplyVector3(bboxMax);
+				bboxMin.applyMatrix4(matrix);
+				bboxMax.applyMatrix4(matrix);
 				
 				if ( bboxMin.x < boundingBox.min.x ) {
 
