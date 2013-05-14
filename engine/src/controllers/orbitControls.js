@@ -13,8 +13,6 @@ goog.provide('SB.OrbitControls');
 
 SB.OrbitControls = function ( object, domElement ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -312,3 +310,6 @@ SB.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false );
 
 };
+
+
+SB.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
